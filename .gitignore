@@ -1,2 +1,4 @@
 .env
-node_modules
+docker-compose.yml
+/frontend/node_modules
+/backend/node_modules
