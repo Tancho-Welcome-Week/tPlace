@@ -21,7 +21,7 @@ bot.on('callback_query', ctx => {
         console.log(query)
         const chatId = query.message.chat.id
         const userId = query.from.id
-        let gameurl = `${appEntry}/auth/${chatId}/${userId}`;
+        let gameurl = `${appEntry}/${chatId}/${userId}`;
         ctx.answerGameQuery(gameurl);
     }
 });
@@ -30,5 +30,4 @@ bot.on('inline_query', ctx => {
     ctx.answerInlineQuery([ { type: "canvas", id: "0", game_short_name: gameShortName } ]);
 });
 
-bot.launch()
-console.log('Bot running')
+bot.launch().then(() => console.log('Bot running'))
