@@ -1,4 +1,5 @@
 const keys = require("./keys");
+const auth = require('./auth')
 
 // Express
 const express = require("express");
@@ -28,13 +29,15 @@ POST /api/admin/clear : admin clear
 
 */
 
-app.get("/", (req, res) => {
-  const isPermitted = true; // TODO: telegram authentication
-  if (isPermitted) {
-    res.sendFile("/frontend/index.html", { root: ".." });
-  } else {
+app.get("/:chatId/:userId", (req, res) => {
+  const chatId = req.params.chatId
+  const userId = req.params.userId
+  const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
+  if (!isPermitted) {
     res.sendStatus(401);
-  }
+  } 
+  // res.sendFile("/frontend/index.html", { root: ".." })
+  res.redirect('https://www.reddit.com/r/HydroHomies/')
 });
 
 app.get("/api/grid", (req, res) => {
@@ -42,8 +45,11 @@ app.get("/api/grid", (req, res) => {
   res.sendStatus(200);
 });
 
-app.post("/api/grid", (req, res) => {
-  const isPermitted = true; // TODO: telegram authentication
+app.post("/api/grid/:chatId/:userId", (req, res) => {
+  const chatId = req.params.chatId
+  const userId = req.params.userId
+  const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
+  const user = getUser(userId) //TODO: check if user can place pixel
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
