@@ -1,0 +1,9 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t tanchowelcomeweek/frontend-test -f ./frontend/Dockerfile.dev ./frontend
+
+script:
+  - docker run -e CI=true tanchowelcomeweek/frontend-test npm test
