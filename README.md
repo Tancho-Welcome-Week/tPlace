@@ -13,3 +13,4 @@ Tech Stack (tentative) - PostgreSQL, Docker, Express, Socket.io, Redis, Vanilla 
 
 1. Download Redis using either https://redis.io/topics/quickstart (Linux, maybe Mac also) or https://redislabs.com/blog/redis-on-windows-10/ (Windows). For file access via WSL on Windows, refer to https://www.tenforums.com/tutorials/127857-access-wsl-linux-files-windows-10-a.html.
 2. NOTE: The redis server must be started via `sudo service redis-server start` before `redis-cli` is invoked. Otherwise, the CLI will be stuck in a loop of `not connected>` commands. If you get stuck, use Ctrl-C to exit.
+3. Run the code that involves the Redis server. It should work.
