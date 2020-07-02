@@ -8,7 +8,7 @@
     "mocha": "^8.0.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha ././test"
   },
   "author": "tancho-welcome-week",
   "license": "ISC"
