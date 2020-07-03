@@ -1,5 +1,6 @@
 .env
 .idea
 docker-compose.yml
-/frontend/node_modules
-/backend/node_modules
+/src/frontend/node_modules
+/src/backend/node_modules
+**/__pycache__
