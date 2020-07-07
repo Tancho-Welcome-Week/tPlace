@@ -1,0 +1,21 @@
+#canvas-bg {
+    border-radius: 10px;
+    background-color: lightgray;
+    padding: 10px;
+    margin: auto;
+    height: fit-content;
+    width: fit-content;
+
+    /* to centre the canvas within this div */
+    display: block;
+    text-align: center;
+
+    /* transform: scale(2, 2); */
+    /* transform: translate(150, 100); */
+}
+
+#canvas {
+    display: block;
+    margin: auto;
+    border: 1px solid black; 
+}

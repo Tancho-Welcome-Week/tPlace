@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <p>Hello world</p>
-  </body>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
+    <title>tPlace</title>
+	<link href="index.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body onload="draw();">
+    <div id="colour-swatches">
+
+    </div>
+    <div id="canvas-bg">
+        <div id="canvas-div">
+            <canvas id="canvas" width="300" height="200">
+                Oh no! Your browser doesn't support this :( Try using a more updated one!
+            </canvas>
+        </div>
+    </div>
+    <div id="coords">
+        <p id="x">x: 0</p>
+        <p id="y">y: 0</p>
+    </div>
+    <div id="countdown-div">
+        <p>time till next click: <span id="countdown">0</span>s</p>
+    </div>
+
+    <script src = "index.js"></script>
+</body>
+
+<script>
+
+</script>
 </html>
