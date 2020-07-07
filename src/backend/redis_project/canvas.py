@@ -1,4 +1,4 @@
-from src.backend.redis_project.commons import *
+from commons import *
 from logging import getLogger, StreamHandler
 import redis
 
@@ -135,5 +135,5 @@ if __name__ == "__main__":
     canvas.set_pixel_color(1, 2, Color.CREAM)
     canvas.set_pixel_color(1, 1, Color.BLACK)
     canvas.set_pixel_color(3, 4, Color.RED)
-    # print(canvas.to_string())
+    print(canvas.to_string())
     canvas.get_canvas()
