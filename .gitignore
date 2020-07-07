@@ -4,3 +4,4 @@ docker-compose.yml
 /src/frontend/node_modules
 /src/backend/node_modules
 **/__pycache__
+.pyc

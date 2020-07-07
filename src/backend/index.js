@@ -1,5 +1,5 @@
 const keys = require("./keys");
-const auth = require('./auth')
+const auth = require("./auth");
 
 // Express
 const express = require("express");
@@ -11,11 +11,28 @@ const { Pool } = require("pg");
 
 // Redis
 const redis = require("redis");
+const { spawn } = require("child_process");
 
 // Express Setup
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Redis setup
+const redisClient = redis.createClient({
+  host: keys.redisHost,
+  port: keys.redisPort,
+  retry_strategy: () => 1000,
+});
+const redisPublisher = redisClient.duplicate();
+const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
+pythonRedis.stdout.on("data", (output) => {
+  console.log("Obtaining data from python script ...");
+  console.log(output.toString());
+});
+pythonRedis.on("close", (code) => {
+  console.log(`Child process closing with code ${code}`);
+});
 
 // Express route handlers
 
@@ -30,14 +47,14 @@ POST /api/admin/clear : admin clear
 */
 
 app.get("/:chatId/:userId", (req, res) => {
-  const chatId = req.params.chatId
-  const userId = req.params.userId
+  const chatId = req.params.chatId;
+  const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
   if (!isPermitted) {
     res.sendStatus(401);
-  } 
+  }
   // res.sendFile("/frontend/index.html", { root: ".." })
-  res.redirect('https://www.reddit.com/r/HydroHomies/')
+  res.redirect("https://www.reddit.com/r/HydroHomies/");
 });
 
 app.get("/api/grid", (req, res) => {
@@ -46,10 +63,10 @@ app.get("/api/grid", (req, res) => {
 });
 
 app.post("/api/grid/:chatId/:userId", (req, res) => {
-  const chatId = req.params.chatId
-  const userId = req.params.userId
+  const chatId = req.params.chatId;
+  const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
-  const user = getUser(userId) //TODO: check if user can place pixel
+  const user = getUser(userId); //TODO: check if user can place pixel
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
