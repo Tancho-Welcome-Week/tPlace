@@ -13,10 +13,23 @@ const { Pool } = require("pg");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
+// Telegram Bot Notification
+const bot = require("./notification")
+
 // Express Setup
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Socket.io Setup
+const http = require("http").Server(app);
+const io = require('socket.io')(http, {
+  perMessageDeflate: false
+});
+
+io.on("connection", () => {
+  console.log("A user is connected")
+});
 
 // Redis setup
 const redisClient = redis.createClient({
@@ -70,7 +83,11 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update
+    // TODO: pixel update in database
+    // TODO: pixel update in redis
+    // TODO: update user fields accordingly
+    const grid = true // TODO: get bitfield data from redis server
+    io.emit('grid', grid)
     res.sendStatus(200);
   } else {
     res.sendStatus(401);
@@ -85,7 +102,8 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    // TODO: admin wipe
+    const grid = true// TODO: get bitfield of all white canvas
+    io.emit('grid', grid)
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(400);
