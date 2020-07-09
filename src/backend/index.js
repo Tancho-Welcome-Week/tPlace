@@ -67,7 +67,7 @@ app.get("/:chatId/:userId", (req, res) => {
     res.sendStatus(401);
   }
   // res.sendFile("/frontend/index.html", { root: ".." })
-  res.redirect("https://www.reddit.com/r/HydroHomies/");
+  res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
 });
 
 app.get("/api/grid", (req, res) => {
@@ -83,10 +83,10 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update in database
-    // TODO: pixel update in redis
+    // TODO: pixel update redis
+    const grid = true // TODO: pull grid info from redis
+    // TODO: canvas update in database
     // TODO: update user fields accordingly
-    const grid = true // TODO: get bitfield data from redis server
     io.emit('grid', grid)
     res.sendStatus(200);
   } else {
