@@ -1,14 +1,14 @@
 drop table if exists Users cascade;
-drop table if exists Masterlist cascade;
+drop table if exists Whitelist cascade;
 drop table if exists Canvas cascade;
 
 create table Users (
     telegram_id varchar(20) primary key,
     last_updated timestamp NOT NULL DEFAULT NOW(),
-    accumulated_pixels integer
+    accumulated_pixels integer DEFAULT 0
 );
 
-create table Masterlist (
+create table Whitelist (
     group_id varchar(20) primary key
 );
 
