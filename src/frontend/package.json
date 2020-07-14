@@ -8,7 +8,8 @@
     "mocha": "^8.0.1"
   },
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha test",
+    "start": "node index.js"
   },
   "author": "tancho-welcome-week",
   "license": "ISC"
