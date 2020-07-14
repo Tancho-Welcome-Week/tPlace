@@ -139,11 +139,7 @@ class Canvas:
         of pixels that would fit in a canvas of the width and height used as parameters for the construction of this
         Canvas object.
         """
-        total_pixel_count = self.width * self.height
-        for i in range(total_pixel_count):
-            offset = format_offset(i)
-            logger.debug("Clearing pixel at offset: {}".format(offset))
-            self.database.bitfield(key=CANVAS_NAME).set(fmt=self.pixel_format, offset=offset, value=0).execute()
+        self.set_pixel_region(1, 1, CANVAS_WIDTH, CANVAS_HEIGHT)
 
 
 if __name__ == "__main__":
@@ -153,24 +149,13 @@ if __name__ == "__main__":
 
     canvas = Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT, pixel_format=PIXEL_FORMAT, name=CANVAS_NAME,
                     host=REDIS_HOST_ADDRESS, port=REDIS_HOST_PORT)
-    # print(canvas.to_string())
-    # canvas.set_pixel_color(1, 2, Color.CREAM)
-    # canvas.set_pixel_color(2, 2, Color.CREAM)
-    # canvas.set_pixel_color(3, 2, Color.CREAM)
-    # canvas.set_pixel_color(4, 2, Color.CREAM)
-    # canvas.set_pixel_color(5, 2, Color.CREAM)
-    # canvas.set_pixel_color(1, 3, Color.CREAM)
-    # canvas.set_pixel_color(1, 1, Color.BLACK)
-    # canvas.set_pixel_color(3, 4, Color.RED)
-    # canvas.set_pixel_color(3, 5, Color.RED)
-    # canvas.set_pixel_color(2, 4, Color.RED)
-    # canvas.set_pixel_color(3, 3, Color.RED)
-    canvas.get_canvas()
+    # canvas.get_canvas()
+    print(canvas.to_string())
     for i in range(CANVAS_HEIGHT):
         for j in range(CANVAS_WIDTH):
             canvas.set_pixel_color(j + 1, i + 1, Color.GREY)
     print(canvas.to_string())
-    canvas.get_canvas()
+    # canvas.get_canvas()
     try:
         canvas.set_pixel_region(2, 2, 4, 4)
         print("Completed")
