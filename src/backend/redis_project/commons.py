@@ -1,7 +1,12 @@
 from enum import Enum
 
 
-REDIS_HOST_ADDRESS = "redis" # change to "localhost" if testing without Docker
+# Use the constant below if running from Docker
+REDIS_HOST_ADDRESS = "redis"
+
+# Use the constant below if running as standalone
+REDIS_HOST_ADDRESS_STANDALONE = "localhost"
+
 REDIS_HOST_PORT = 6379
 
 CANVAS_NAME = "tPlace canvas"
