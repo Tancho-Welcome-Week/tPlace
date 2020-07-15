@@ -13,8 +13,8 @@ const { Pool } = require("pg");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
-// Telegram Bot Notification
-const bot = require("./notification")
+// Notification Scheduler
+const startNotificationSchedule = require("./scheduler")
 
 // Express Setup
 const app = express();
@@ -46,6 +46,13 @@ pythonRedis.stdout.on("data", (output) => {
 pythonRedis.on("close", (code) => {
   console.log(`Child process closing with code ${code}`);
 });
+
+// Start Schedule
+const users = true; //TODO: get users from database
+startNotificationSchedule(users);
+setInterval(() => {
+  //TODO: add redis backup to database
+}, 300000)
 
 // Express route handlers
 
