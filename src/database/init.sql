@@ -5,7 +5,8 @@ drop table if exists Canvas cascade;
 create table Users (
     telegram_id varchar(20) primary key,
     last_updated timestamp NOT NULL DEFAULT NOW(),
-    accumulated_pixels integer DEFAULT 0
+    accumulated_pixels integer DEFAULT 0,
+    notifications bool DEFAULT TRUE
 );
 
 create table Whitelist (

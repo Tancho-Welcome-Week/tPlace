@@ -1,3 +1,5 @@
+const { parse } = require('path')
+
 const Pool = require('pg').Pool
 
 // Move to seperate file with restricted permissions after testing, make sure details match
@@ -9,11 +11,11 @@ const pool = new Pool({
   port: 5432,
 })
 
-// TODO: Change to async functions if necessary after testing
+//Add better error handling & response messages
 // User Functions
 
 const createUser = (request, response) => {
-    const { telegram_id } = request.body
+    const telegram_id = request.body.telegram_id
 
     pool.query('INSERT INTO Users (telegram_id) VALUES ($1)', [telegram_id], (error, results) => {
         if (error) {
@@ -24,13 +26,34 @@ const createUser = (request, response) => {
 }
 
 const getUserByTelegramId = (request, response) => {
-    const telegram_id = parseInt(request.params.telegram_id)
+    const telegram_id = request.params.telegram_id
   
     pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id], (error, results) => {
         if (error) {
             throw error
         }
         response.status(200).json(results.rows)
+    })
+}
+
+const getUserWithNotifications = (request, response) => {
+    pool.query('SELECT * FROM Users WHERE notifications = TRUE', (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+const setUserNotificationsByTelegramId = (request, response) => {
+    const telegram_id = request.params.telegram_id
+    const notifications = request.params.notifications
+
+    pool.query('UPDATE Users SET notifcations = $2 WHERE telegram_id = $1', [telegram_id, notifications], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).send('User notifications status updated!')
     })
 }
 
@@ -44,7 +67,7 @@ const getAllUsers = (request, response) => {
 }
 
 const deleteUserByTelegramId = (request, response) => {
-    const telegram_id = parseInt(request.params.telegram_id)
+    const telegram_id = request.params.telegram_id
   
     pool.query('DELETE FROM Users WHERE telegram_id = $1', [telegram_id], (error, results) => {
         if (error) {
@@ -56,7 +79,7 @@ const deleteUserByTelegramId = (request, response) => {
 
 // Add additional details based on how this function will be used (Based on fixed time distance and update all users together?)
 const incrementUserPixels = (request, response) => {
-    const telegram_id = parseInt(request.params.telegram_id)
+    const telegram_id = request.params.telegram_id
   
     pool.query('UPDATE Users SET accumulated_pixels = accumulated_pixels + 1 WHERE telegram_id = $1', [telegram_id], (error, results) => {
         if (error) {
@@ -69,7 +92,7 @@ const incrementUserPixels = (request, response) => {
 
 // Add additional check to ensure accumulated_pixels >= 0 (Check in backend but add additional check here if possible)
 const decrementUserPixels = (request, response) => {
-    const telegram_id = parseInt(request.params.telegram_id)
+    const telegram_id = request.params.telegram_id
   
     pool.query('UPDATE Users SET accumulated_pixels = accumulated_pixels - 1, last_updated = NOW() WHERE telegram_id = $1', [telegram_id], (error, results) => {
         if (error) {
@@ -92,7 +115,7 @@ const getWhitelistGroupIds = (request, response) => {
 }
 
 const addWhitelistGroupId = (request, response) => {
-    const { group_id } = request.body
+    const group_id = request.body.group_id
 
     pool.query('INSERT INTO Whitelist (group_id) VALUES ($1)', [group_id], (error, results) => {
         if (error) {
@@ -103,7 +126,7 @@ const addWhitelistGroupId = (request, response) => {
 }
 
 const deleteWhitelistGroupId = (request, response) => {
-    const group_id = parseInt(request.params.group_id)
+    const group_id = request.params.group_id
   
     pool.query('DELETE FROM Whitelist WHERE group_id = $1', [group_id], (error, results) => {
         if (error) {
