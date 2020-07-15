@@ -95,12 +95,7 @@ class Canvas:
         :param bottom_right_pixel_x_coordinate: x-coordinate of the bottom-right corner.
         :param bottom_right_pixel_y_coordinate: y-coordinate of the bottom-right corner.
         """
-        # width_of_region = bottom_right_pixel_x_coordinate - top_left_pixel_x_coordinate + 1
-        # row_value = "0000" * width_of_region
         for y_coordinate in range(top_left_pixel_y_coordinate, bottom_right_pixel_y_coordinate + 1):
-            # offset = calculate_offset(top_left_pixel_x_coordinate, y_coordinate, self.width)
-            # logger.warning("Offset: {}, Row: {}".format(offset, row_value))
-            # self.database.setrange(name=self.name, offset=offset, value=).execute()
             for x_coordinate in range(top_left_pixel_x_coordinate, bottom_right_pixel_x_coordinate + 1):
                 offset = calculate_offset(x_coordinate, y_coordinate, self.width)
                 self.database.bitfield(key=self.name).set(fmt=self.pixel_format, offset=offset,
@@ -142,24 +137,24 @@ class Canvas:
         self.set_pixel_region(1, 1, CANVAS_WIDTH, CANVAS_HEIGHT)
 
 
-if __name__ == "__main__":
-    logger.addHandler(StreamHandler())
-    # logger.setLevel(level="INFO")
-    # logger.setLevel(level="DEBUG")
-
-    canvas = Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT, pixel_format=PIXEL_FORMAT, name=CANVAS_NAME,
-                    host=REDIS_HOST_ADDRESS, port=REDIS_HOST_PORT)
-    # canvas.get_canvas()
-    print(canvas.to_string())
-    for i in range(CANVAS_HEIGHT):
-        for j in range(CANVAS_WIDTH):
-            canvas.set_pixel_color(j + 1, i + 1, Color.GREY)
-    print(canvas.to_string())
-    # canvas.get_canvas()
-    try:
-        canvas.set_pixel_region(2, 2, 4, 4)
-        print("Completed")
-    except Exception as e:
-        print(e)
-    print(canvas.to_string())
-    # canvas.get_canvas()
+# if __name__ == "__main__":
+#     logger.addHandler(StreamHandler())
+#     # logger.setLevel(level="INFO")
+#     # logger.setLevel(level="DEBUG")
+#
+#     canvas = Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT, pixel_format=PIXEL_FORMAT, name=CANVAS_NAME,
+#                     host=REDIS_HOST_ADDRESS_STANDALONE, port=REDIS_HOST_PORT)
+#     # canvas.get_canvas()
+#     print(canvas.to_string())
+#     for i in range(CANVAS_HEIGHT):
+#         for j in range(CANVAS_WIDTH):
+#             canvas.set_pixel_color(j + 1, i + 1, Color.GREY)
+#     print(canvas.to_string())
+#     # canvas.get_canvas()
+#     try:
+#         canvas.set_pixel_region(2, 2, 4, 4)
+#         print("Completed")
+#     except Exception as e:
+#         print(e)
+#     print(canvas.to_string())
+#     # canvas.get_canvas()
