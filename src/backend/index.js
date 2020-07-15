@@ -13,10 +13,23 @@ const { Pool } = require("pg");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
+// Telegram Bot Notification
+const bot = require("./notification")
+
 // Express Setup
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Socket.io Setup
+const http = require("http").Server(app);
+const io = require('socket.io')(http, {
+  perMessageDeflate: false
+});
+
+io.on("connection", () => {
+  console.log("A user is connected")
+});
 
 // Redis setup
 const redisClient = redis.createClient({
@@ -54,7 +67,7 @@ app.get("/:chatId/:userId", (req, res) => {
     res.sendStatus(401);
   }
   // res.sendFile("/frontend/index.html", { root: ".." })
-  res.redirect("https://www.reddit.com/r/HydroHomies/");
+  res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
 });
 
 app.get("/api/grid", (req, res) => {
@@ -70,7 +83,11 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update
+    // TODO: pixel update redis
+    const grid = true // TODO: pull grid info from redis
+    // TODO: canvas update in database
+    // TODO: update user fields accordingly
+    io.emit('grid', grid)
     res.sendStatus(200);
   } else {
     res.sendStatus(401);
@@ -85,7 +102,8 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    // TODO: admin wipe
+    const grid = true// TODO: get bitfield of all white canvas
+    io.emit('grid', grid)
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(400);
