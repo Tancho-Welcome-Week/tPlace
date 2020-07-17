@@ -1,6 +1,6 @@
 {
   "AWSEBDockerrunVersion": 1,
-  "containerDefinitions": [
+  "Image": [
     {
       "name": "backend",
       "image": "tanchowelcomeweek/tplace-backend",
