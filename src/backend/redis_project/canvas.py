@@ -84,9 +84,27 @@ class Canvas:
         logger.info("Setting pixel color at offset {} to color {}".format(offset, color.value))
         self.database.bitfield(key=self.name).set(fmt=self.pixel_format, offset=offset, value=color.value).execute()
 
+    def set_pixel_region(self, top_left_pixel_x_coordinate: int, top_left_pixel_y_coordinate: int,
+                         bottom_right_pixel_x_coordinate: int, bottom_right_pixel_y_coordinate: int) -> None:
+        """
+        Sets a region of pixels to the default color (white). The x and y coordinates of the top-left and bottom-right
+        corners must be specified. This method will then set the entire rectangular region within the corners to the
+        default color, inclusive of both corners.
+        :param top_left_pixel_x_coordinate: x-coordinate of the top-left corner.
+        :param top_left_pixel_y_coordinate: y-coordinate of the top-left corner.
+        :param bottom_right_pixel_x_coordinate: x-coordinate of the bottom-right corner.
+        :param bottom_right_pixel_y_coordinate: y-coordinate of the bottom-right corner.
+        """
+        for y_coordinate in range(top_left_pixel_y_coordinate, bottom_right_pixel_y_coordinate + 1):
+            for x_coordinate in range(top_left_pixel_x_coordinate, bottom_right_pixel_x_coordinate + 1):
+                offset = calculate_offset(x_coordinate, y_coordinate, self.width)
+                self.database.bitfield(key=self.name).set(fmt=self.pixel_format, offset=offset,
+                                                          value=Color.WHITE.value).execute()
+
     def get_canvas(self) -> bytes:
         """
-        Returns the entire stored canvas bitfield as one long stream of bytes.
+        Returns the entire stored canvas bitfield as one long stream of bytes. When converted to a string, the bytes
+        may look strange or unusual; however, they are present.
         :return: Returns the canvas bitfield as bytes.
         """
         bitfield = self.database.get(name=self.name)
@@ -116,24 +134,27 @@ class Canvas:
         of pixels that would fit in a canvas of the width and height used as parameters for the construction of this
         Canvas object.
         """
-        total_pixel_count = self.width * self.height
-        for i in range(total_pixel_count):
-            offset = format_offset(i)
-            logger.debug("Clearing pixel at offset: {}".format(offset))
-            self.database.bitfield(key=CANVAS_NAME).set(fmt=self.pixel_format, offset=offset, value=0).execute()
+        self.set_pixel_region(1, 1, CANVAS_WIDTH, CANVAS_HEIGHT)
 
 
-if __name__ == "__main__":
-    logger.addHandler(StreamHandler())
-    logger.setLevel(level="INFO")
-    # logger.setLevel(level="DEBUG")
-
-    canvas = Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT, pixel_format=PIXEL_FORMAT, name=CANVAS_NAME,
-                    host=REDIS_HOST_ADDRESS, port=REDIS_HOST_PORT)
-    # print(canvas.to_string())
-    canvas.get_canvas()
-    canvas.set_pixel_color(1, 2, Color.CREAM)
-    canvas.set_pixel_color(1, 1, Color.BLACK)
-    canvas.set_pixel_color(3, 4, Color.RED)
-    print(canvas.to_string())
-    canvas.get_canvas()
+# if __name__ == "__main__":
+#     logger.addHandler(StreamHandler())
+#     # logger.setLevel(level="INFO")
+#     # logger.setLevel(level="DEBUG")
+#
+#     canvas = Canvas(width=CANVAS_WIDTH, height=CANVAS_HEIGHT, pixel_format=PIXEL_FORMAT, name=CANVAS_NAME,
+#                     host=REDIS_HOST_ADDRESS_STANDALONE, port=REDIS_HOST_PORT)
+#     # canvas.get_canvas()
+#     print(canvas.to_string())
+#     for i in range(CANVAS_HEIGHT):
+#         for j in range(CANVAS_WIDTH):
+#             canvas.set_pixel_color(j + 1, i + 1, Color.GREY)
+#     print(canvas.to_string())
+#     # canvas.get_canvas()
+#     try:
+#         canvas.set_pixel_region(2, 2, 4, 4)
+#         print("Completed")
+#     except Exception as e:
+#         print(e)
+#     print(canvas.to_string())
+#     # canvas.get_canvas()
