@@ -1,0 +1,63 @@
+#canvas-bg {
+    border-radius: 10px;
+    background-color: lightgray;
+    padding: 10px;
+    margin: auto;
+    height: 420px;
+    width: 620px;
+
+    /* to centre the canvas within this div */
+    display: block;
+    text-align: center;
+}
+
+#canvas-div {
+    /* transform: scale(2, 2) translateY(50px); */
+}
+
+#canvas {
+    display: block;
+    margin: auto;
+    border: 1px solid black; 
+
+    /* transform: scale(2, 2); */
+    /* transform: translate(300px, 200px); */
+}
+
+.popup {
+    visibility: hidden;
+    /* display: block; */
+    position: absolute;
+    /* width: 140px; */
+    /* z-index: 10; */
+    /* top: 20%;  */
+    /* left: 50%;  */
+    background-color: #999;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    margin-left: -10px;
+    margin-top: 6px;
+}
+
+.show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+#cooldown-popup {
+    transition: opacity 1s;
+}
