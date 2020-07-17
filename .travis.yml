@@ -9,12 +9,12 @@ script:
   - docker run -e CI=true tanchowelcomeweek/frontend-test npm test
 
 after-success:
-  - docker build -t tanchowelcomeweek/tplace-frontend ./src/frontend
+  # - docker build -t tanchowelcomeweek/tplace-frontend ./src/frontend
   - docker build -t tanchowelcomeweek/tplace-backend ./src/backend
     # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # Take those images and push them to docker hub
-  - docker push tanchowelcomeweek/tplace-frontend
+  # - docker push tanchowelcomeweek/tplace-frontend
   - docker push tanchowelcomeweek/tplace-backend
 
 deploy:
