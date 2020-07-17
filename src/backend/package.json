@@ -6,11 +6,12 @@
     "nodemon": "^1.18.3",
     "pg": "8.0.3",
     "redis": "2.8.0",
+    "socket.io": "^2.3.0",
     "telegraf": "^3.38.0"
   },
   "scripts": {
-    "dev": "nodemon",
-    "start": "node index.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"
