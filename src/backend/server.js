@@ -17,7 +17,8 @@ const { spawn } = require("child_process");
 const bot = require("./notification");
 
 // Express Setup
-const app = express();
+app = express();
+app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -66,7 +67,7 @@ app.get("/:chatId/:userId", (req, res) => {
   if (!isPermitted) {
     res.sendStatus(401);
   }
-  res.sendFile("./index.html", { root: "." });
+  res.sendFile("./public/index.html", { root: "." });
   //res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
 });
 
