@@ -1,0 +1,12 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "tanchowelcomeweek/tplace-backend",
+      "hostname": "backend",
+      "essential": true,
+      "memory": 1023
+    }
+  ]
+}
