@@ -11,6 +11,7 @@ const { Pool } = require("pg");
 
 // Redis
 const redis = require("redis");
+const canvas = require("./redis_js/canvas.js");
 const { spawn } = require("child_process");
 
 // Telegram Bot Notification
@@ -32,20 +33,17 @@ io.on("connection", () => {
 });
 
 // Redis setup
-const redisClient = redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
-});
-const redisPublisher = redisClient.duplicate();
-const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
-pythonRedis.stdout.on("data", (output) => {
-  console.log("Obtaining data from python script ...");
-  console.log(output.toString());
-});
-pythonRedis.on("close", (code) => {
-  console.log(`Child process closing with code ${code}`);
-});
+const redisClient = redis.createClient(canvas.CONFIG_FILE);
+
+// const redisPublisher = redisClient.duplicate();
+// const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
+// pythonRedis.stdout.on("data", (output) => {
+//   console.log("Obtaining data from python script ...");
+//   console.log(output.toString());
+// });
+// pythonRedis.on("close", (code) => {
+//   console.log(`Child process closing with code ${code}`);
+// });
 
 // Express route handlers
 
@@ -109,5 +107,11 @@ app.post("/admin/clear", (req, res) => {
     res.sendStatus(400);
   }
 });
+
+app.get("/", () => {
+  console.log(canvas.getValue(redisClient, "ping"));
+  console.log(canvas.setValue(redisClient, "ping", "pong"));
+  console.log(canvas.getValue(redisClient, "ping"));
+})
 
 app.listen(5000, () => console.log("Listening on port 5000..."));
