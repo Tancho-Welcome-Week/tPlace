@@ -1,4 +1,5 @@
-# tPlace
+# tPlace 
+[![Build Status](https://travis-ci.org/Tancho-Welcome-Week/tPlace.svg?branch=master)](https://travis-ci.org/Tancho-Welcome-Week/tPlace)
 
 Link to Google Doc: https://docs.google.com/document/d/1rtCWr6h_V5rW4PW9A89pC6WUaZYYxDM0FjZsCx6NeT4/edit?ts=5ee7828a
 
