@@ -1,12 +1,12 @@
 {
   "AWSEBDockerrunVersion": 1,
-  "containerDefinitions": [
+  "Image": {
+    "Name": "tanchowelcomeweek/tplace-backend",
+    "Update": "true"
+  },
+  "Ports": [
     {
-      "name": "backend",
-      "image": "tanchowelcomeweek/tplace-backend",
-      "hostname": "backend",
-      "essential": true,
-      "memory": 1023
+      "ContainerPort": "5000"
     }
   ]
 }
