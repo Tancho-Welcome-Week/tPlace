@@ -3,10 +3,10 @@ services:
   - docker
 
 before_install:
-  - docker build -t tanchowelcomeweek/frontend-test -f ./src/frontend/Dockerfile.dev ./src/frontend
+  - docker build -t tanchowelcomeweek/backend-test -f ./src/backend/Dockerfile.dev ./src/backend
 
 script:
-  - docker run -e CI=true tanchowelcomeweek/frontend-test npm test
+  - docker run -e CI=true tanchowelcomeweek/backend-test npm test
 
 after-success:
   # - docker build -t tanchowelcomeweek/tplace-frontend ./src/frontend
