@@ -13,22 +13,28 @@ const { Pool } = require("pg");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
+<<<<<<< HEAD:src/backend/index.js
 // Notification Scheduler
 const startNotificationSchedule = require("./scheduler")
+=======
+// Telegram Bot Notification
+const bot = require("./notification");
+>>>>>>> 8e1d85cc4f07007a3183c0f8069b16e9df8feace:src/backend/server.js
 
 // Express Setup
-const app = express();
+app = express();
+app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
 
 // Socket.io Setup
 const http = require("http").Server(app);
-const io = require('socket.io')(http, {
-  perMessageDeflate: false
+const io = require("socket.io")(http, {
+  perMessageDeflate: false,
 });
 
 io.on("connection", () => {
-  console.log("A user is connected")
+  console.log("A user is connected");
 });
 
 // Redis setup
@@ -76,8 +82,8 @@ app.get("/:chatId/:userId", (req, res) => {
   if (!isPermitted) {
     res.sendStatus(401);
   }
-  // res.sendFile("/frontend/index.html", { root: ".." })
-  res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
+  res.sendFile("./public/index.html", { root: "." });
+  //res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
 });
 
 app.get("/api/grid", (req, res) => {
@@ -104,10 +110,10 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
     const color = req.body.color;
     const user = req.body.user;
     // TODO: pixel update redis
-    const grid = true // TODO: pull grid info from redis
+    const grid = true; // TODO: pull grid info from redis
     // TODO: canvas update in database
     // TODO: update user fields accordingly
-    io.emit('grid', grid)
+    io.emit("grid", grid);
     res.sendStatus(200);
   } else {
     res.sendStatus(401);
@@ -122,8 +128,8 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    const grid = true// TODO: get bitfield of all white canvas
-    io.emit('grid', grid)
+    const grid = true; // TODO: get bitfield of all white canvas
+    io.emit("grid", grid);
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(400);

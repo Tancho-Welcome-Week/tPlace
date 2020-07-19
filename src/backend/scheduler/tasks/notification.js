@@ -1,6 +1,6 @@
 const message = require('message')
 
-exports.sendMorningNotifications = (users) {
+exports.sendMorningNotifications = (users) => {
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -10,7 +10,7 @@ exports.sendMorningNotifications = (users) {
     }
 }
 
-exports.sendLunchNotifications = (users) {
+exports.sendLunchNotifications = (users) => {
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -20,7 +20,7 @@ exports.sendLunchNotifications = (users) {
     }
 }
 
-exports.sendDinnerNotifications = (users) {
+exports.sendDinnerNotifications = (users) => {
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -30,7 +30,7 @@ exports.sendDinnerNotifications = (users) {
     }
 }
 
-exports.sendNightNotifications = (users) {
+exports.sendNightNotifications = (users) => {
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
