@@ -14,11 +14,12 @@ const redis = require("redis");
 const canvas = require("./redis_js/canvas.js");
 const redis_commons = require("./redis_js/commons.js");
 
-// Telegram Bot Notification
-const bot = require("./notification");
+// Notification Scheduler
+const startNotificationSchedule = require("./scheduler")
 
 // Express Setup
-const app = express();
+app = express();
+app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -35,6 +36,16 @@ io.on("connection", () => {
 // Redis setup
 const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
 redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
+
+// Start Schedule
+const users = true; //TODO: get users from database
+startNotificationSchedule(users);
+setInterval(() => {
+  //TODO: add redis backup to database
+}, 300000)
+
+// Flag for whitelisting
+const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Express route handlers
 
@@ -55,7 +66,7 @@ app.get("/:chatId/:userId", (req, res) => {
   if (!isPermitted) {
     res.sendStatus(401);
   }
-  res.sendFile("./index.html", { root: "." });
+  res.sendFile("./public/index.html", { root: "." });
   //res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
 });
 
@@ -63,6 +74,16 @@ app.get("/api/grid", (req, res) => {
   console.log("Grid requested.");
   res.sendStatus(200);
 });
+
+app.post("/whitelist", (req, res) => {
+  const chatId = req.params.chatId
+  if (isWhitelistPeriod) {
+    //TODO: add chatId to database
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(401)
+  }
+})
 
 app.post("/api/grid/:chatId/:userId", (req, res) => {
   const chatId = req.params.chatId;
