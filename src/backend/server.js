@@ -6,6 +6,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+//HTTPS
+const fs = require("fs");
+const https = require("https")
+
 // PostgreSQL
 const { Pool } = require("pg");
 
@@ -14,7 +18,7 @@ const redis = require("redis");
 const { spawn } = require("child_process");
 
 // Notification Scheduler
-const startNotificationSchedule = require("./scheduler")
+const startNotificationSchedule = require("./scheduler/schedule")
 
 // Express Setup
 app = express();
@@ -131,4 +135,8 @@ app.post("/admin/clear", (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("Listening on port 5000..."));
+https.createServer({
+  key: fs.readFileSync("../../server.key"),
+  cert: fs.readFileSync("../../server.cert")
+}, app)
+.listen(5000, () => console.log("Listening on port 5000..."));
