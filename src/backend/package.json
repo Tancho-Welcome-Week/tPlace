@@ -17,6 +17,7 @@
   "devDependencies": {
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "telegraf-inline-menu": "^5.0.0"
   }
 }
