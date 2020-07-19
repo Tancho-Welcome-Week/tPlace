@@ -14,7 +14,7 @@ const CANVAS_WIDTH = 2;
 
 const REDIS_CONFIG_FILE = {
     port      : REDIS_HOST_PORT,
-    host      : REDIS_HOST_ADDRESS_STANDALONE,
+    host      : REDIS_HOST_ADDRESS,
     return_buffers : true
 };
 
