@@ -12,7 +12,7 @@ const { Pool } = require("pg");
 // Redis
 const redis = require("redis");
 const canvas = require("./redis_js/canvas.js");
-const { spawn } = require("child_process");
+const redis_commons = require("./redis_js/commons.js");
 
 // Telegram Bot Notification
 const bot = require("./notification");
@@ -33,17 +33,8 @@ io.on("connection", () => {
 });
 
 // Redis setup
-const redisClient = redis.createClient(canvas.CONFIG_FILE);
-
-// const redisPublisher = redisClient.duplicate();
-// const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
-// pythonRedis.stdout.on("data", (output) => {
-//   console.log("Obtaining data from python script ...");
-//   console.log(output.toString());
-// });
-// pythonRedis.on("close", (code) => {
-//   console.log(`Child process closing with code ${code}`);
-// });
+const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
+redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
 
 // Express route handlers
 
@@ -81,8 +72,16 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update redis
-    const grid = true; // TODO: pull grid info from redis
+
+    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
+    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
+    redisManager.setValue(x_coordinate, y_coordinate, color);
+
+    // TODO: Verify that the Promise is handled correctly
+    const grid = (async function() {
+      return await redisManager.getCanvas();
+    })();
+
     // TODO: canvas update in database
     // TODO: update user fields accordingly
     io.emit("grid", grid);
@@ -100,18 +99,19 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    const grid = true; // TODO: get bitfield of all white canvas
+
+    redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], redis_commons.Color.WHITE);
+
+    // TODO: Verify that the Promise is handled correctly
+    const grid = (async function() {
+      return await redisManager.getCanvas();
+    })();
+
     io.emit("grid", grid);
     res.sendStatus(200);
   } catch (e) {
     res.sendStatus(400);
   }
 });
-
-app.get("/", () => {
-  console.log(canvas.getValue(redisClient, "ping"));
-  console.log(canvas.setValue(redisClient, "ping", "pong"));
-  console.log(canvas.getValue(redisClient, "ping"));
-})
 
 app.listen(5000, () => console.log("Listening on port 5000..."));
