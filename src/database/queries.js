@@ -1,15 +1,5 @@
-const { parse } = require('path')
+const Pool = require('../backend/server').Pool
 
-const Pool = require('pg').Pool
-
-// Move to seperate file with restricted permissions after testing, make sure details match
-const pool = new Pool({
-  user: 'localhost',
-  host: 'localhost',
-  database: 'tPlace',
-  password: 'hydrohomies',
-  port: 5432,
-})
 
 //Add better error handling & response messages
 // User Functions
@@ -137,3 +127,19 @@ const deleteWhitelistGroupId = (request, response) => {
 }
 
 // Canvas Functions
+
+// Exports
+
+module.export = {
+    createUser,
+    getUserByTelegramId,
+    getUserWithNotifications,
+    setUserNotificationsByTelegramId,
+    getAllUsers,
+    deleteUserByTelegramId,
+    incrementUserPixels,
+    decrementUserPixels,
+    getWhitelistGroupIds,
+    addWhitelistGroupId,
+    deleteWhitelistGroupId
+}
