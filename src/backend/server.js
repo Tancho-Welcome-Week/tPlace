@@ -13,13 +13,8 @@ const { Pool } = require("pg");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
-<<<<<<< HEAD:src/backend/index.js
 // Notification Scheduler
 const startNotificationSchedule = require("./scheduler")
-=======
-// Telegram Bot Notification
-const bot = require("./notification");
->>>>>>> 8e1d85cc4f07007a3183c0f8069b16e9df8feace:src/backend/server.js
 
 // Express Setup
 app = express();
