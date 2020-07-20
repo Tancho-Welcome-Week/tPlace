@@ -14,8 +14,8 @@ const cors = require("cors");
 const redis = require("redis");
 const { spawn } = require("child_process");
 
-// Telegram Bot Notification
-const bot = require("./notification");
+// Notification Scheduler
+const startNotificationSchedule = require("./scheduler")
 
 // Express Setup
 app = express();
@@ -48,6 +48,16 @@ pythonRedis.stdout.on("data", (output) => {
 pythonRedis.on("close", (code) => {
   console.log(`Child process closing with code ${code}`);
 });
+
+// Start Schedule
+const users = true; //TODO: get users from database
+startNotificationSchedule(users);
+setInterval(() => {
+  //TODO: add redis backup to database
+}, 300000)
+
+// Flag for whitelisting
+const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Express route handlers
 
@@ -92,6 +102,16 @@ app.get("/api/grid", (req, res) => {
   console.log("Grid requested.");
   res.sendStatus(200);
 });
+
+app.post("/whitelist", (req, res) => {
+  const chatId = req.params.chatId
+  if (isWhitelistPeriod) {
+    //TODO: add chatId to database
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(401)
+  }
+})
 
 app.post("/api/grid/:chatId/:userId", (req, res) => {
   const chatId = req.params.chatId;
