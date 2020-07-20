@@ -1,5 +1,6 @@
 const keys = require("./keys");
 const auth = require("./auth");
+const db = require("./queries");
 
 // Express
 const express = require("express");
@@ -7,7 +8,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 // PostgreSQL
-const { Pool } = require("pg");
+// const { Pool } = require("pg").Pool;
 
 // Redis
 const redis = require("redis");
@@ -49,6 +50,22 @@ pythonRedis.on("close", (code) => {
 });
 
 // Express route handlers
+
+// Database Requests
+
+app.get("/users", db.getAllUsers)
+//app.get("/users/:telegramId". db.getUserByTelegramId)
+app.get("/users/notifications", db.getUsersWithNotifications)
+app.post("/users", db.createUser)
+app.put("/users/:telegramId", db.setUserNotificationsByTelegramId)
+app.put("/users/:telegramId/increment", db.incrementUserPixels)
+app.put("/users/:telegramId/decrement", db.decrementUserPixels)
+app.delete("/users/:telegramId", db.deleteUserByTelegramId)
+
+app.get("/whitelist", db.getWhitelistGroupIds)
+app.post("/whitelist", db.addWhitelistGroupId)
+app.delete("/whitelist/:groupId", db.deleteWhitelistGroupId)
+
 
 /*
 Requests:
