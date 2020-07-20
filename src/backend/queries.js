@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 // Move to seperate file with restricted permissions after testing, make sure details match
+// Change to pg variables from keys file before deployment
 const pool = new Pool({
     user: 'admin',
     host: 'localhost',
@@ -8,17 +9,18 @@ const pool = new Pool({
     port: 5432,
   })
 
-//Add better error handling & response messages
+// TODO: Better error handling
+
 // User Functions
 
-const createUser = async (request, response) => {
-    const telegram_id = request.body.telegram_id
+// GET methods
 
-    await pool.query('INSERT INTO Users (telegram_id) VALUES ($1)', [telegram_id], (error, results) => {
+const getAllUsers = async (request, response) => {
+    await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC', (error, results) => {
         if (error) {
             throw error
         }
-        response.status(201).send('User added!')
+        response.status(200).json(results.rows)
     })
 }
 
@@ -42,65 +44,62 @@ const getUsersWithNotifications = async (request, response) => {
     })
 }
 
+// POST methods
+
+const createUser = async (request, response) => {
+    const telegram_id = request.query.telegram_id
+
+    await pool.query('INSERT INTO Users (telegram_id) VALUES ($1) RETURNING telegram_id', [telegram_id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(201).send(`User added with telegram_id: ${results.rows[0].telegram_id}!`)
+    })
+}
+
+// PUT methods
+
 const setUserNotificationsByTelegramId = async (request, response) => {
-    const telegram_id = request.params.telegram_id
-    const notifications = request.params.notifications
+    const telegram_id = request.query.telegram_id
+    const notifications = request.query.notifications
 
-    await pool.query('UPDATE Users SET notifcations = $2 WHERE telegram_id = $1', [telegram_id, notifications], (error, results) => {
+    await pool.query('UPDATE Users SET notifications = $2 WHERE telegram_id = $1 RETURNING telegram_id, notifications', [telegram_id, notifications], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).send('User notifications status updated!')
+        response.status(200).send(`User ${results.rows[0].telegram_id} notification status updated to ${results.rows[0].notifications}!`)
     })
 }
 
-const getAllUsers = async (request, response) => {
-    await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC', (error, results) => {
+const setUserAccumulatedPixelsByTelegramId = async (request, response) => {
+    const telegram_id = request.query.telegram_id
+    const accumulated_pixels = request.query.accumulated_pixels
+  
+    await pool.query('UPDATE Users SET accumulated_pixels = $2, last_updated = NOW() WHERE telegram_id = $1 RETURNING telegram_id, accumulated_pixels', [telegram_id, accumulated_pixels], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).json(results.rows)
-    })
+        response.status(200).send(`User ${results.rows[0].telegram_id} accumulated pixels changed to ${results.rows[0].accumulated_pixels}!`)
+      }
+    )
 }
+
+// DELETE methods
 
 const deleteUserByTelegramId = async (request, response) => {
     const telegram_id = request.params.telegram_id
   
-    await pool.query('DELETE FROM Users WHERE telegram_id = $1', [telegram_id], (error, results) => {
+    await pool.query('DELETE FROM Users WHERE telegram_id = $1 RETURNING telegram_id', [telegram_id], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).send('User deleted!')
+        response.status(200).send(`User ${results.rows[0].telegram_id} deleted!`)
     })
 }
 
-// Add additional details based on how this function will be used (Based on fixed time distance and update all users together?)
-const incrementUserPixels = async (request, response) => {
-    const telegram_id = request.params.telegram_id
-  
-    await pool.query('UPDATE Users SET accumulated_pixels = accumulated_pixels + 1 WHERE telegram_id = $1', [telegram_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).send('User accumulated pixels incremented by 1!')
-      }
-    )
-}
-
-// Add additional check to ensure accumulated_pixels >= 0 (Check in backend but add additional check here if possible)
-const decrementUserPixels = async (request, response) => {
-    const telegram_id = request.params.telegram_id
-  
-    await pool.query('UPDATE Users SET accumulated_pixels = accumulated_pixels - 1, last_updated = NOW() WHERE telegram_id = $1', [telegram_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).send('User accumulated pixels decremented by 1!')
-      }
-    )
-}
-
 // Whitelist Functions
+
+// GET methods
 
 const getWhitelistGroupIds = async (request, response) => {
     await pool.query('SELECT * FROM Whitelist', (error, results) => {
@@ -111,25 +110,29 @@ const getWhitelistGroupIds = async (request, response) => {
     })
 }
 
-const addWhitelistGroupId = async (request, response) => {
-    const group_id = request.body.group_id
+// POST methods
 
-    await pool.query('INSERT INTO Whitelist (group_id) VALUES ($1)', [group_id], (error, results) => {
+const addWhitelistGroupId = async (request, response) => {
+    const group_id = request.query.group_id
+
+    await pool.query('INSERT INTO Whitelist (group_id) VALUES ($1) RETURNING group_id', [group_id], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(201).send('Group ID added!')
+        response.status(201).send(`Group ID ${results.rows[0].group_id} added!`)
     })
 }
+
+// DELETE methods
 
 const deleteWhitelistGroupId = async (request, response) => {
     const group_id = request.params.group_id
   
-    await pool.query('DELETE FROM Whitelist WHERE group_id = $1', [group_id], (error, results) => {
+    await pool.query('DELETE FROM Whitelist WHERE group_id = $1 RETURNING group_id', [group_id], (error, results) => {
         if (error) {
             throw error
         }
-        response.status(200).send('Group ID deleted!')
+        response.status(200).send(`Group ID ${results.rows[0].group_id} deleted!`)
     })
 }
 
@@ -139,13 +142,12 @@ const deleteWhitelistGroupId = async (request, response) => {
 
 module.exports = {
     createUser: createUser,
-    //getUserByTelegramId: getUserByTelegramId,
+    getUserByTelegramId: getUserByTelegramId,
     getUsersWithNotifications: getUsersWithNotifications,
     setUserNotificationsByTelegramId: setUserNotificationsByTelegramId,
     getAllUsers: getAllUsers,
     deleteUserByTelegramId: deleteUserByTelegramId,
-    incrementUserPixels: incrementUserPixels,
-    decrementUserPixels: decrementUserPixels,
+    setUserAccumulatedPixelsByTelegramId: setUserAccumulatedPixelsByTelegramId,
     getWhitelistGroupIds: getWhitelistGroupIds,
     addWhitelistGroupId: addWhitelistGroupId,
     deleteWhitelistGroupId: deleteWhitelistGroupId

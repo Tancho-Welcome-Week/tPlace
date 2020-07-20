@@ -64,17 +64,16 @@ const isWhitelistPeriod = process.env.WHITELIST || false;
 // Database Requests
 
 app.get("/users", db.getAllUsers)
-//app.get("/users/:telegramId". db.getUserByTelegramId)
-app.get("/users/notifications", db.getUsersWithNotifications)
+app.get("/users/:telegram_id", db.getUserByTelegramId)
+app.get("/notifications", db.getUsersWithNotifications)
 app.post("/users", db.createUser)
-app.put("/users/:telegramId", db.setUserNotificationsByTelegramId)
-app.put("/users/:telegramId/increment", db.incrementUserPixels)
-app.put("/users/:telegramId/decrement", db.decrementUserPixels)
-app.delete("/users/:telegramId", db.deleteUserByTelegramId)
+app.put("/notifications/:telegram_id", db.setUserNotificationsByTelegramId)
+app.put("/pixels/:telegram_id", db.setUserAccumulatedPixelsByTelegramId)
+app.delete("/users/:telegram_id", db.deleteUserByTelegramId)
 
 app.get("/whitelist", db.getWhitelistGroupIds)
 app.post("/whitelist", db.addWhitelistGroupId)
-app.delete("/whitelist/:groupId", db.deleteWhitelistGroupId)
+app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
 
 
 /*
