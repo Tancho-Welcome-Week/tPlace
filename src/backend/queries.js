@@ -138,6 +138,42 @@ const deleteWhitelistGroupId = async (request, response) => {
 
 // Canvas Functions
 
+// GET methods
+
+const getLatestCanvas = async (request, response) => {
+    await pool.query('SELECT * FROM Canvas ORDER BY last_updated DESC LIMIT 1', (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+const getCanvasByTelegramId = async (request, response) => {
+    const telegram_id = request.params.telegram_id
+
+    await pool.query('SELECT * FROM Canvas WHERE telegram_id = $1 ORDER BY last_updated DESC', [telegram_id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+// POST methods
+
+const addCanvas = async (request, response) => {
+    const telegram_id = request.query.telegram_id
+    const bitfield = request.query.bitfield
+
+    await pool.query('INSERT INTO Canvas (telegram_id, bitfield) VALUES ($1, $2) RETURNING telegram_id', [telegram_id, bitfield], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(201).send(`Canvas by ${results.rows[0].telegram_id} added!`)
+    })
+}
+
 // Exports
 
 module.exports = {
@@ -150,5 +186,8 @@ module.exports = {
     setUserAccumulatedPixelsByTelegramId: setUserAccumulatedPixelsByTelegramId,
     getWhitelistGroupIds: getWhitelistGroupIds,
     addWhitelistGroupId: addWhitelistGroupId,
-    deleteWhitelistGroupId: deleteWhitelistGroupId
+    deleteWhitelistGroupId: deleteWhitelistGroupId,
+    getLatestCanvas: getLatestCanvas,
+    getCanvasByTelegramId: getCanvasByTelegramId,
+    addCanvas, addCanvas
 }

@@ -75,6 +75,9 @@ app.get("/whitelist", db.getWhitelistGroupIds)
 app.post("/whitelist", db.addWhitelistGroupId)
 app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
 
+app.get("/canvas", db.getLatestCanvas)
+app.get("/canvas/:telegram_id", db.getCanvasByTelegramId)
+app.post("/canvas", db.addCanvas)
 
 /*
 Requests:
