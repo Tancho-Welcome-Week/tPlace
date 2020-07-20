@@ -15,7 +15,7 @@ const redis = require("redis");
 const { spawn } = require("child_process");
 
 // Notification Scheduler
-const startNotificationSchedule = require("./scheduler")
+// const startNotificationSchedule = require("./scheduler")
 
 // Express Setup
 app = express();
@@ -51,10 +51,10 @@ pythonRedis.on("close", (code) => {
 
 // Start Schedule
 const users = true; //TODO: get users from database
-startNotificationSchedule(users);
+//startNotificationSchedule(users);
 setInterval(() => {
   //TODO: add redis backup to database
-}, 300000)
+}, 300000);
 
 // Flag for whitelisting
 const isWhitelistPeriod = process.env.WHITELIST || false;
@@ -104,14 +104,14 @@ app.get("/api/grid", (req, res) => {
 });
 
 app.post("/whitelist", (req, res) => {
-  const chatId = req.params.chatId
+  const chatId = req.params.chatId;
   if (isWhitelistPeriod) {
     //TODO: add chatId to database
-    res.sendStatus(200)
+    res.sendStatus(200);
   } else {
-    res.sendStatus(401)
+    res.sendStatus(401);
   }
-})
+});
 
 app.post("/api/grid/:chatId/:userId", (req, res) => {
   const chatId = req.params.chatId;
@@ -149,3 +149,5 @@ app.post("/admin/clear", (req, res) => {
 });
 
 app.listen(5000, () => console.log("Listening on port 5000..."));
+
+module.exports = app; // exporting for testing purposes
