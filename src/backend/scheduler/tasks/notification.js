@@ -1,4 +1,4 @@
-const message = require('message')
+const message = require('./message')
 
 exports.sendMorningNotifications = (users) => {
     const currTime = Date.now()

@@ -1,23 +1,23 @@
-import {scheduleJob} from "node-schedule";
+// import {scheduleJob} from "node-schedule";
 
-const schedule = require('node-schedule')
-const notification = require('tasks/notification')
+const schedule = require('node-schedule');
+const notification = require('./tasks/notification.js')
 
 const startNotificationSchedule = (users) => {
 
-    scheduleJob('* 30 9 * *', () => {
+    schedule.scheduleJob('* 30 9 * *', () => {
         notification.sendMorningNotifications(users);
     })
 
-    scheduleJob('* 30 12 * *', () => {
+    schedule.scheduleJob('* 30 12 * *', () => {
         notification.sendLunchNotifications(users);
     })
 
-    scheduleJob('* 30 19 * *', () => {
+    schedule.scheduleJob('* 30 19 * *', () => {
         notification.sendDinnerNotifications(users);
     })
 
-    scheduleJob('* 0 23 * *', () => {
+    schedule.scheduleJob('* 0 23 * *', () => {
         notification.sendNightNotifications(users);
     })
 

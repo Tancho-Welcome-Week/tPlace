@@ -15,7 +15,8 @@ const canvas = require("./redis_js/canvas.js");
 const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
-const startNotificationSchedule = require("./scheduler")
+const startNotificationSchedule = require("./scheduler/schedule.js");
+const {getUser} = require("./auth");
 
 // Express Setup
 app = express();
@@ -41,7 +42,13 @@ redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_H
 const users = true; //TODO: get users from database
 startNotificationSchedule(users);
 setInterval(() => {
-  //TODO: add redis backup to database
+  redisManager.getCanvas().then((result, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      //TODO: add redis backup to database
+    }
+  })
 }, 300000)
 
 // Flag for whitelisting
@@ -98,15 +105,17 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
     const y_coordinate = 0; // TODO: Get y-coordinate from frontend
     redisManager.setValue(x_coordinate, y_coordinate, color);
 
-    // TODO: Verify that the Promise is handled correctly
-    const grid = (async function() {
-      return await redisManager.getCanvas();
-    })();
-
-    // TODO: canvas update in database
-    // TODO: update user fields accordingly
-    io.emit("grid", grid);
-    res.sendStatus(200);
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        // TODO: canvas update in database
+        // TODO: update user fields accordingly
+        res.sendStatus(200);
+      }
+    });
   } else {
     res.sendStatus(401);
   }
@@ -123,13 +132,15 @@ app.post("/admin/clear", (req, res) => {
 
     redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], redis_commons.Color.WHITE);
 
-    // TODO: Verify that the Promise is handled correctly
-    const grid = (async function() {
-      return await redisManager.getCanvas();
-    })();
-
-    io.emit("grid", grid);
-    res.sendStatus(200);
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        res.sendStatus(200);
+      }
+    });
   } catch (e) {
     res.sendStatus(400);
   }
