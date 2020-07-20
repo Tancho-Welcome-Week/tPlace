@@ -119,39 +119,10 @@ class RedisManager {
     }
 }
 
-
-// const redisManager = new RedisManager(commons.CANVAS_NAME);
-// redisManager.initializeCanvas(commons.CANVAS_WIDTH, commons.CANVAS_HEIGHT, commons.PIXEL_FORMAT);
-// redisManager.setValue(2, 2, commons.Color.RED);
-// redisManager.setValue(1, 1, commons.Color.BLUE);
-// // redisManager.getValue();
-// redisManager.getCanvas().then((result) => { console.log(result) });
-// redisManager.deleteCanvas();
-
-
 module.exports = { RedisManager };
 
 
-// const redisClient = redis.createClient(commons.REDIS_CONFIG_FILE);
-// initializeCanvas(redisClient, commons.CANVAS_WIDTH, commons.CANVAS_HEIGHT, commons.CANVAS_NAME);
-// setValue(redisClient, commons.CANVAS_NAME, 1, 1, '0001');
-// setValue(redisClient, commons.CANVAS_NAME, 2, 1, '0010');
-// setValue(redisClient, commons.CANVAS_NAME, 3, 1, '0011');
-// setValue(redisClient, commons.CANVAS_NAME, 1, 2, '0100');
-// setValue(redisClient, commons.CANVAS_NAME, 2, 2, '0101');
-// setValue(redisClient, commons.CANVAS_NAME, 3, 2, '0110');
-// setValue(redisClient, commons.CANVAS_NAME, 1, 3, '0111');
-// setValue(redisClient, commons.CANVAS_NAME, 2, 3, '1000');
-// setValue(redisClient, commons.CANVAS_NAME, 3, 3, '1001');
-// setValue(redisClient, commons.CANVAS_NAME, 4, 4, '1111');
-// for (let i = 0; i < (commons.CANVAS_WIDTH * commons.CANVAS_HEIGHT); i++) {
-//     getValue(redisClient, commons.CANVAS_NAME, '#'+i);
-// }
 
-// getCanvas(redisClient, commons.CANVAS_NAME).then((result) => { console.log(result); });
-//
-// deleteCanvas(redisClient, commons.CANVAS_NAME);
-//
 // function dec2bin(dec){
 //     const binaryString = (dec >>> 0).toString(2);
 //     const paddedString = ("0000" + binaryString).slice(-4);

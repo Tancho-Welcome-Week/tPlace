@@ -1,5 +1,5 @@
-const keys = require("./keys");
-const auth = require("./auth");
+const keys = require("./keys.js");
+const auth = require("./auth.js");
 
 // Express
 const express = require("express");
@@ -16,7 +16,7 @@ const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
 const startNotificationSchedule = require("./scheduler/schedule.js");
-const {getUser} = require("./auth");
+const {getUser} = require("./auth.js");
 
 // Express Setup
 app = express();
