@@ -67,9 +67,9 @@ app.put("/notifications/:telegram_id", db.setUserNotificationsByTelegramId)
 app.put("/pixels/:telegram_id", db.setUserAccumulatedPixelsByTelegramId)
 app.delete("/users/:telegram_id", db.deleteUserByTelegramId)
 
-app.get("/whitelist", db.getWhitelistGroupIds)
-app.post("/whitelist", db.addWhitelistGroupId)
-app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
+app.get("/whitelist_db", db.getWhitelistGroupIds)
+app.post("/whitelist_db", db.addWhitelistGroupId)
+app.delete("/whitelist_db/:group_id", db.deleteWhitelistGroupId)
 
 app.get("/canvas", db.getLatestCanvas)
 app.get("/canvas/:telegram_id", db.getCanvasByTelegramId)
