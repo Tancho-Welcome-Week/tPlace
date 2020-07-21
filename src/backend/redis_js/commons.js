@@ -1,4 +1,4 @@
-const keys = require("./keys.js");
+const keys = require("../keys.js");
 // Use the constant below if running from Docker
 const REDIS_HOST_ADDRESS_DOCKER = "redis";
 
