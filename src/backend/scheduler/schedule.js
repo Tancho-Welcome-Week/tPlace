@@ -5,19 +5,19 @@ const notification = require('./tasks/notification.js')
 
 const startNotificationSchedule = (users) => {
 
-    schedule.scheduleJob('* 30 9 * *', () => {
+    schedule.scheduleJob('30 9 * * *', () => {
         notification.sendMorningNotifications(users);
     })
 
-    schedule.scheduleJob('* 30 12 * *', () => {
+    schedule.scheduleJob('30 12 * * *', () => {
         notification.sendLunchNotifications(users);
     })
 
-    schedule.scheduleJob('* 30 19 * *', () => {
+    schedule.scheduleJob('30 19 * * *', () => {
         notification.sendDinnerNotifications(users);
     })
 
-    schedule.scheduleJob('* 0 23 * *', () => {
+    schedule.scheduleJob('0 23 * * *', () => {
         notification.sendNightNotifications(users);
     })
 

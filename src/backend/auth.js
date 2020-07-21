@@ -1,12 +1,19 @@
-exports.authenticateChatId = (chatId) => {
-    return true
-    //todo: Add chatId verification
-}
+const queries = require("./queries")
+const { Pool } = require("pg");
 
-exports.getUser = () => {
-    //todo: Get user
-}
+const pool = new Pool({
+    user: 'admin',
+    host: 'localhost',
+    database: 'tPlace',
+    password: 'tPlace2020',
+    port: 5432,
+})
 
-exports.createUser = () => {
-    //todo: Create new user
+const authenticateChatId = async (chatId) => {
+    const id = await pool.query('SELECT * FROM Whitelist', (error, results) => {
+        if (error) {
+            throw error
+        }
+    })
+    return !!id
 }

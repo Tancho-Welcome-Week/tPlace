@@ -7,6 +7,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+//HTTPS
+const fs = require("fs");
+const https = require("https")
+
 // PostgreSQL
 // const { Pool } = require("pg").Pool;
 
@@ -16,8 +20,7 @@ const canvas = require("./redis_js/canvas.js");
 const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
-const startNotificationSchedule = require("./scheduler/schedule.js");
-const {getUser} = require("./auth.js");
+const startNotificationSchedule = require("./scheduler/schedule")
 
 // Express Setup
 app = express();
