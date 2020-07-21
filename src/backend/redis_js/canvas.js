@@ -1,5 +1,6 @@
 const redis = require("redis");
 const commons = require("./commons.js");
+const color = require("../colors.js");
 
 
 class RedisManager {
@@ -32,7 +33,7 @@ class RedisManager {
         this.width = canvas_width;
         this.height = canvas_height;
         this.format = pixel_format;
-        this.setAreaValue(1, 1, this.width, this.height, commons.Color.WHITE);
+        this.setAreaValue(1, 1, this.width, this.height, color.Color.WHITE);
     }
 
     /**
