@@ -1,5 +1,6 @@
 const keys = require("./keys");
 const auth = require("./auth");
+const db = require("./queries");
 
 // Express
 const express = require("express");
@@ -7,7 +8,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 // PostgreSQL
-const { Pool } = require("pg");
+// const { Pool } = require("pg").Pool;
 
 // Redis
 const redis = require("redis");
@@ -59,6 +60,24 @@ setInterval(() => {
 const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Express route handlers
+
+// Database Requests
+
+app.get("/users", db.getAllUsers)
+app.get("/users/:telegram_id", db.getUserByTelegramId)
+app.get("/notifications", db.getUsersWithNotifications)
+app.post("/users", db.createUser)
+app.put("/notifications/:telegram_id", db.setUserNotificationsByTelegramId)
+app.put("/pixels/:telegram_id", db.setUserAccumulatedPixelsByTelegramId)
+app.delete("/users/:telegram_id", db.deleteUserByTelegramId)
+
+app.get("/whitelist", db.getWhitelistGroupIds)
+app.post("/whitelist", db.addWhitelistGroupId)
+app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
+
+app.get("/canvas", db.getLatestCanvas)
+app.get("/canvas/:telegram_id", db.getCanvasByTelegramId)
+app.post("/canvas", db.addCanvas)
 
 /*
 Requests:
