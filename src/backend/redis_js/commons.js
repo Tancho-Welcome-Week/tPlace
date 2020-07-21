@@ -20,44 +20,6 @@ const REDIS_CONFIG_FILE = {
   return_buffers: true,
 };
 
-const Color = {
-  WHITE: "0000",
-  BEIGE: "0001",
-  CREAM: "0010",
-  YELLOW: "0011",
-  ORANGE: "0100",
-  RED: "0101",
-  MAROON: "0110",
-  VIOLET: "0111",
-  INDIGO: "1000",
-  BLUE: "1001",
-  TURQUOISE: "1010",
-  OLIVE: "1011",
-  GREEN: "1100",
-  LIME: "1101",
-  GREY: "1110",
-  BLACK: "1111",
-};
-
-const ColorDecimal = {
-  WHITE: 0,
-  BEIGE: 1,
-  CREAM: 2,
-  YELLOW: 3,
-  ORANGE: 4,
-  RED: 5,
-  MAROON: 6,
-  VIOLET: 7,
-  INDIGO: 8,
-  BLUE: 9,
-  TURQUOISE: 10,
-  OLIVE: 11,
-  GREEN: 12,
-  LIME: 13,
-  GREY: 14,
-  BLACK: 15,
-};
-
 /**
  * Converts a 1-indexed value to its 0-indexed counterpart.
  * @param indexToConvert The 1-indexed value to convert.
