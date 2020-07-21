@@ -60,24 +60,6 @@ const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Express route handlers
 
-// Database Requests
-
-app.get("/users", db.getAllUsers)
-app.get("/users/:telegram_id", db.getUserByTelegramId)
-app.get("/notifications", db.getUsersWithNotifications)
-app.post("/users", db.createUser)
-app.put("/notifications/:telegram_id", db.setUserNotificationsByTelegramId)
-app.put("/pixels/:telegram_id", db.setUserAccumulatedPixelsByTelegramId)
-app.delete("/users/:telegram_id", db.deleteUserByTelegramId)
-
-app.get("/whitelist", db.getWhitelistGroupIds)
-app.post("/whitelist", db.addWhitelistGroupId)
-app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
-
-app.get("/canvas", db.getLatestCanvas)
-app.get("/canvas/:telegram_id", db.getCanvasByTelegramId)
-app.post("/canvas", db.addCanvas)
-
 /*
 Requests:
 
@@ -107,7 +89,7 @@ app.get("/api/grid", (req, res) => {
 app.post("/whitelist", (req, res) => {
   const chatId = req.params.chatId;
   if (isWhitelistPeriod) {
-    //TODO: add chatId to database
+    await db.addWhitelistGroupId(chatId)
     res.sendStatus(200);
   } else {
     res.sendStatus(401);
