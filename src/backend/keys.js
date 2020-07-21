@@ -6,4 +6,6 @@ module.exports = {
   pgDatabase: process.env.PGDATABASE,
   pgPassword: process.env.PGPASSWORD,
   pgPort: process.env.PGPORT,
+  isWhitelistPeriod: process.env.WHITELIST,
+  isBeta: process.env.BETA
 };
