@@ -1,5 +1,5 @@
-const keys = require("./keys");
-const auth = require("./auth");
+const keys = require("./keys.js");
+const auth = require("./auth.js");
 const db = require("./queries");
 
 // Express
@@ -12,10 +12,12 @@ const cors = require("cors");
 
 // Redis
 const redis = require("redis");
-const { spawn } = require("child_process");
+const canvas = require("./redis_js/canvas.js");
+const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
-// const startNotificationSchedule = require("./scheduler")
+const startNotificationSchedule = require("./scheduler/schedule.js");
+const {getUser} = require("./auth.js");
 
 // Express Setup
 app = express();
@@ -34,26 +36,20 @@ io.on("connection", () => {
 });
 
 // Redis setup
-const redisClient = redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
-});
-const redisPublisher = redisClient.duplicate();
-const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
-pythonRedis.stdout.on("data", (output) => {
-  console.log("Obtaining data from python script ...");
-  console.log(output.toString());
-});
-pythonRedis.on("close", (code) => {
-  console.log(`Child process closing with code ${code}`);
-});
+const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
+redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
 
 // Start Schedule
 const users = true; //TODO: get users from database
 //startNotificationSchedule(users);
 setInterval(() => {
-  //TODO: add redis backup to database
+  redisManager.getCanvas().then((result, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      //TODO: add redis backup to database
+    }
+  })
 }, 300000);
 
 // Flag for whitelisting
@@ -123,12 +119,22 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update redis
-    const grid = true; // TODO: pull grid info from redis
-    // TODO: canvas update in database
-    // TODO: update user fields accordingly
-    io.emit("grid", grid);
-    res.sendStatus(200);
+
+    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
+    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
+    redisManager.setValue(x_coordinate, y_coordinate, color);
+
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        // TODO: canvas update in database
+        // TODO: update user fields accordingly
+        res.sendStatus(200);
+      }
+    });
   } else {
     res.sendStatus(401);
   }
@@ -142,9 +148,18 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    const grid = true; // TODO: get bitfield of all white canvas
-    io.emit("grid", grid);
-    res.sendStatus(200);
+
+    redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], redis_commons.Color.WHITE);
+
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        res.sendStatus(200);
+      }
+    });
   } catch (e) {
     res.sendStatus(400);
   }

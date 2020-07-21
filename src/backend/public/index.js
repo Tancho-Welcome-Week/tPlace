@@ -11,8 +11,8 @@ let startY = 0; // topmost canvas y-coordinate displayed
 
 function draw() {
     // for the actual image data
-    CANVAS_HEIGHT = 200;
-    CANVAS_WIDTH = 300;
+    var CANVAS_HEIGHT = 200;
+    var CANVAS_WIDTH = 300;
 
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
