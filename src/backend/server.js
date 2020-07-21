@@ -1,5 +1,6 @@
-const keys = require("./keys");
-const auth = require("./auth");
+const keys = require("./keys.js");
+const auth = require("./auth.js");
+const db = require("./queries");
 
 // Express
 const express = require("express");
@@ -11,14 +12,20 @@ const fs = require("fs");
 const https = require("https")
 
 // PostgreSQL
-const { Pool } = require("pg");
+// const { Pool } = require("pg").Pool;
 
 // Redis
 const redis = require("redis");
-const { spawn } = require("child_process");
+const canvas = require("./redis_js/canvas.js");
+const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
+<<<<<<< HEAD
 const startNotificationSchedule = require("./scheduler/schedule")
+=======
+const startNotificationSchedule = require("./scheduler/schedule.js");
+const {getUser} = require("./auth.js");
+>>>>>>> 1afb5ac099f4542b58ba44a8de0054dcf4fd4ade
 
 // Express Setup
 app = express();
@@ -37,32 +44,44 @@ io.on("connection", () => {
 });
 
 // Redis setup
-const redisClient = redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
-});
-const redisPublisher = redisClient.duplicate();
-const pythonRedis = spawn("python", ["./redis_project/canvas.py"]);
-pythonRedis.stdout.on("data", (output) => {
-  console.log("Obtaining data from python script ...");
-  console.log(output.toString());
-});
-pythonRedis.on("close", (code) => {
-  console.log(`Child process closing with code ${code}`);
-});
+const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
+redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
 
 // Start Schedule
 const users = true; //TODO: get users from database
-startNotificationSchedule(users);
+//startNotificationSchedule(users);
 setInterval(() => {
-  //TODO: add redis backup to database
-}, 300000)
+  redisManager.getCanvas().then((result, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      //TODO: add redis backup to database
+    }
+  })
+}, 300000);
 
 // Flag for whitelisting
 const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Express route handlers
+
+// Database Requests
+
+app.get("/users", db.getAllUsers)
+app.get("/users/:telegram_id", db.getUserByTelegramId)
+app.get("/notifications", db.getUsersWithNotifications)
+app.post("/users", db.createUser)
+app.put("/notifications/:telegram_id", db.setUserNotificationsByTelegramId)
+app.put("/pixels/:telegram_id", db.setUserAccumulatedPixelsByTelegramId)
+app.delete("/users/:telegram_id", db.deleteUserByTelegramId)
+
+app.get("/whitelist", db.getWhitelistGroupIds)
+app.post("/whitelist", db.addWhitelistGroupId)
+app.delete("/whitelist/:group_id", db.deleteWhitelistGroupId)
+
+app.get("/canvas", db.getLatestCanvas)
+app.get("/canvas/:telegram_id", db.getCanvasByTelegramId)
+app.post("/canvas", db.addCanvas)
 
 /*
 Requests:
@@ -91,14 +110,14 @@ app.get("/api/grid", (req, res) => {
 });
 
 app.post("/whitelist", (req, res) => {
-  const chatId = req.params.chatId
+  const chatId = req.params.chatId;
   if (isWhitelistPeriod) {
     //TODO: add chatId to database
-    res.sendStatus(200)
+    res.sendStatus(200);
   } else {
-    res.sendStatus(401)
+    res.sendStatus(401);
   }
-})
+});
 
 app.post("/api/grid/:chatId/:userId", (req, res) => {
   const chatId = req.params.chatId;
@@ -108,12 +127,22 @@ app.post("/api/grid/:chatId/:userId", (req, res) => {
   if (isPermitted) {
     const color = req.body.color;
     const user = req.body.user;
-    // TODO: pixel update redis
-    const grid = true; // TODO: pull grid info from redis
-    // TODO: canvas update in database
-    // TODO: update user fields accordingly
-    io.emit("grid", grid);
-    res.sendStatus(200);
+
+    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
+    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
+    redisManager.setValue(x_coordinate, y_coordinate, color);
+
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        // TODO: canvas update in database
+        // TODO: update user fields accordingly
+        res.sendStatus(200);
+      }
+    });
   } else {
     res.sendStatus(401);
   }
@@ -127,16 +156,31 @@ app.post("/admin/clear", (req, res) => {
       res.status(400).send("<p>Bad Request. Invalid coordinates.</p>");
       return;
     }
-    const grid = true; // TODO: get bitfield of all white canvas
-    io.emit("grid", grid);
-    res.sendStatus(200);
+
+    redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], redis_commons.Color.WHITE);
+
+    redisManager.getCanvas().then((result, error) => {
+      if (error) {
+        console.log(error);
+        res.sendStatus(500);
+      } else {
+        io.emit("grid", result);
+        res.sendStatus(200);
+      }
+    });
   } catch (e) {
     res.sendStatus(400);
   }
 });
 
+<<<<<<< HEAD
 https.createServer({
   key: fs.readFileSync("../../server.key"),
   cert: fs.readFileSync("../../server.cert")
 }, app)
 .listen(5000, () => console.log("Listening on port 5000..."));
+=======
+app.listen(5000, () => console.log("Listening on port 5000..."));
+
+module.exports = app; // exporting for testing purposes
+>>>>>>> 1afb5ac099f4542b58ba44a8de0054dcf4fd4ade
