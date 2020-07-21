@@ -47,7 +47,6 @@ function calculateOffset(pixelXCoordinate, pixelYCoordinate, canvasWidth) {
 module.exports = {
   REDIS_CONFIG_FILE,
   calculateOffset,
-  Color,
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
   CANVAS_NAME,
