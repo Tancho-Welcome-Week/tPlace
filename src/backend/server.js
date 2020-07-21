@@ -20,12 +20,7 @@ const canvas = require("./redis_js/canvas.js");
 const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
-<<<<<<< HEAD
 const startNotificationSchedule = require("./scheduler/schedule")
-=======
-const startNotificationSchedule = require("./scheduler/schedule.js");
-const {getUser} = require("./auth.js");
->>>>>>> 1afb5ac099f4542b58ba44a8de0054dcf4fd4ade
 
 // Express Setup
 app = express();
@@ -173,14 +168,6 @@ app.post("/admin/clear", (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-https.createServer({
-  key: fs.readFileSync("../../server.key"),
-  cert: fs.readFileSync("../../server.cert")
-}, app)
-.listen(5000, () => console.log("Listening on port 5000..."));
-=======
 app.listen(5000, () => console.log("Listening on port 5000..."));
 
 module.exports = app; // exporting for testing purposes
->>>>>>> 1afb5ac099f4542b58ba44a8de0054dcf4fd4ade
