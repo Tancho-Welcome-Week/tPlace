@@ -1,6 +1,7 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
+const color = require("./colors")
 
 // Express
 const express = require("express");
@@ -43,20 +44,25 @@ const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
 redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
 
 // Start Schedule
-const users = true; //TODO: get users from database
-//startNotificationSchedule(users);
+db.getAllUsers().then(users => {
+  startNotificationSchedule(users);
+  //TODO: Exclude users exempted from notifications
+})
+
 setInterval(() => {
   redisManager.getCanvas().then((result, error) => {
     if (error) {
       console.log(error);
     } else {
-      //TODO: add redis backup to database
+      db.addCanvas("250437415", result).then(r => {
+        console.log('Bitfield backed up successfully. UWU')
+      })
     }
   })
 }, 300000);
 
 // Flag for whitelisting
-const isWhitelistPeriod = process.env.WHITELIST || false;
+const isWhitelistPeriod = process.env.WHITELIST || true;
 
 // Express route handlers
 
@@ -70,24 +76,16 @@ POST /api/admin/clear : admin clear
 
 */
 
-app.get("/:chatId/:userId", (req, res) => {
-  const chatId = req.params.chatId;
-  const userId = req.params.userId;
-  const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
-  if (!isPermitted) {
-    res.sendStatus(401);
-  }
-  res.sendFile("./public/index.html", { root: "." });
-  //res.redirect("https://www.reddit.com/r/HydroHomies/"); //TODO: Send frontend thinga majig
-});
-
-app.get("/api/grid", (req, res) => {
+app.get("/api/grid", async(req, res) => {
+  const grid = await redisManager.getCanvas()
+  const json = {"grid": grid}
+  res.json(json)
   console.log("Grid requested.");
   res.sendStatus(200);
 });
 
-app.post("/whitelist", (req, res) => {
-  const chatId = req.params.chatId;
+app.post("/whitelist", async (req, res) => {
+  const chatId = req.body.chatId;
   if (isWhitelistPeriod) {
     await db.addWhitelistGroupId(chatId)
     res.sendStatus(200);
@@ -96,36 +94,7 @@ app.post("/whitelist", (req, res) => {
   }
 });
 
-app.post("/api/grid/:chatId/:userId", (req, res) => {
-  const chatId = req.params.chatId;
-  const userId = req.params.userId;
-  const isPermitted = auth.authenticateChatId(chatId); // TODO: telegram authentication
-  const user = getUser(userId); //TODO: check if user can place pixel
-  if (isPermitted) {
-    const color = req.body.color;
-    const user = req.body.user;
-
-    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
-    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
-    redisManager.setValue(x_coordinate, y_coordinate, color);
-
-    redisManager.getCanvas().then((result, error) => {
-      if (error) {
-        console.log(error);
-        res.sendStatus(500);
-      } else {
-        io.emit("grid", result);
-        // TODO: canvas update in database
-        // TODO: update user fields accordingly
-        res.sendStatus(200);
-      }
-    });
-  } else {
-    res.sendStatus(401);
-  }
-});
-
-app.post("/admin/clear", (req, res) => {
+app.post("/admin/clear", async (req, res) => {
   try {
     const topLeft = req.body.topLeft; // array of two numbers
     const bottomRight = req.body.bottomRight; // array of two numbers
@@ -134,20 +103,75 @@ app.post("/admin/clear", (req, res) => {
       return;
     }
 
-    redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], redis_commons.Color.WHITE);
+    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.Color.WHITE);
 
-    redisManager.getCanvas().then((result, error) => {
-      if (error) {
-        console.log(error);
-        res.sendStatus(500);
-      } else {
-        io.emit("grid", result);
-        res.sendStatus(200);
-      }
-    });
+    try {
+      const grid = await redisManager.getCanvas();
+      io.emit("grid", grid);
+      res.sendStatus(200)
+    } catch (err) {
+      console.log(err);
+      res.sendStatus(500)
+    }
+
   } catch (e) {
     res.sendStatus(400);
   }
+});
+
+
+app.post("/api/grid/:chatId/:userId", async (req, res) => {
+  const chatId = req.params.chatId;
+  const userId = req.params.userId;
+  const isPermitted = auth.authenticateChatId(chatId);
+  if (isPermitted) {
+    const color = req.body.color;
+    const accumulatedPixels = req.body.accumulated_pixels; // TODO: Check how Frontend sends
+
+    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
+    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
+    await redisManager.setValue(x_coordinate, y_coordinate, color);
+
+    try {
+      const grid = await redisManager.getCanvas();
+      io.emit("grid", grid);
+      res.sendStatus(200)
+    } catch (err) {
+      console.log(err);
+      res.sendStatus(500)
+    }
+
+    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+app.get("/api/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const user = await db.getUserByTelegramId(userId)
+    res.json(user)
+    res.sendStatus(200)
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+app.get("/start/:chatId/:userId", async (req, res) => {
+  const chatId = req.params.chatId;
+  const userId = req.params.userId;
+  const isPermitted = await auth.authenticateChatId(chatId);
+  console.log(isPermitted)
+  if (!isPermitted) {
+    res.sendStatus(401);
+    return
+  }
+  let user = await db.getUserByTelegramId(userId);
+  if (!user) {
+    user = await db.createUser(userId, chatId);
+  }
+  res.sendFile("./public/index.html", { root: "." });
 });
 
 app.listen(5000, () => console.log("Listening on port 5000..."));

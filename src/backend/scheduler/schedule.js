@@ -20,7 +20,6 @@ const startNotificationSchedule = (users) => {
     schedule.scheduleJob('0 23 * * *', () => {
         notification.sendNightNotifications(users);
     })
-
 }
 
 module.exports = startNotificationSchedule

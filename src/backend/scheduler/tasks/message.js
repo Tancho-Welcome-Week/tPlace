@@ -11,7 +11,7 @@ const NIGHT_NOTIFICATION_PIXEL_FULLY_RECHARGED = "Just because it's quiet hours,
     "get to pixeling! Your pixels are charged!";
 
 const sendNotification = (user, message) => {
-    const chatId = user.chatId
+    const chatId = user.telegram_id
     bot.telegram.sendMessage(chatId, message);
 }
 
