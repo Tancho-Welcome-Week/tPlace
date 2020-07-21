@@ -18,12 +18,12 @@ const pool = new Pool({
 
 async function getAllUsers() {
     const users = await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC').rows
-    return users.rows
+    return users
 }
 
 async function getUserByTelegramId(telegram_id) {
-    const user = await pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id])
-    return user.rows[0]
+    const user = await pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id]).rows[0]
+    return user
 }
 
 async function getUsersWithNotifications() {
