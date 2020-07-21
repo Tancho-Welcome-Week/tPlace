@@ -1,6 +1,6 @@
-
+const keys = require("../keys.js");
 // Use the constant below if running from Docker
-const REDIS_HOST_ADDRESS = "redis";
+const REDIS_HOST_ADDRESS_DOCKER = "redis";
 
 // Use the constant below if running as standalone
 const REDIS_HOST_ADDRESS_STANDALONE = "localhost";
@@ -8,15 +8,16 @@ const REDIS_HOST_ADDRESS_STANDALONE = "localhost";
 const REDIS_HOST_PORT = 6379;
 
 const CANVAS_NAME = "tPlace canvas";
-const PIXEL_FORMAT = 'u4';
+const PIXEL_FORMAT = "u4";
 const CANVAS_HEIGHT = 2;
 const CANVAS_WIDTH = 2;
 
 const REDIS_CONFIG_FILE = {
-    port      : REDIS_HOST_PORT,
-    // host      : REDIS_HOST_ADDRESS,
-    host      : REDIS_HOST_ADDRESS_STANDALONE,
-    return_buffers : true
+  port: REDIS_HOST_PORT,
+  host: keys.redisHost,
+  // host      : REDIS_HOST_ADDRESS,
+  // host      : REDIS_HOST_ADDRESS_STANDALONE,
+  return_buffers: true,
 };
 
 /**
@@ -24,7 +25,7 @@ const REDIS_CONFIG_FILE = {
  * @param indexToConvert The 1-indexed value to convert.
  */
 function convertOneIndexToZeroIndex(indexToConvert) {
-    return indexToConvert - 1;
+  return indexToConvert - 1;
 }
 
 /**
@@ -36,11 +37,19 @@ function convertOneIndexToZeroIndex(indexToConvert) {
  * @returns {string} Returns a formatted offset string for use in Redis.
  */
 function calculateOffset(pixelXCoordinate, pixelYCoordinate, canvasWidth) {
-    const heightIndexOffset = convertOneIndexToZeroIndex(pixelYCoordinate) * canvasWidth;
-    const widthIndexOffset = convertOneIndexToZeroIndex(pixelXCoordinate);
-    const totalOffset = (heightIndexOffset + widthIndexOffset);
-    return "#" + totalOffset;
+  const heightIndexOffset =
+    convertOneIndexToZeroIndex(pixelYCoordinate) * canvasWidth;
+  const widthIndexOffset = convertOneIndexToZeroIndex(pixelXCoordinate);
+  const totalOffset = heightIndexOffset + widthIndexOffset;
+  return "#" + totalOffset;
 }
 
-module.exports = { REDIS_CONFIG_FILE, calculateOffset, Color, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_NAME, PIXEL_FORMAT };
-
+module.exports = {
+  REDIS_CONFIG_FILE,
+  calculateOffset,
+  Color,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  CANVAS_NAME,
+  PIXEL_FORMAT,
+};
