@@ -99,7 +99,7 @@ bot.on('callback_query', ctx => {
     } else {
         const chatId = query.message.chat.id
         const userId = query.from.id
-        let gameurl = `${appEntry}/${chatId}/${userId}`;
+        let gameurl = `${appEntry}/start/${chatId}/${userId}`;
         ctx.answerGameQuery(gameurl);
     }
 });
