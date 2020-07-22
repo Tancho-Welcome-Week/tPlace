@@ -69,6 +69,40 @@ bot.help(ctx => ctx.reply('Use the /start command to start the game!'))
 bot.command('tplace', (ctx) =>
     ctx.replyWithGame(gameShortName))
 
+bot.command('off', ctx => {
+    const userId = ctx.update.message.from.id
+    const url = `${appEntry}/toggle/off`
+    axios.post(url, {userId: userId})
+        .then(res => {
+            if (res.status == 200) {
+                ctx.reply('Notification turned off successfully!')
+            } else {
+                ctx.reply('It seems you are not registered yet! Register on the bot using the Start Drawing button!')
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            ctx.reply(`Unicorns! Looks like an error has occured. Contact @Khairoulll for more info`)
+        })
+})
+
+bot.command('on', ctx => {
+    const userId = ctx.update.message.from.id
+    const url = `${appEntry}/toggle/on`
+    axios.post(url, {userId: userId})
+        .then(res => {
+            if (res.status == 200) {
+                ctx.reply('Notification turned on successfully!')
+            } else {
+                ctx.reply('It seems you are not registered yet! Register on the bot using the Start Drawing button!')
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            ctx.reply(`Unicorns! Looks like an error has occured. Contact @Khairoulll for more info`)
+        })
+})
+
 // bot.command('whitelist', (ctx) => {
 //     const chatId = ctx.update.message.chat.id
 //     const url = `${appEntry}/whitelist`

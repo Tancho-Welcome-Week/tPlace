@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+const fs = require("fs")
 const keys = require('./keys')
 // Move to seperate file with restricted permissions after testing, make sure details match
 // Change to pg variables from keys file before deployment
@@ -10,25 +11,33 @@ const pool = new Pool({
     port: keys.pgPort,
   })
 
+
 // TODO: Better error handling
+
+
+// Initialise database
+const initDatabase = () => {
+    const init = fs.readFileSync("../database/init.sql").toString();
+    pool.query(init).then(r => console.log('Database initialised successfully'));
+}
 
 // User Functions
 
 // GET methods
 
 async function getAllUsers() {
-    const users = await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC').rows
-    return users
+    const users = await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC')
+    return users.rows
 }
 
 async function getUserByTelegramId(telegram_id) {
-    const user = await pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id]).rows[0]
-    return user
+    const user = await pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id])
+    return user.rows[0]
 }
 
 async function getUsersWithNotifications() {
-    const users = await pool.query('SELECT * FROM Users WHERE notifications = TRUE').rows
-    return users
+    const users = await pool.query('SELECT * FROM Users WHERE notifications = TRUE')
+    return users.rows
 }
 
 // POST methods
@@ -36,14 +45,14 @@ async function getUsersWithNotifications() {
 async function createUser(telegram_id, group_id) {
     await pool.query('INSERT INTO Users (telegram_id, group_id) VALUES ($1, $2)', [telegram_id, group_id])
     const user = await getUserByTelegramId(telegram_id)
-    console.log(user)
     return user;
 }
 
 // PUT methods
 
 async function setUserNotificationsByTelegramId(telegram_id, notifications) {
-    await pool.query('UPDATE Users SET notifications = $2 WHERE telegram_id = $1 RETURNING telegram_id, notifications', [telegram_id, notifications])
+    const result = await pool.query('UPDATE Users SET notifications = $2 WHERE telegram_id = $1 RETURNING telegram_id, notifications', [telegram_id, notifications])
+    return !!result.rows[0]
 }
 
 async function setUserAccumulatedPixelsByTelegramId(telegram_id, accumulated_pixels) {
@@ -61,13 +70,13 @@ async function deleteUserByTelegramId(telegram_id) {
 // GET methods
 
 async function getWhitelistGroupIds() {
-    const group_ids = await pool.query('SELECT * FROM Whitelist').rows
-    return group_ids
+    const group_ids = await pool.query('SELECT * FROM Whitelist')
+    return group_ids.rows
 }
 
 async function getWhitelistByGroupId(id) {
-    const group_id = await pool.query("SELECT * FROM Whitelist WHERE group_id = $1", [id]).rows
-    return group_id
+    const group_id = await pool.query("SELECT * FROM Whitelist WHERE group_id = $1", [id])
+    return group_id.rows[0]
 }
 
 // POST methods
@@ -87,13 +96,13 @@ async function deleteWhitelistGroupId(group_id) {
 // GET methods
 
 async function getLatestCanvas() {
-    const canvas = await pool.query('SELECT * FROM Canvas ORDER BY last_updated DESC LIMIT 1').rows[0]
-    return canvas
+    const canvas = await pool.query('SELECT * FROM Canvas ORDER BY last_updated DESC LIMIT 1')
+    return canvas.rows[0]
 }
 
 async function getCanvasByTelegramId(telegram_id) {
-    const canvas = await pool.query('SELECT * FROM Canvas WHERE telegram_id = $1 ORDER BY last_updated DESC', [telegram_id]).rows[0]
-    return canvas
+    const canvas = await pool.query('SELECT * FROM Canvas WHERE telegram_id = $1 ORDER BY last_updated DESC', [telegram_id])
+    return canvas.rows[0]
 }
 
 // POST methods
@@ -105,6 +114,7 @@ async function addCanvas(telegram_id, bitfield) {
 // Exports
 
 module.exports = {
+    initDatabase: initDatabase,
     createUser: createUser,
     getUserByTelegramId: getUserByTelegramId,
     getUsersWithNotifications: getUsersWithNotifications,
