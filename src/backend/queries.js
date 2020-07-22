@@ -17,8 +17,12 @@ const pool = new Pool({
 
 // Initialise database
 const initDatabase = () => {
-    const init = fs.readFileSync("../database/init.sql").toString();
-    pool.query(init).then(r => console.log('Database initialised successfully'));
+    const init = fs.readFileSync("./database/init.sql").toString();
+    try {
+        pool.query(init).then(r => console.log('Database initialised successfully'));
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 // User Functions
