@@ -47,10 +47,7 @@ const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
 redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
 
 // Start Schedule
-db.getAllUsers().then(users => {
-  startNotificationSchedule(users);
-  //TODO: Exclude users exempted from notifications
-})
+startNotificationSchedule().then(r => console.log('Notification schedule started'))
 
 setInterval(() => {
   redisManager.getCanvas().then((result, error) => {
@@ -96,6 +93,39 @@ app.post("/whitelist", async (req, res) => {
     res.sendStatus(401);
   }
 });
+
+app.post("/toggle/off", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const exists = await db.setUserNotificationsByTelegramId(userId, false)
+    if (!exists) {
+      res.sendStatus(204)
+      return
+    }
+    res.sendStatus(200)
+  } catch (err) {
+    console.log(err)
+    res.sendStatus(401)
+  }
+
+})
+
+app.post("/toggle/on", async (req, res) => {
+  const userId = req.body.userId;
+
+  try {
+    const exists = await db.setUserNotificationsByTelegramId(userId, true)
+    if (!exists) {
+      res.sendStatus(204)
+      return
+    }
+    res.sendStatus(200)
+  } catch (err) {
+    console.log(err)
+    res.sendStatus(401)
+  }
+
+})
 
 app.post("/admin/clear", async (req, res) => {
   try {
@@ -164,14 +194,16 @@ app.get("/api/user/:userId", async (req, res) => {
 app.get("/start/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
-  const isPermitted = await auth.authenticateChatId(chatId);
-  console.log(isPermitted)
+  const isPermitted = keys.isBeta || await auth.authenticateChatId(chatId);
   if (!isPermitted) {
     res.sendStatus(401);
     return
   }
   let user = await db.getUserByTelegramId(userId);
   if (!user) {
+    if (keys.isBeta) {
+      await db.addWhitelistGroupId(chatId)
+    }
     user = await db.createUser(userId, chatId);
   }
   res.sendFile("./public/index.html", { root: "." });

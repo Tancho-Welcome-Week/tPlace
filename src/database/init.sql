@@ -23,5 +23,5 @@ create table Canvas (
     foreign key (telegram_id) references Users
 );
 
-INSERT INTO Whitelist (group_id) VALUES ('-484684580');
-INSERT INTO Users (telegram_id, group_id) VALUES ('250437415', '-484684580');
+--INSERT INTO Whitelist (group_id) VALUES ('-484684580');
+--INSERT INTO Users (telegram_id, group_id) VALUES ('250437415', '-484684580');
