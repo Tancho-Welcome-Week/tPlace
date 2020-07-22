@@ -2,12 +2,15 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+    <!-- <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
     <title>tPlace</title>
-    <link href="index.css" rel="stylesheet" type="text/css"/>
+    <link href="main.css" rel="stylesheet" type="text/css"/>
+    <script src="jquery-3.5.1.min.js"></script>
 </head>
 
 <body onload="draw();" style="background-color: #1B2D37; color: white;">
-    <div id="colour-swatches" style="position:absolute; left: 50%; top: 50%; transform: translateX(-450px) translateY(-50%);">
+    <div id="colour-swatches" style="position:absolute; left: 50%; top: 50%; transform: translateX(-380px) translateY(-50%);">
         <svg height="500px" viewBox="0 0 94 689" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
             <g transform="matrix(1,0,0,1,-231.839,-195.88)">
                 <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,-114.241,95.3528)">
@@ -117,7 +120,7 @@
     </div>
     <div id="canvas-bg">
         <div id="canvas-div">
-            <canvas id="canvas" width="600" height="400">
+            <canvas id="canvas" width="512" height="512">
                 Oh no! Your browser doesn't support this :( Try using a more updated one!
             </canvas>
             <div class='popup' id='confirm-popup'>
@@ -125,20 +128,44 @@
                 <button class='button' id='cancel'>Cancel</button>
             </div>
             <div class='popup' id='cooldown-popup'>
-                You can't put pixels while on cooldown, but feel free to try colours on!
+                You can't put pixels while on cooldown,
+                <br>but feel free to try colours on!
                 <button class='button' id='ok'>Okay!</button>
             </div>
+            <div class='popup' id='outofrange-popup'>
+                You can't put pixels outside of the canvas!
+                <button class='button' id='ok2'>Okay!</button>
+            </div>
+            <!-- <img class='popup' id='confirm-popup' src='confirmation popup.svg' width='140' usemap='#cfm-buttons'>
+            <map name='cfm-buttons'>
+                <area shape="rect" coords="" onclick="confirmColour()">
+                <area shape="rect" coords="" onclick="cancelColour()">
+            </map> -->
         </div>
+        <!-- <span class="popup" id="confirm-popup" style="width: 90px; height: 30px; background-image: url('confirmation popup.svg'); display:block"></span> -->
     </div>
-    <div id="coords">
+    <div id="display-items" style="position:absolute; left: 20px; bottom: 20px;">
+        <p>coordinates: (<span id="x">0</span>, <span id="y">0</span>)</p>
+        <p>time till next click: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
+        <p>number of pixels clickable: <span id="accPixels"></span></p>
+    </div>
+
+    <!-- <div id="coords-div">
         <p id="x">x: 0</p>
         <p id="y">y: 0</p>
     </div>
     <div id="countdown-div">
-        <p>time till next click: <span id="countdown">0</span>s</p>
+        <p>time till next click: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
     </div>
+    <div id="accPixels-div">
+        <p>number of pixels clickable: <span id="accPixels"></span></p>
+    </div>
+    <div>
+        <img id="cat" />
+    </div> -->
 
-    <script src = "index.js"></script>
+    <script src = "main.js"></script>
+    <script src = "/socket.io/socket.io.js"></script>
 </body>
 
 </html>
