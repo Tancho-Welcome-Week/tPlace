@@ -39,6 +39,9 @@ io.on("connection", () => {
   console.log("A user is connected");
 });
 
+//Initialise Database
+db.initDatabase();
+
 // Redis setup
 const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
 redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);

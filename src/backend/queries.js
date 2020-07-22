@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+const fs = require("fs")
 const keys = require('./keys')
 // Move to seperate file with restricted permissions after testing, make sure details match
 // Change to pg variables from keys file before deployment
@@ -11,6 +12,13 @@ const pool = new Pool({
   })
 
 // TODO: Better error handling
+
+
+// Initialise database
+const initDatabase = () => {
+    const init = fs.readFileSync("../database/init.sql").toString();
+    pool.query(init).then(r => console.log('Database initialised successfully'));
+}
 
 // User Functions
 
@@ -105,6 +113,7 @@ async function addCanvas(telegram_id, bitfield) {
 // Exports
 
 module.exports = {
+    initDatabase: initDatabase,
     createUser: createUser,
     getUserByTelegramId: getUserByTelegramId,
     getUsersWithNotifications: getUsersWithNotifications,
