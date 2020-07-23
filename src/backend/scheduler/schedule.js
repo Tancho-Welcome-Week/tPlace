@@ -3,22 +3,22 @@
 const schedule = require('node-schedule');
 const notification = require('./tasks/notification.js')
 
-const startNotificationSchedule = (users) => {
+const startNotificationSchedule = async () => {
 
     schedule.scheduleJob('30 9 * * *', () => {
-        notification.sendMorningNotifications(users);
+        notification.sendMorningNotifications();
     })
 
     schedule.scheduleJob('30 12 * * *', () => {
-        notification.sendLunchNotifications(users);
+        notification.sendLunchNotifications();
     })
 
     schedule.scheduleJob('30 19 * * *', () => {
-        notification.sendDinnerNotifications(users);
+        notification.sendDinnerNotifications();
     })
 
     schedule.scheduleJob('0 23 * * *', () => {
-        notification.sendNightNotifications(users);
+        notification.sendNightNotifications();
     })
 }
 

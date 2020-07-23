@@ -1,6 +1,8 @@
 const message = require('./message')
+const db = require('../../queries')
 
-exports.sendMorningNotifications = (users) => {
+exports.sendMorningNotifications = async () => {
+    const users = await db.getUsersWithNotifications()
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -10,7 +12,8 @@ exports.sendMorningNotifications = (users) => {
     }
 }
 
-exports.sendLunchNotifications = (users) => {
+exports.sendLunchNotifications = async () => {
+    const users = await db.getUsersWithNotifications()
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -20,7 +23,8 @@ exports.sendLunchNotifications = (users) => {
     }
 }
 
-exports.sendDinnerNotifications = (users) => {
+exports.sendDinnerNotifications = async () => {
+    const users = await db.getUsersWithNotifications()
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time
@@ -30,7 +34,9 @@ exports.sendDinnerNotifications = (users) => {
     }
 }
 
-exports.sendNightNotifications = (users) => {
+exports.sendNightNotifications = async () => {
+    const users = await db.getUsersWithNotifications()
+    console.log(users)
     const currTime = Date.now()
     for (const user of users) {
         // minusing 5 minutes of the current time

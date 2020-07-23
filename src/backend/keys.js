@@ -1,3 +1,5 @@
+// const dotenv = require('dotenv').config(); //for non docker testing
+
 module.exports = {
   redisHost: process.env.REDIS_HOST,
   redisPort: process.env.REDIS_PORT,
@@ -6,4 +8,6 @@ module.exports = {
   pgDatabase: process.env.PGDATABASE,
   pgPassword: process.env.PGPASSWORD,
   pgPort: process.env.PGPORT,
+  isWhitelistPeriod: process.env.WHITELIST,
+  isBeta: process.env.BETA
 };
