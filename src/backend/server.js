@@ -151,12 +151,7 @@ app.post("/admin/clear", async (req, res) => {
     try {
       const grid = await redisManager.getCanvas();
       io.emit("grid", grid);
-      res.sendStatus(201);
-
-      const returnMessage = {
-        "Accepted": "accepted"
-      }
-      res.send(returnMessage);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
@@ -168,7 +163,7 @@ app.post("/admin/clear", async (req, res) => {
 });
 
 
-app.post("/api/grid/:chatId/:userId", async (req, res) => {
+app.put("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
@@ -183,16 +178,10 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     try {
       const grid = await redisManager.getCanvas();
       io.emit("grid", grid);
-
-      const returnMessage = {
-        "Accepted": "accepted"
-      }
-
-      res.sendStatus(201);
-      res.send(returnMessage);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
-      res.sendStatus(500);
+      res.sendStatus(500)
     }
 
     await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
