@@ -1,7 +1,8 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
-const color = require("./colors")
+const color = require("./colors");
+const canvas_commons = require("./canvas_commons.js");
 
 // Express
 const express = require("express");
@@ -30,7 +31,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Socket.io Setup
-const http = require("http").Server(app);
+const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   perMessageDeflate: false,
 });
@@ -43,8 +44,8 @@ io.on("connection", () => {
 db.initDatabase();
 
 // Redis setup
-const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
-redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
+const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
+redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
@@ -150,7 +151,12 @@ app.post("/admin/clear", async (req, res) => {
     try {
       const grid = await redisManager.getCanvas();
       io.emit("grid", grid);
-      res.sendStatus(200)
+      res.sendStatus(201);
+
+      const returnMessage = {
+        "Accepted": "accepted"
+      }
+      res.send(returnMessage);
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
@@ -177,10 +183,16 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     try {
       const grid = await redisManager.getCanvas();
       io.emit("grid", grid);
-      res.sendStatus(200)
+
+      const returnMessage = {
+        "Accepted": "accepted"
+      }
+
+      res.sendStatus(201);
+      res.send(returnMessage);
     } catch (err) {
       console.log(err);
-      res.sendStatus(500)
+      res.sendStatus(500);
     }
 
     await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
