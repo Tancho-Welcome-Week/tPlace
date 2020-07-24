@@ -150,8 +150,13 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      // io.emit("grid", grid);
-      res.sendStatus(200);
+      io.emit("grid", grid);
+      res.sendStatus(201);
+
+      const returnMessage = {
+        "Accepted": "accepted"
+      }
+      res.send(returnMessage);
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
@@ -177,8 +182,14 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      // io.emit("grid", grid);
-      res.sendStatus(200);
+      io.emit("grid", grid);
+
+      const returnMessage = {
+        "Accepted": "accepted"
+      }
+
+      res.sendStatus(201);
+      res.send(returnMessage);
     } catch (err) {
       console.log(err);
       res.sendStatus(500);
