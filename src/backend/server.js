@@ -150,8 +150,8 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      // io.emit("grid", grid);
-      res.sendStatus(200);
+      io.emit("grid", grid);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
@@ -177,11 +177,11 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      // io.emit("grid", grid);
-      res.sendStatus(200);
+      io.emit("grid", grid);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
-      res.sendStatus(500);
+      res.sendStatus(500)
     }
 
     await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
