@@ -1,7 +1,8 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
-const color = require("./colors")
+const color = require("./colors");
+const canvas_commons = require("./canvas_commons.js");
 
 // Express
 const express = require("express");
@@ -43,8 +44,8 @@ io.on("connection", () => {
 db.initDatabase();
 
 // Redis setup
-const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
-redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
+const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
+redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
@@ -63,6 +64,15 @@ setInterval(() => {
 
 // Flag for whitelisting
 const isWhitelistPeriod = process.env.WHITELIST || true;
+
+// Allow CORS
+app.use(function (req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+        res.header('Access-Control-Allow-Credentials', 'true')
+        next()
+    }
+)
 
 // Express route handlers
 

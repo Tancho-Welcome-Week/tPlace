@@ -37,18 +37,14 @@ function convertOneIndexToZeroIndex(indexToConvert) {
  * @returns {string} Returns a formatted offset string for use in Redis.
  */
 function calculateOffset(pixelXCoordinate, pixelYCoordinate, canvasWidth) {
-  const heightIndexOffset =
-    convertOneIndexToZeroIndex(pixelYCoordinate) * canvasWidth;
-  const widthIndexOffset = convertOneIndexToZeroIndex(pixelXCoordinate);
-  const totalOffset = heightIndexOffset + widthIndexOffset;
-  return "#" + totalOffset;
+    const heightIndexOffset = convertOneIndexToZeroIndex(pixelYCoordinate) * canvasWidth;
+    const widthIndexOffset = convertOneIndexToZeroIndex(pixelXCoordinate);
+    const totalOffset = heightIndexOffset + widthIndexOffset;
+    return "#" + totalOffset;
 }
 
 module.exports = {
-  REDIS_CONFIG_FILE,
-  calculateOffset,
-  CANVAS_HEIGHT,
-  CANVAS_WIDTH,
-  CANVAS_NAME,
-  PIXEL_FORMAT,
+    REDIS_CONFIG_FILE,
+    RETRY_STRATEGY_FUNCTION,
+    calculateOffset
 };
