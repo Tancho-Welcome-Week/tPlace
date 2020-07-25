@@ -146,7 +146,7 @@ app.post("/admin/clear", async (req, res) => {
       return;
     }
 
-    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.Color.WHITE);
+    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.ColorBinary.WHITE);
 
     try {
       const grid = await redisManager.getCanvas();

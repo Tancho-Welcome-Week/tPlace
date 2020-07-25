@@ -1,5 +1,4 @@
-
-// var socket = io.connect();
+// var socket = io();
 
 var xCoordDisplay = document.getElementById("x");
 var yCoordDisplay = document.getElementById("y");
@@ -19,7 +18,7 @@ var numberOfAccumulatedPixels = new accumulatedPixels(0);
 
 var startTime;
 
-var currentColour = "RED";
+var currentColour = "RED"; 
 
 const DISP_TO_CANVAS_SCALE = 512/128;
 
@@ -72,34 +71,48 @@ function draw() {
         // finally 8-bit unsigned int array used by imgData
 
         // directly changes myImgData variable
-        const gridValue = Object.values(grid.grid);
         console.log("grid callback reached");
+        const gridValue = Object.values(grid.grid);
         // console.log(bitfieldGrid);
         // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
         // console.log(Object.values(grid));
-        var view = Uint8Array.from(gridValue);
-        console.log(view);
-        var rgbaArr = new Uint32Array(128*128);
-        for (let i = 0; i < view.length; i++) {
+        console.log(gridValue);
+        // var view = Uint8Array.from(gridValue);
+        // console.log(view);
+        var rgbaArr = new Uint8ClampedArray(128*128*4);
+        for (let i = 0; i < gridValue.length; i++) {
             // iterates over each byte to separate into the two bits
-            var num = view[i]; // gives an integer between 0 and 255
+            var num = gridValue[i]; // gives an integer between 0 and 255
             var nibble1 = (num & 0xF0) >> 4; // 0xF0 == '11110000' 
             var nibble2 = num & 0x0F // 0x0F == '00001111'
-            // console.log(nibble1); // 0111 == 7?
-            // console.log(nibble2); // 1011 == 11?
             var color1 = ColorIndex[nibble1];
             var color2 = ColorIndex[nibble2];
+            // console.log(nibble1); // 0111 == 7?
+            // console.log(nibble2); // 1011 == 11?
             // console.log(color1);
             // console.log(color2);
             var rgba1 = ColorRGB[color1];
             var rgba2 = ColorRGB[color2];
-            rgbaArr[i*2] = 255 << 24 + rgba1[2] << 16 + rgba1[1] << 8 + rgba1[0];
-            rgbaArr[i*2 + 1] = 255 << 24 + rgba2[2] << 16 + rgba2[1] << 8 + rgba2[0];
+            if (num !== 0) {
+                console.log(num);
+                console.log(rgba1);
+                console.log(rgba2);
+            }
+            rgbaArr[i*8] = rgba1[0];
+            rgbaArr[i*8 + 1] = rgba1[1];
+            rgbaArr[i*8 + 2] = rgba1[2];
+            rgbaArr[i*8 + 3] = 255;
+            rgbaArr[i*8 + 4] = rgba2[0];
+            rgbaArr[i*8 + 5] = rgba2[1];
+            rgbaArr[i*8 + 6] = rgba2[2];
+            rgbaArr[i*8 + 7] = 255;
+            // rgbaArr[i*2 + 2] = 255 << 24 | rgba1[2] << 16 | rgba1[1] << 8 | rgba1[0];
+            // rgbaArr[i*2 + 1] = 255 << 24 | rgba2[2] << 16 | rgba2[1] << 8 | rgba2[0];
         }
 
         console.log(rgbaArr);
-
         myImgData.data.set(rgbaArr);
+        redraw(myImgData, currentZoom);
     }
 
     const userUrl = window.location.href.split("/"); 
@@ -174,7 +187,6 @@ function draw() {
 
         // TODO: put black border around image?
     }
-    redraw(myImgData, currentZoom);
 
     // ZOOMING 
     function zoom(delta, absX, absY) {
@@ -252,7 +264,7 @@ function draw() {
                 // won't put a colour
                 console.log("there is already a selected pixel");
             } else {
-                [x, y] = getCurrentCoods(evt);
+                const [x, y] = getCurrentCoods(evt);
                 if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
                     // pixel out of range; won't put a colour 
                     var popup = document.getElementById("outofrange-popup");
@@ -309,12 +321,12 @@ function draw() {
             }
         }
     };
-    canvas.addEventListener('mousedown', downDrag(evt),false);
-    canvas.addEventListener('mousemove', moveDrag(evt),false);
-    canvas.addEventListener('mouseup', upDrag(evt),false);
-    canvas.addEventListener('touchstart', downDrag(evt),false);
-    canvas.addEventListener('touchmove', moveDrag(evt),false);
-    canvas.addEventListener('touchend', upDrag(evt),false);
+    canvas.addEventListener('mousedown', downDrag, false);
+    canvas.addEventListener('mousemove', moveDrag, false);
+    canvas.addEventListener('mouseup', upDrag, false);
+    canvas.addEventListener('touchstart', downDrag, false);
+    canvas.addEventListener('touchmove', moveDrag, false);
+    canvas.addEventListener('touchend', upDrag, false);
 
     function confirmColour(x, y, chatId, userId) { 
         console.log("Confirmed colour");
@@ -340,11 +352,11 @@ function draw() {
         // var r = ColorRGB.currentColour[0];
         // var g = ColorRGB.currentColour[1];
         // var b = ColorRGB.currentColour[2];
-        var r = 0;
+        var r = 255;
         var g = 0;
-        var b = 255;
+        var b = 0;
         
-        var data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accumulated_pixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] }); 
+        var data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] }); 
         console.log(data);
         xhr.send(data); 
     }
@@ -371,7 +383,7 @@ function draw() {
                 document.getElementById(`${previousColour}`).style["stroke-width"]="0.9px"; 
             }
             previousColour = number;
-            currentColour = Colour[number]; // string of colour name e.g. "RED"
+            currentColour = Color[number]; // string of colour name e.g. "RED"
         };
     }
     for (var n=1; n<=34; n++) {
