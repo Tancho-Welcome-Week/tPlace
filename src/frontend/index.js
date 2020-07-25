@@ -1,4 +1,5 @@
-// var socket = io();
+
+// var socket = io.connect();
 
 var xCoordDisplay = document.getElementById("x");
 var yCoordDisplay = document.getElementById("y");
@@ -14,54 +15,13 @@ var currentZoom = 1; // default zoom is 2
 var startX = 0; // leftmost canvas x-coordinate displayed
 var startY = 0; // topmost canvas y-coordinate displayed
 
-var numberOfAccumulatedPixels = 1.8; // will be taken from api, this is just for testing purposes
+var numberOfAccumulatedPixels = new accumulatedPixels(0);
+
 var startTime;
 
 var currentColour = "RED";
-const Colour = ["WHITE", "BEIGE", "CREAM"]; 
-Object.freeze(Colour);
-const ColourBits = {
-    // actually may not even need this if can just use index of Colour array
-    WHITE: "0000",
-    BEIGE: "0001", 
-    CREAM: "0010",
-    YELLOW: "0011",
-    ORANGE: "0100",
-    RED: "0101",
-    MAROON: "0110",
-    VIOLET: "0111",
-    INDIGO: "1000",
-    BLUE: "1001",
-    TURQUOISE: "1010",
-    OLIVE: "1011",
-    GREEN: "1100",
-    LIME: "1101",
-    GREY: "1110",
-    BLACK: "1111"
-};
-Object.freeze(ColourBits);
-const ColourRGBA = {
-    // TODO: change to correct rgba code
-    WHITE: "0000",
-    BEIGE: "0001", 
-    CREAM: "0010",
-    YELLOW: "0011",
-    ORANGE: "0100",
-    RED: "0101",
-    MAROON: "0110",
-    VIOLET: "0111",
-    INDIGO: "1000",
-    BLUE: "1001",
-    TURQUOISE: "1010",
-    OLIVE: "1011",
-    GREEN: "1100",
-    LIME: "1101",
-    GREY: "1110",
-    BLACK: "1111"
-}
-Object.freeze(ColourRGBA);
 
-var DISP_TO_CANVAS_SCALE = 512/128;
+const DISP_TO_CANVAS_SCALE = 512/128;
 
 function draw() {
     // for the actual image data
@@ -80,18 +40,20 @@ function draw() {
     // API requests
     function httpGetAsync(theUrl, callback) {
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() { 
+
+        xmlHttp.onload = function() { 
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-                callback(xmlHttp.responseText);
+                callback(xmlHttp.response);
         }
         xmlHttp.open("GET", theUrl, true);
+        xmlHttp.responseType = "json";
         xmlHttp.send(null);
     }
 
     function httpGetBinary(theUrl, callback) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", theUrl, true);
-        xmlHttp.responseType ="arraybuffer";
+        xmlHttp.responseType = "arraybuffer";
 
         xmlHttp.onload = function() {
             var arrayBuffer = xmlHttp.response; // note: NOT responseText
@@ -110,40 +72,70 @@ function draw() {
         // finally 8-bit unsigned int array used by imgData
 
         // directly changes myImgData variable
-        
-        var view = new Uint8ClampedArray(grid);
-        // var rgbaArr = new Uint32Array(128*128);
-        // for (let i = 0; i < view.length; i++) {
-        //     // iterates over each byte to separate into the two bits
-        //     var num = view[i] & 0xFF; // gives an integer between 0 and 255
-        //     var nibble1 = num & 0xF0; // gives an integer between 0 and 16
-        //     var nibble2 = num >> 4;
-        //     // var lower_nibble = (num & 0xF0) >> 4;
-        //     // var higher_nibble = num & 0x0F;
-        //     var colour1 = Colour[nibble1];
-        //     var colour2 = Colour[nibble2];
-        //     rgbaArr[i*2] = ColourRGBA.colour1;
-        //     rgbaArr[i*2 + 1] = ColourRGBA.colour2;
-        // }
+        const gridValue = Object.values(grid.grid);
+        console.log("grid callback reached");
+        // console.log(bitfieldGrid);
+        // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
+        // console.log(Object.values(grid));
+        var view = Uint8Array.from(gridValue);
+        console.log(view);
+        var rgbaArr = new Uint32Array(128*128);
+        for (let i = 0; i < view.length; i++) {
+            // iterates over each byte to separate into the two bits
+            var num = view[i]; // gives an integer between 0 and 255
+            var nibble1 = (num & 0xF0) >> 4; // 0xF0 == '11110000' 
+            var nibble2 = num & 0x0F // 0x0F == '00001111'
+            // console.log(nibble1); // 0111 == 7?
+            // console.log(nibble2); // 1011 == 11?
+            var color1 = ColorIndex[nibble1];
+            var color2 = ColorIndex[nibble2];
+            // console.log(color1);
+            // console.log(color2);
+            var rgba1 = ColorRGB[color1];
+            var rgba2 = ColorRGB[color2];
+            rgbaArr[i*2] = 255 << 24 + rgba1[2] << 16 + rgba1[1] << 8 + rgba1[0];
+            rgbaArr[i*2 + 1] = 255 << 24 + rgba2[2] << 16 + rgba2[1] << 8 + rgba2[0];
+        }
 
+        console.log(rgbaArr);
 
-        myImgData.data.set(view);
+        myImgData.data.set(rgbaArr);
     }
+
+    const userUrl = window.location.href.split("/"); 
+    // const userId = userUrl[userUrl.length - 1];
+    const userId = '250437415';
+    let chatId;
 
     function initUserVariables(userVariables) {
-        // init number of accumulated pixels and cooldown timing
-        // need to consider (now - last timestamp) / 5min
+        // {
+        //     telegram_id: '250437415',
+        //    group_id: blabla,
+        //     last_updated: 2020-07-21T15:27:41.215Z,
+        //     accumulated_pixels: 0,
+        //     notifications: true
+        //   }
+        console.log(userVariables);
+        // console.log("init user variables reached");
+        chatId = userVariables["group_id"];
+
+        numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
+        const lastUpdated = new Date(userVariables["last_updated"]);
+        const gap = new Date() - lastUpdated; // in ms
+        numberOfAccumulatedPixels.addPixels(Math.floor(gap / ACCUMULATED_PIXEL_GAP));
+        console.log("initialised number of pixels: ");
+        updateAccPixels();
+        
+        // TODO: init cooldown timing
+        startTime = new Date();
         // if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins
-        // also has a chatId and userId
-        accumulatePixels();
     }
 
-    // httpGetAsync("/api/grid", bitfieldToImgData);
-    // httpGetAsync("/api/getUserVariables", initUserVariables);
+    httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
+    httpGetAsync("https://tplace.xyz/api/grid", bitfieldToImgData);
     
-
-    var rawArr = [255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, ]
-    bitfieldToImgData(rawArr);
+    // var rawArr = [255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, ]
+    // bitfieldToImgData(rawArr);
 
     function redraw(imgData, scale) {
         // TODO: I THINK CAN REMOVE THE PARAMETERS CUZ I JUST USE myImgData and currentZoom all the time?
@@ -214,14 +206,14 @@ function draw() {
     var dragStart, dragged;
     var lastX, lastY;
     var hasSelectedPixel;
-    canvas.addEventListener('mousedown', function(evt) {
+    function downDrag(evt) {
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
         dragStart = {x: lastX, y: lastY};
         dragged = true;
-    },false);
-    canvas.addEventListener('mousemove', function(evt) {
+    }
+    function moveDrag(evt) {
         if (dragged) {
             console.log('drag');
             currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
@@ -236,8 +228,8 @@ function draw() {
             lastX = currX;
             lastY = currY;
         }
-    },false);
-    canvas.addEventListener('mouseup', function(evt) {
+    }
+    function upDrag(evt) {
         minDelta = 5; // i.e. more than 5 pixels movement consider drag
         currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -277,7 +269,7 @@ function draw() {
                     redraw(myImgData, currentZoom);        
                     hasSelectedPixel = true;
                     
-                    if (Math.floor(numberOfAccumulatedPixels) > 0) {
+                    if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
                         var popup = document.getElementById("confirm-popup");
                         popup.style.left = `${evt.pageX-8}px`;
                         popup.style.top = `${evt.pageY+1}px`;
@@ -286,8 +278,9 @@ function draw() {
 
                         var confirmBtn = document.getElementById("confirm");
                         confirmBtn.onclick = function() {
-                            confirmColour(currX, currY);
-                            if (Math.floor(numberOfAccumulatedPixels) == 1) {
+                            confirmColour(x, y, chatId, userId);
+                            console.log(x, y);
+                            if (Math.floor(numberOfAccumulatedPixels.getPixels()) == 1) {
                                 // last accumulated pixel used
                                 startCountdown();
                             }
@@ -315,38 +308,45 @@ function draw() {
                 }
             }
         }
-    },false);
+    };
+    canvas.addEventListener('mousedown', downDrag(evt),false);
+    canvas.addEventListener('mousemove', moveDrag(evt),false);
+    canvas.addEventListener('mouseup', upDrag(evt),false);
+    canvas.addEventListener('touchstart', downDrag(evt),false);
+    canvas.addEventListener('touchmove', moveDrag(evt),false);
+    canvas.addEventListener('touchend', upDrag(evt),false);
 
-    function confirmColour(currX, currY) { 
+    function confirmColour(x, y, chatId, userId) { 
         console.log("Confirmed colour");
         var cfm_popup = document.getElementById("confirm-popup");
         cfm_popup.classList.toggle('show');
-        numberOfAccumulatedPixels--;
+        numberOfAccumulatedPixels.subtractPixels(1);
         updateAccPixels();
 
         // TODO: POST REQUEST with data of new pixel 
-        /*
         let xhr = new XMLHttpRequest(); 
-        let url = "/:chatId/:userId"; 
+        let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`; 
         xhr.open("POST", url, true); 
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
-        xhr.onreadystatechange = function() { 
-            if (xhr.readyState === 4 && xhr.status === 200) { 
-                // Print received data from server 
-                console.log(this.responseText);
-                // result.innerHTML = this.responseText; 
-            }
-        }; 
+        // xhr.onreadystatechange = function() { 
+        //     if (xhr.readyState === 4 && xhr.status === 200) { 
+        //         // Print received data from server 
+        //         console.log(this.responseText);
+        //     }
+        // }; 
         // Sending JSON object
         var now = new Date();
-        var r = ColourRGBA.currentColour[0];
-        var g = ColourRGBA.currentColour[1];
-        var b = ColourRGBA.currentColour[2];
+        // var r = ColorRGB.currentColour[0];
+        // var g = ColorRGB.currentColour[1];
+        // var b = ColorRGB.currentColour[2];
+        var r = 0;
+        var g = 0;
+        var b = 255;
         
-        var data = JSON.stringify({ "x": currX, "y": currY, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accPixels": numberOfAccumulatedPixels }); 
+        var data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accumulated_pixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] }); 
+        console.log(data);
         xhr.send(data); 
-        */
     }
     function cancelColour(imgData, originalPixel) {
         console.log("Go back go back go back");
@@ -379,7 +379,7 @@ function draw() {
     }
 
     updateAccPixels();
-    startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
+    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
     accumulatePixels();
 
     // socket.on('grid', function(grid){
@@ -390,15 +390,14 @@ function draw() {
 
 
 function updateAccPixels() {
-    console.log(numberOfAccumulatedPixels);
-    accPixels.innerText = Math.floor(numberOfAccumulatedPixels);
+    console.log(numberOfAccumulatedPixels.getPixels());
+    accPixels.innerText = Math.floor(numberOfAccumulatedPixels.getPixels());
 }
 
 
 function accumulatePixels() {
     var increaseAccPixels = setInterval(function() {
-        console.log("Adding pixel!")
-        numberOfAccumulatedPixels++;
+        numberOfAccumulatedPixels.addPixels(1);
         updateAccPixels();
     }, cooldownTime*1000); // *1000 to convert to ms
 }
