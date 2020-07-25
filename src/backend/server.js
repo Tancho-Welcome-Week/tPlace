@@ -31,7 +31,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Socket.io Setup
-const http = require("http").Server(app);
+const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   perMessageDeflate: false,
 });
@@ -67,10 +67,10 @@ const isWhitelistPeriod = process.env.WHITELIST || true;
 
 // Allow CORS
 app.use(function (req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-        res.header('Access-Control-Allow-Credentials', 'true')
-        next()
+      res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+      res.header('Access-Control-Allow-Credentials', 'true')
+      next()
     }
 )
 
