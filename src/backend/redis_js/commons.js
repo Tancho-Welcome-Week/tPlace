@@ -42,10 +42,10 @@ const RETRY_STRATEGY_FUNCTION = function(options) {
  * @param indexToConvert The 1-indexed value to convert.
  */
 function convertOneIndexToZeroIndex(indexToConvert) {
-    // return indexToConvert - 1;
+    return indexToConvert - 1;
 
     // TODO: Stopgap measure must be reverted.
-    return indexToConvert;
+    // return indexToConvert;
 }
 
 /**

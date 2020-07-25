@@ -15,6 +15,7 @@ class RedisManager {
     constructor(key) {
         this.key = key;
         this.redisClient = redis.createClient(commons.REDIS_CONFIG_FILE);
+        console.log("Redis Manager initialized.")
     }
 
     /**
@@ -33,7 +34,8 @@ class RedisManager {
         this.width = canvas_width;
         this.height = canvas_height;
         this.format = pixel_format;
-        this.setAreaValue(1, 1, this.width, this.height, color.Color.WHITE);
+        this.setAreaValue(1, 1, this.width, this.height, color.ColorBinary.WHITE);
+        console.log("Redis Canvas initialized to zeroes with height " + this.height + " and width " + this.width);
     }
 
     /**
