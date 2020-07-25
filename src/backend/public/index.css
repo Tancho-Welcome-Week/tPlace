@@ -1,57 +1,80 @@
-/*@media screen and (max-width: 600px) {*/
-/*    #canvas-bg{*/
-/*        border-radius: 10px;*/
-/*        background-color: lightgray;*/
-/*        padding: 12px;*/
-/*        padding-top: 21px;*/
-/*        padding-bottom: 3px;*/
-/*        margin: 0 auto;*/
-/*        height: 80vh;*/
-/*        width: 80vw;*/
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-/*        !* to centre the canvas within this div *!*/
-/*        display: block;*/
-/*        text-align: center;*/
-/*        vertical-align: middle;*/
+@font-face {
+    font-family: 'inversionz italic';
+    src: url('fonts/inversionz_italic-webfont.woff2') format('woff2'),
+         url('fonts/inversionz_italic-webfont.woff') format('woff');
+}
+  
+@font-face {
+    font-family: 'inversionz unboxed italic';
+    src: url('fonts/inversionz_unboxed_italic-webfont.woff2') format('woff2'),
+         url('fonts/inversionz_unboxed_italic-webfont.woff') format('woff');
+}
+  
+@font-face {
+    font-family: 'inversionz unboxed regular';
+    src: url('fonts/inversionz_unboxed-webfont.woff2') format('woff2'),
+         url('fonts/inversionz_unboxed-webfont.woff') format('woff');
+}
+  
+@font-face {
+    font-family: 'inversionz regular';
+    src: url('fonts/inversionz-webfont.woff2') format('woff2'),
+         url('fonts/inversionz-webfont.woff') format('woff');
+}
 
-/*        !* position:absolute;*/
-/*        left: 50%;*/
-/*        top: 50%;*/
-/*        transform: translateX(-50%) translateY(-50%); *!*/
-/*    }*/
-/*}*/
+h1 {
+    font-family: 'inversionz unboxed regular', sans-serif;
+    font-size: 60px;
+    letter-spacing: -5px;
+    line-height: 0.2em;
+}
+
+body {
+    background-color: #1b2d37;
+    background-image: url('img/banner.jpg');
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
+    color: white;
+}
 
 #canvas-bg {
-    border-radius: 10px;
-    background-color: lightgray;
-    padding: 12px;
-    padding-top: 21px;
-    padding-bottom: 3px;
-    vertical-align: middle;
-    margin: auto;
-    height: 532px;
-    width: 532px;
+    border-radius: 6px;
+    /* margin: auto; */
+    height: 90vw;
+    width: 90vw;
+    padding: 10px;
 
     /* to centre the canvas within this div */
-    display: block;
-    text-align: center;
-
-    /* position:absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%); */
-
+    /* display: block;
+    text-align: left; */
 }
 
 #canvas {
     display: block;
-    margin: auto;
-    border-radius: 2px;
-    /* border: 1px solid black;  */
+    background-color: lightgray;
+    /* margin: auto; */
+    border: 1px solid black; 
+    border-radius: 6px;
+    height: 90vw;
+    width: 90vw;
 
     background-color: white;
     /* transform: scale(2, 2); */
     /* transform: translate(300px, 200px); */
+}
+
+@media (min-width: 768px) {
+    #canvas-bg {
+        height: 490px;
+        width: 490px;
+    }
+    #canvas {
+        height: 490px;
+        width: 490px;
+    }
 }
 
 .popup {
@@ -77,7 +100,7 @@
     animation: fadeIn 1s;
 }
 
-/* Add animation (fade in the popup) */
+/* Add animation (fade in/out the popup) */
 @-webkit-keyframes fadeIn {
     from {opacity: 0;} 
     to {opacity: 1;}
@@ -88,10 +111,6 @@
     to {opacity: 1;}
 }
 
-#cooldown-popup {
-    transition: opacity 1s;
-}
-
 @-webkit-keyframes fadeOut {
     from {opacity: 1;} 
     to {opacity: 0;}
@@ -100,4 +119,115 @@
 @keyframes fadeOut {
     from {opacity: 1;}
     to {opacity: 0;}
+}
+
+
+#cooldown-popup {
+    transition: opacity 1s;
+}
+
+.header {
+    text-align: center;
+}
+
+:root {
+    --swatch-mobile-height: 17vw;
+}
+/* Grid */
+.grid-header {
+    grid-area: header;
+    text-align: center;
+}
+.grid-swatches {
+    grid-area: swatches;
+    text-align: center;
+    height: var(--swatch-mobile-height);
+}
+.grid-canvas {
+    grid-area: canvas;
+}
+.grid-info {
+    grid-area: info;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-areas:
+        'header'
+        'canvas'
+        'swatches'
+        'info';
+    grid-gap: 10px;
+}
+
+.grid-container > div {
+    border-radius: 10px;
+}
+
+@media (min-width: 768px) {
+    .grid-container {
+        display: grid;
+        grid-template-areas:
+            'header header'
+            'swatches canvas'
+            'info info';
+        grid-gap: 10px;
+        padding: 10px;
+        margin: 0px 30%;
+    }
+
+    .grid-swatches {
+        height: 500px;
+        text-align: right;
+        padding: 6px;
+    }
+    .grid-canvas {
+        text-align: left;
+    }
+}
+
+/* Rotate palette for mobile */
+.palette {
+    height: 500px;
+}
+
+@media (max-width: 768px) {
+    .palette {
+        transform: rotate(90deg) scale(5.3);
+        height: var(--swatch-mobile-height);
+    }
+}
+
+/* BG */
+.bg {
+    background-image: 
+    /* linear-gradient(90deg, rgba(0, 0, 0, 0) 0%,rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 0) 100%); */
+    radial-gradient(farthest-side, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 75%, rgba(0, 0, 0, 0) 100%);
+}
+
+.bg-solid {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Background Video */
+.background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    z-index: -2;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+  
+.background-video video {
+height: 100%;
+width: 100%;
+object-fit: cover;
 }

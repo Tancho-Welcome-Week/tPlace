@@ -335,8 +335,8 @@ function draw() {
         updateAccPixels();
 
         // TODO: POST REQUEST with data of new pixel 
-        let xhr = new XMLHttpRequest(); 
-        let url = `http://localhost:5000/api/grid/-484684580/1231231`;
+        let xhr = new XMLHttpRequest();
+        let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
         xhr.open("POST", url, true); 
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
