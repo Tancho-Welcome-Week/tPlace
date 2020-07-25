@@ -149,7 +149,7 @@ app.post("/admin/clear", async (req, res) => {
       return;
     }
 
-    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.Color.WHITE);
+    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.ColorBinary.WHITE);
 
     try {
       const grid = await redisManager.getCanvas();
@@ -171,6 +171,10 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
+  if (req.body.x <= 0 || req.body.y <= 0) {
+    res.sendStatus(400)
+    return
+  }
   if (isPermitted) {
     console.log(req.body)
     const redValue = req.body.r;
