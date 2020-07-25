@@ -43,9 +43,6 @@ const RETRY_STRATEGY_FUNCTION = function(options) {
  */
 function convertOneIndexToZeroIndex(indexToConvert) {
     return indexToConvert - 1;
-
-    // TODO: Stopgap measure must be reverted.
-    // return indexToConvert;
 }
 
 /**

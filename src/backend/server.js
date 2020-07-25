@@ -219,12 +219,12 @@ app.get("/start/:chatId/:userId", async (req, res) => {
   res.sendFile("./public/index.html", { root: "." });
 });
 
-app.delete("/delete/redis/canvas", async (req, res) => {
-  await redisManager.deleteCanvas();
-  await redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT,
-      canvas_commons.PIXEL_FORMAT);
-  res.sendStatus(200)
-})
+// app.delete("/delete/redis/canvas", async (req, res) => {
+//   await redisManager.deleteCanvas();
+//   await redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT,
+//       canvas_commons.PIXEL_FORMAT);
+//   res.sendStatus(200)
+// })
 
 app.listen(5000, () => console.log("Listening on port 5000..."));
 
