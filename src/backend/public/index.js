@@ -1,5 +1,4 @@
 var socket = io();
-
 var xCoordDisplay = document.getElementById("x");
 var yCoordDisplay = document.getElementById("y");
 var countdownSec = document.getElementById("countdown-s");
@@ -337,7 +336,7 @@ function draw() {
 
         // TODO: POST REQUEST with data of new pixel 
         let xhr = new XMLHttpRequest(); 
-        let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`; 
+        let url = `http://localhost:5000/api/grid/-484684580/1231231`;
         xhr.open("POST", url, true); 
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
@@ -394,7 +393,10 @@ function draw() {
     // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
     accumulatePixels();
 
+    // var potato = io({transports: ['websocket'], upgrade: false})
+    // var socket = potato.connect();
     socket.on('grid', function(grid){
+        console.log(grid)
         bitfieldToImgData(grid);
         redraw(myImgData, currentZoom);
     });

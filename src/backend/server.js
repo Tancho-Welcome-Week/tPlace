@@ -1,7 +1,7 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
-const color = require("./colors");
+const color = require("./public/colors");
 const canvas_commons = require("./canvas_commons.js");
 
 // Express
@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 // Socket.io Setup
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
-  perMessageDeflate: false,
+  perMessageDeflate: false
 });
 
 io.on("connection", () => {
@@ -176,7 +176,6 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     return
   }
   if (isPermitted) {
-    console.log(req.body)
     const redValue = req.body.r;
     const greenValue = req.body.g;
     const blueValue = req.body.b;
@@ -193,6 +192,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
+      console.log(grid)
       io.emit("grid", grid);
       res.sendStatus(200)
     } catch (err) {
@@ -242,6 +242,6 @@ app.get("/start/:chatId/:userId", async (req, res) => {
 //   res.sendStatus(200)
 // })
 
-app.listen(5000, () => console.log("Listening on port 5000..."));
+http.listen(5000, () => console.log("Listening on port 5000..."));
 
 module.exports = app; // exporting for testing purposes
