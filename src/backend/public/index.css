@@ -1,25 +1,55 @@
+/*@media screen and (max-width: 600px) {*/
+/*    #canvas-bg{*/
+/*        border-radius: 10px;*/
+/*        background-color: lightgray;*/
+/*        padding: 12px;*/
+/*        padding-top: 21px;*/
+/*        padding-bottom: 3px;*/
+/*        margin: 0 auto;*/
+/*        height: 80vh;*/
+/*        width: 80vw;*/
+
+/*        !* to centre the canvas within this div *!*/
+/*        display: block;*/
+/*        text-align: center;*/
+/*        vertical-align: middle;*/
+
+/*        !* position:absolute;*/
+/*        left: 50%;*/
+/*        top: 50%;*/
+/*        transform: translateX(-50%) translateY(-50%); *!*/
+/*    }*/
+/*}*/
+
 #canvas-bg {
     border-radius: 10px;
     background-color: lightgray;
-    padding: 10px;
+    padding: 12px;
+    padding-top: 21px;
+    padding-bottom: 3px;
+    vertical-align: middle;
     margin: auto;
-    height: 420px;
-    width: 620px;
+    height: 532px;
+    width: 532px;
 
     /* to centre the canvas within this div */
     display: block;
     text-align: center;
-}
 
-#canvas-div {
-    /* transform: scale(2, 2) translateY(50px); */
+    /* position:absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%); */
+
 }
 
 #canvas {
     display: block;
     margin: auto;
-    border: 1px solid black; 
+    border-radius: 2px;
+    /* border: 1px solid black;  */
 
+    background-color: white;
     /* transform: scale(2, 2); */
     /* transform: translate(300px, 200px); */
 }
@@ -60,4 +90,14 @@
 
 #cooldown-popup {
     transition: opacity 1s;
+}
+
+@-webkit-keyframes fadeOut {
+    from {opacity: 1;} 
+    to {opacity: 0;}
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
 }
