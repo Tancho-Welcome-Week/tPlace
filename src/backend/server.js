@@ -1,7 +1,8 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
-const color = require("./colors")
+const color = require("./colors");
+const canvas_commons = require("./canvas_commons.js");
 
 // Express
 const express = require("express");
@@ -30,7 +31,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Socket.io Setup
-const http = require("http").Server(app);
+const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
   perMessageDeflate: false,
 });
@@ -43,8 +44,8 @@ io.on("connection", () => {
 db.initDatabase();
 
 // Redis setup
-const redisManager = new canvas.RedisManager(redis_commons.CANVAS_NAME);
-redisManager.initializeCanvas(redis_commons.CANVAS_WIDTH, redis_commons.CANVAS_HEIGHT, redis_commons.PIXEL_FORMAT);
+const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
+redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
@@ -64,6 +65,15 @@ setInterval(() => {
 // Flag for whitelisting
 const isWhitelistPeriod = process.env.WHITELIST || true;
 
+// Allow CORS
+app.use(function (req, res, next) {
+      res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+      res.header('Access-Control-Allow-Credentials', 'true')
+      next()
+    }
+)
+
 // Express route handlers
 
 /*
@@ -79,9 +89,8 @@ POST /api/admin/clear : admin clear
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
   const json = {"grid": grid}
-  res.json(json)
+  res.status(200).json(json)
   console.log("Grid requested.");
-  res.sendStatus(200);
 });
 
 app.post("/whitelist", async (req, res) => {
@@ -129,6 +138,7 @@ app.post("/toggle/on", async (req, res) => {
 
 app.post("/admin/clear", async (req, res) => {
   try {
+    console.log(req.body)
     const topLeft = req.body.topLeft; // array of two numbers
     const bottomRight = req.body.bottomRight; // array of two numbers
     if (bottomRight[0] < topLeft[0] || bottomRight[1] < topLeft[1]) {
@@ -148,6 +158,7 @@ app.post("/admin/clear", async (req, res) => {
     }
 
   } catch (e) {
+    console.log(e)
     res.sendStatus(400);
   }
 });
@@ -158,12 +169,20 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
   if (isPermitted) {
-    const color = req.body.color;
-    const accumulatedPixels = req.body.accumulated_pixels; // TODO: Check how Frontend sends
+    console.log(req.body)
+    const redValue = req.body.r;
+    const greenValue = req.body.g;
+    const blueValue = req.body.b;
+    const colorValue = redValue + "," + greenValue + "," + blueValue;
+    const binaryColorValue = color.ColorRGBToBinary[colorValue];
 
-    const x_coordinate = 0; // TODO: Get x-coordinate from frontend
-    const y_coordinate = 0; // TODO: Get y-coordinate from frontend
-    await redisManager.setValue(x_coordinate, y_coordinate, color);
+    const accumulatedPixels = req.body.accPixels; // TODO: Ensure that name is changed
+
+    const x_coordinate = req.body.x;
+    const y_coordinate = req.body.y;
+    await redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
+    console.log("Set pixel with x-coordinate " + x_coordinate + " and y-coordinate " + y_coordinate +
+        " with binary value " + binaryColorValue);
 
     try {
       const grid = await redisManager.getCanvas();
@@ -208,6 +227,13 @@ app.get("/start/:chatId/:userId", async (req, res) => {
   }
   res.sendFile("./public/index.html", { root: "." });
 });
+
+// app.delete("/delete/redis/canvas", async (req, res) => {
+//   await redisManager.deleteCanvas();
+//   await redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT,
+//       canvas_commons.PIXEL_FORMAT);
+//   res.sendStatus(200)
+// })
 
 app.listen(5000, () => console.log("Listening on port 5000..."));
 

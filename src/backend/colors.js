@@ -1,4 +1,4 @@
-const Color = {
+const ColorBinary = {
     WHITE: "0000",
     SILVER: "0001",
     GREY: "0010",
@@ -95,4 +95,13 @@ const ColorDecimal = {
 
 const ColorIndex = Object.keys(ColorRGB);
 
-module.exports = { Color, ColorRGB, ColorDecimal, ColorIndex };
+let ColorRGBToBinary = {};
+
+const binaryValues = Object.values(ColorBinary);
+const rgbValues = Object.values(ColorRGB);
+
+for (let i = 0; i < binaryValues.length; i++) {
+    ColorRGBToBinary[rgbValues[i]] = binaryValues[i];
+}
+
+module.exports = { ColorBinary, ColorRGB, ColorDecimal, ColorRGBToBinary, ColorIndex };

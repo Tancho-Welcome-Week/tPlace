@@ -344,7 +344,7 @@ function draw() {
         var g = 0;
         var b = 255;
         
-        var data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accumulated_pixels": numberOfAccumulatedPixels.getPixels(), "color": Color[currentColour] }); 
+        var data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now, "accumulated_pixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] }); 
         console.log(data);
         xhr.send(data); 
     }
