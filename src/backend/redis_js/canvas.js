@@ -14,6 +14,10 @@ class RedisManager {
      */
     constructor(key) {
         this.key = key;
+        // this.redisClient = redis.createClient({
+        //     config: commons.REDIS_CONFIG_FILE,
+        //     retry_strategy: commons.RETRY_STRATEGY_FUNCTION
+        // });
         this.redisClient = redis.createClient(commons.REDIS_CONFIG_FILE);
     }
 
@@ -56,7 +60,7 @@ class RedisManager {
      * be specified as 1-based (i.e. the smallest possible value is 1, not 0).
      * @param pixelXCoordinate The x-coordinate of the pixel to set, which must be specified as 1-based.
      * @param pixelYCoordinate The y-coordinate of the pixel to set, which must be specified as 1-based.
-     * @param value The Color to set the pixel to, which must be part of the enumeration of Colors.
+     * @param value The color to set the pixel to, which must be a binary string in the enumeration of Colors.
      * @return No return value is expected.
      */
     setValue(pixelXCoordinate, pixelYCoordinate, value) {
