@@ -65,6 +65,15 @@ setInterval(() => {
 // Flag for whitelisting
 const isWhitelistPeriod = process.env.WHITELIST || true;
 
+// Allow CORS
+app.use(function (req, res, next) {
+      res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+      res.header('Access-Control-Allow-Credentials', 'true')
+      next()
+    }
+)
+
 // Express route handlers
 
 /*
@@ -141,8 +150,8 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      res.sendStatus(200)
       io.emit("grid", grid);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
@@ -168,8 +177,8 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      res.sendStatus(200)
       io.emit("grid", grid);
+      res.sendStatus(200)
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
