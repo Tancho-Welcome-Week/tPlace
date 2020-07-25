@@ -1,6 +1,6 @@
 const redis = require("redis");
 const commons = require("./commons.js");
-const color = require("../colors.js");
+const color = require("../public/colors.js");
 
 
 class RedisManager {
