@@ -137,8 +137,11 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
+  if (req.body.userId !== 250437415) {
+    res.sendStatus(401)
+    return
+  }
   try {
-    console.log(req.body)
     const topLeft = req.body.topLeft; // array of two numbers
     const bottomRight = req.body.bottomRight; // array of two numbers
     if (bottomRight[0] < topLeft[0] || bottomRight[1] < topLeft[1]) {
