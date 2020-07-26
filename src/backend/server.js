@@ -2,7 +2,7 @@ const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
 const color = require("./public/colors");
-const canvas_commons = require("./canvas_commons.js");
+const canvas_commons = require("./public/canvas_commons.js");
 
 // Express
 const express = require("express");
@@ -182,7 +182,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     const colorValue = redValue + "," + greenValue + "," + blueValue;
     const binaryColorValue = color.ColorRGBToBinary[colorValue];
 
-    const accumulatedPixels = req.body.accPixels; // TODO: Ensure that name is changed
+    const accumulatedPixels = req.body.accPixels;
 
     const x_coordinate = req.body.x;
     const y_coordinate = req.body.y;
@@ -200,7 +200,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
       res.sendStatus(500)
     }
 
-    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
+    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels)
   } else {
     res.sendStatus(401);
   }
