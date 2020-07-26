@@ -86,6 +86,10 @@ POST /api/admin/clear : admin clear
 
 */
 
+app.get('/', function(req, res){
+  res.status(404).send('Please spare us, we\'re scrub coders :(');
+});
+
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
   const json = {"grid": grid}
@@ -153,7 +157,8 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      io.emit("grid", grid);
+      const json = {grid: grid}
+      io.emit("grid", json);
       res.sendStatus(200)
     } catch (err) {
       console.log(err);
@@ -235,6 +240,17 @@ app.get("/start/:chatId/:userId", async (req, res) => {
   }
   res.sendFile("./public/index.html", { root: "." });
 });
+
+// app.get('*', function(req, res){
+//   res.status(404).send('Please spare us, we\'re scrub coders :(');
+// });
+//
+// app.all('/*', (req,res, next) => {
+//   res.status(403).send({
+//     message: 'Access Forbidden'
+//   });
+//   // or whatever
+// });
 
 // app.delete("/delete/redis/canvas", async (req, res) => {
 //   await redisManager.deleteCanvas();
