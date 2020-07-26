@@ -6,6 +6,9 @@ let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
+let canvas = document.getElementById('canvas');
+
+const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -20,10 +23,22 @@ let startTime;
 
 let currentColour = "RED"; 
 
-const DISP_TO_CANVAS_SCALE = 490/128;
+// Resizing Canvas
+function scaleCanvas() {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+        canvas.setAttribute('width', '490');
+        canvas.setAttribute('height', '490');
+    } else {
+        canvas.setAttribute('width', 0.9*vw);
+        canvas.setAttribute('height', 0.9*vw);
+    }
+}
+scaleCanvas();
+window.addEventListener('resize', scaleCanvas());
+
+const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
 
 function draw() {
-    let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
