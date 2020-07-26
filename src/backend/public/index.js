@@ -20,17 +20,18 @@ let startTime;
 
 let currentColour = "RED"; 
 
-const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
+let displayToCanvasScale;
 
 function draw() {
     let canvas = document.getElementById('canvas');
+    displayToCanvasScale = canvas.clientWidth/128;
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
     let memCvs = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     let memCtx = memCvs.getContext('2d');
 
-    let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global letiable
+    let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global variable
 
     // API requests
     function httpGetAsync(theUrl, callback) {
@@ -66,7 +67,7 @@ function draw() {
         // map the to 32-bit colours, i.e. r g b a each being one byte 
         // finally 8-bit unsigned int array used by imgData
 
-        // directly changes myImgData letiable
+        // directly changes myImgData variable
         console.log("grid callback reached");
         console.log(grid)
         const gridValue = Object.values(grid.grid);
@@ -126,7 +127,7 @@ function draw() {
         //     notifications: true
         //   }
         console.log(userVariables);
-        // console.log("init user letiables reached");
+        // console.log("init user variables reached");
         chatId = userVariables["group_id"];
 
         numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
@@ -234,8 +235,8 @@ function draw() {
             const deltaX = currX - lastX;
             const deltaY = currY - lastY;
             // updating canvas
-            startX -= deltaX/DISP_TO_CANVAS_SCALE / currentZoom;
-            startY -= deltaY/DISP_TO_CANVAS_SCALE / currentZoom;
+            startX -= deltaX/displayToCanvasScale / currentZoom;
+            startY -= deltaY/displayToCanvasScale / currentZoom;
             redraw(myImgData, currentZoom);
             // updating lastX and lastY
             lastX = currX;
@@ -251,8 +252,8 @@ function draw() {
         if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
             // END DRAG; updating canvas
             // console.log('dragMouseUp');
-            startX -= (currX - lastX)/DISP_TO_CANVAS_SCALE / currentZoom;
-            startY -= (currY - lastY)/DISP_TO_CANVAS_SCALE / currentZoom;
+            startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+            startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
             redraw(myImgData, currentZoom);
             dragStart = null;
             dragged = false;
@@ -378,7 +379,7 @@ function draw() {
             col.style["stroke-width"]="3.5px";
             console.log(number);
             // reset previous colour's border on selecting a new colour
-            if (previousColour != -1) {
+            if (previousColour !== -1) {
                 document.getElementById(`${previousColour}`).style["stroke-width"]="2"; 
             }
             previousColour = number;
@@ -386,12 +387,12 @@ function draw() {
             console.log(currentColour + " selected");
         };
     }
-    for (var n=0; n<16; n++) {
+    for (let n=0; n<16; n++) {
         colourPanelListeners(n);
     }
 
     updateAccPixels();
-    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user letiables that don't become accumulated pixels
+    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
     accumulatePixels();
 
     // let potato = io({transports: ['websocket'], upgrade: false})
@@ -455,11 +456,11 @@ function putColour(coords, imgData) {
     
     [x, y] = coords;
 
-    let i = getStartingIndexForCoord(x, y);
+    const i = getStartingIndexForCoord(x, y);
     
-    let originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
+    const originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
-    var rgb = ColorRGB[currentColour];
+    const rgb = ColorRGB[currentColour];
     imgData.data[i] = rgb[0];
     imgData.data[i+1] = rgb[1];
     imgData.data[i+2] = rgb[2];
@@ -469,8 +470,8 @@ function putColour(coords, imgData) {
 }
 
 function getCurrentCoords(event) {
-    let x = Math.floor(startX + event.offsetX/DISP_TO_CANVAS_SCALE / currentZoom);
-    let y = Math.floor(startY + event.offsetY/DISP_TO_CANVAS_SCALE / currentZoom);
+    let x = Math.floor(startX + event.offsetX/displayToCanvasScale / currentZoom);
+    let y = Math.floor(startY + event.offsetY/displayToCanvasScale / currentZoom);
     return [x, y];
 }
 
