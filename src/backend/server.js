@@ -226,11 +226,12 @@ app.get("/start/:chatId/:userId", async (req, res) => {
     return
   }
   let user = await db.getUserByTelegramId(userId);
+  let whitelist = await db.getWhitelistByGroupId(chatId)
   if (!user) {
-    if (keys.isBeta) {
+    if (keys.isBeta && !whitelist) {
       await db.addWhitelistGroupId(chatId)
     }
-    user = await db.createUser(userId, chatId);
+    await db.createUser(userId, chatId);
   }
   res.sendFile("./public/index.html", { root: "." });
 });
