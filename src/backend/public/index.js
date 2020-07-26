@@ -7,7 +7,6 @@ let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
 
-let countdownRunning = false;
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
 // these will change with zooming and scrolling around
@@ -21,7 +20,7 @@ let startTime;
 
 let currentColour = "RED"; 
 
-const DISP_TO_CANVAS_SCALE = 512/128;
+const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
 
 function draw() {
     let canvas = document.getElementById('canvas');
@@ -138,7 +137,7 @@ function draw() {
         console.log(gap);
         updateAccPixels();
         
-        // TODO: init cooldown timing
+        // TODO: fix cooldown timing
         startTime = new Date();
         // if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins
     }
@@ -157,6 +156,7 @@ function draw() {
 
         // putting grey gridlines on imgData
         // every 5 pixels, if it's a white square, make it grey
+        
         for (let r = 0; r < 128; r++) {
 
             if ((r+1) % 5 === 0) {
@@ -180,6 +180,7 @@ function draw() {
                 }
             }
         }
+        
         
         // update memCtx with new image data  
         memCtx.putImageData(imgData, 0, 0);
@@ -335,7 +336,6 @@ function draw() {
         numberOfAccumulatedPixels.subtractPixels(1);
         updateAccPixels();
 
-        // TODO: POST REQUEST with data of new pixel 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
         xhr.open("POST", url, true); 
@@ -349,12 +349,9 @@ function draw() {
         // }; 
         // Sending JSON object
         let now = new Date();
-        // let r = ColorRGB.currentColour[0];
-        // let g = ColorRGB.currentColour[1];
-        // let b = ColorRGB.currentColour[2];
-        let r = 255;
-        let g = 0;
-        let b = 0;
+        let r = ColorRGB[currentColour][0];
+        let g = ColorRGB[currentColour][1];
+        let b = ColorRGB[currentColour][2];
         
         let data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now,
             "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
@@ -374,20 +371,22 @@ function draw() {
     canvas.addEventListener('mousemove', displayCoords);
 
 
-    let previousColour = 0;
+    let previousColour = -1;
     function colourPanelListeners(number) {
         let col = document.getElementById(`${number}`);
         col.onclick = function(){ 
-            col.style["stroke-width"]="3px";
+            col.style["stroke-width"]="3.5px";
+            console.log(number);
             // reset previous colour's border on selecting a new colour
-            if (previousColour !== 0) {
-                document.getElementById(`${previousColour}`).style["stroke-width"]="0.9px"; 
+            if (previousColour != -1) {
+                document.getElementById(`${previousColour}`).style["stroke-width"]="2"; 
             }
             previousColour = number;
             currentColour = ColorIndex[number]; // string of colour name e.g. "RED"
+            console.log(currentColour + " selected");
         };
     }
-    for (let n=1; n<=34; n++) {
+    for (var n=0; n<16; n++) {
         colourPanelListeners(n);
     }
 
@@ -436,7 +435,6 @@ function startCountdown() {
     let interval = setInterval(function() {
         if (secs === 0) {
             clearInterval(interval);
-            countdownRunning = false;
         } else {
             secs--;
             mins = Math.floor(secs / 60);
@@ -461,10 +459,10 @@ function putColour(coords, imgData) {
     
     let originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
-    // TODO: use selected colour
-    imgData.data[i] = 255;
-    imgData.data[i+1] = 0;
-    imgData.data[i+2] = 0;
+    var rgb = ColorRGB[currentColour];
+    imgData.data[i] = rgb[0];
+    imgData.data[i+1] = rgb[1];
+    imgData.data[i+2] = rgb[2];
     imgData.data[i+3] = 255;
 
     return originalPixel;

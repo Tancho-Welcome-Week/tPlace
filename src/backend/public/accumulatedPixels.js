@@ -12,9 +12,11 @@ class accumulatedPixels {
         if (this.currentPixelCount + pixelsToAdd > this.MAX_PIXEL_COUNT) {
             this.currentPixelCount = this.MAX_PIXEL_COUNT;
             // console.log("No pixels added.");
-        } else {
+        } else if (pixelsToAdd > 0) {
             this.currentPixelCount += pixelsToAdd;
             // console.log("Adding pixels: " + pixelsToAdd);
+        } else {
+            console.log("Cannot add negative pixels");
         }
     }
 
