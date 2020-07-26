@@ -2,7 +2,7 @@ const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
 const color = require("./public/colors");
-const canvas_commons = require("./canvas_commons.js");
+const canvas_commons = require("./public/canvas_commons.js");
 
 // Express
 const express = require("express");
