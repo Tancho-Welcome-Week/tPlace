@@ -26,6 +26,12 @@ const startNotificationSchedule = require("./scheduler/schedule")
 
 // Express Setup
 app = express();
+app.use(function(req, res, next) {
+  if (req.url === '/') {
+    res.redirect('https://www.reddit.com/r/YouFellForItFool/comments/cjlngm/you_fell_for_it_fool/')
+  }
+  next();
+})
 app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
@@ -86,6 +92,11 @@ POST /api/admin/clear : admin clear
 
 */
 
+// app.get('/', async (req, res) => {
+//   console.log('/ called')
+//   res.redirect('https://www.reddit.com/r/HydroHomies/')
+// })
+
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
   const json = {"grid": grid}
@@ -95,9 +106,15 @@ app.get("/api/grid", async(req, res) => {
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
+  console.log(req.body)
   if (isWhitelistPeriod) {
-    await db.addWhitelistGroupId(chatId)
-    res.sendStatus(200);
+    try {
+      await db.addWhitelistGroupId(chatId)
+      res.sendStatus(200);
+    } catch (err) {
+      console.log(err)
+      res.sendStatus(400)
+    }
   } else {
     res.sendStatus(401);
   }
@@ -153,7 +170,8 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      io.emit("grid", grid);
+      const json = {grid: grid}
+      io.emit("grid", json);
       res.sendStatus(200)
     } catch (err) {
       console.log(err);
@@ -210,8 +228,7 @@ app.get("/api/user/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
     const user = await db.getUserByTelegramId(userId)
-    res.json(user)
-    res.sendStatus(200)
+    res.status(200).json(user)
   } catch (err) {
     console.log(err)
   }
@@ -234,6 +251,10 @@ app.get("/start/:chatId/:userId", async (req, res) => {
     await db.createUser(userId, chatId);
   }
   res.sendFile("./public/index.html", { root: "." });
+});
+
+app.get('*', function(req, res){
+  res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 });
 
 // app.delete("/delete/redis/canvas", async (req, res) => {

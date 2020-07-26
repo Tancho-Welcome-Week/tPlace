@@ -1,3 +1,4 @@
+
 // const { ColorIndex, ColorRGB, ColorBinary } = require("./colors");
 // const { CANVAS_WIDTH, CANVAS_HEIGHT } = require("./canvas_commons");
 let socket = io();
@@ -6,6 +7,11 @@ let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
+let canvas = document.getElementById('canvas');
+var hammertime = new Hammer(canvas);
+hammertime.get('pinch').set({enable: true});
+
+const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -20,10 +26,22 @@ let startTime;
 
 let currentColour = "RED"; 
 
-const DISP_TO_CANVAS_SCALE = 490/128;
+// Resizing Canvas
+function scaleCanvas() {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+        canvas.setAttribute('width', '490');
+        canvas.setAttribute('height', '490');
+    } else {
+        canvas.setAttribute('width', 0.9*vw);
+        canvas.setAttribute('height', 0.9*vw);
+    }
+}
+scaleCanvas();
+window.addEventListener('resize', scaleCanvas());
+
+const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
 
 function draw() {
-    let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
@@ -217,7 +235,7 @@ function draw() {
         } 
         startX = absX - (absX-startX)/factor;
         startY = absY - (absY-startY)/factor;
-        console.log(currentZoom, startX, startY, absX, absY);
+        // console.log(currentZoom, startX, startY, absX, absY);
         
         redraw(myImgData, currentZoom);
     }
@@ -233,12 +251,33 @@ function draw() {
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     canvas.addEventListener('mousewheel', handleScroll, false);
 
+     // Pinch to Zoom
+    var prevPinch = 1,
+    pinchChk = false;
+
+    function handlePinch(e) {
+        let scale = -((prevPinch-e.scale))*50;
+        prevPinch = e.scale;
+        zoom(scale, 64, 64);
+        pinchChk = true;
+    }
+
+    hammertime.on('pinch', handlePinch);
+
+    hammertime.on('pinchstart', function(e) {
+        pinchChk = true;
+    });
+    hammertime.on('pinchend', function(e) {
+        window.setTimeout(function(){pinchChk = false}, 50);
+        prevPinch = 1;
+    })
 
     // DRAGGING AND CLICKING
     let dragStart, dragged;
     let lastX, lastY;
     let hasSelectedPixel;
     function downDrag(evt) {
+        if (pinchChk == true) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -246,7 +285,7 @@ function draw() {
         dragged = true;
     }
     function moveDrag(evt) {
-        if (dragged) {
+        if (dragged && pinchChk == false) {
             // console.log('drag');
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -270,9 +309,11 @@ function draw() {
         if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
             // END DRAG; updating canvas
             // console.log('dragMouseUp');
-            startX -= (currX - lastX)/DISP_TO_CANVAS_SCALE / currentZoom;
-            startY -= (currY - lastY)/DISP_TO_CANVAS_SCALE / currentZoom;
-            redraw(myImgData, currentZoom);
+            if (pinchChk == false) {
+                startX -= (currX - lastX)/DISP_TO_CANVAS_SCALE / currentZoom;
+                startY -= (currY - lastY)/DISP_TO_CANVAS_SCALE / currentZoom;
+                redraw(myImgData, currentZoom);
+            }            
             dragStart = null;
             dragged = false;
         } else {
@@ -344,9 +385,41 @@ function draw() {
     canvas.addEventListener('mousedown', downDrag, false);
     canvas.addEventListener('mousemove', moveDrag, false);
     canvas.addEventListener('mouseup', upDrag, false);
-    canvas.addEventListener('touchstart', downDrag, false);
-    canvas.addEventListener('touchmove', moveDrag, false);
-    canvas.addEventListener('touchend', upDrag, false);
+    // canvas.addEventListener('touchstart', downDrag, false);
+    // canvas.addEventListener('touchmove', moveDrag, false);
+    // canvas.addEventListener('touchend', upDrag, false);
+
+// Convert touch to mouse
+function touchHandler(event) {
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = "";
+    switch(event.type)
+    {
+        case "touchstart": type = "mousedown"; break;
+        case "touchmove":  type = "mousemove"; break;        
+        case "touchend":   type = "mouseup";   break;
+        default:           return;
+    }
+
+    // initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+    //                screenX, screenY, clientX, clientY, ctrlKey, 
+    //                altKey, shiftKey, metaKey, button, relatedTarget);
+
+    var simulatedEvent = document.createEvent("MouseEvent");
+    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+                                  first.screenX, first.screenY, 
+                                  first.clientX, first.clientY, false, 
+                                  false, false, false, 0/*left*/, null);
+
+    first.target.dispatchEvent(simulatedEvent);
+    event.preventDefault();
+}
+
+canvas.addEventListener("touchstart", touchHandler, true);
+canvas.addEventListener("touchmove", touchHandler, true);
+canvas.addEventListener("touchend", touchHandler, true);
+canvas.addEventListener("touchcancel", touchHandler, true);    
 
     function confirmColour(x, y, chatId, userId) { 
         console.log("Confirmed colour");
