@@ -26,6 +26,12 @@ const startNotificationSchedule = require("./scheduler/schedule")
 
 // Express Setup
 app = express();
+app.use(function(req, res, next) {
+  if (req.url === '/') {
+    res.redirect('https://www.reddit.com/r/HydroHomies/')
+  }
+  next();
+})
 app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
@@ -86,9 +92,10 @@ POST /api/admin/clear : admin clear
 
 */
 
-app.get('/', function(req, res){
-  res.status(404).send('Please spare us, we\'re scrub coders :(');
-});
+// app.get('/', async (req, res) => {
+//   console.log('/ called')
+//   res.redirect('https://www.reddit.com/r/HydroHomies/')
+// })
 
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
@@ -241,16 +248,9 @@ app.get("/start/:chatId/:userId", async (req, res) => {
   res.sendFile("./public/index.html", { root: "." });
 });
 
-// app.get('*', function(req, res){
-//   res.status(404).send('Please spare us, we\'re scrub coders :(');
-// });
-//
-// app.all('/*', (req,res, next) => {
-//   res.status(403).send({
-//     message: 'Access Forbidden'
-//   });
-//   // or whatever
-// });
+app.get('*', function(req, res){
+  res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+});
 
 // app.delete("/delete/redis/canvas", async (req, res) => {
 //   await redisManager.deleteCanvas();
