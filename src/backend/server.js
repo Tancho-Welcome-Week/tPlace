@@ -182,7 +182,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     const colorValue = redValue + "," + greenValue + "," + blueValue;
     const binaryColorValue = color.ColorRGBToBinary[colorValue];
 
-    const accumulatedPixels = req.body.accPixels; // TODO: Ensure that name is changed
+    const accumulatedPixels = req.body.accPixels;
 
     const x_coordinate = req.body.x;
     const y_coordinate = req.body.y;
@@ -192,15 +192,15 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      console.log(grid)
-      io.emit("grid", grid);
+      const json = {grid: grid}
+      io.emit("grid", json);
       res.sendStatus(200)
     } catch (err) {
       console.log(err);
       res.sendStatus(500)
     }
 
-    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels - 1)
+    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels)
   } else {
     res.sendStatus(401);
   }
