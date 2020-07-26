@@ -222,8 +222,7 @@ app.get("/api/user/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
     const user = await db.getUserByTelegramId(userId)
-    res.json(user)
-    res.sendStatus(200)
+    res.status(200).json(user)
   } catch (err) {
     console.log(err)
   }
