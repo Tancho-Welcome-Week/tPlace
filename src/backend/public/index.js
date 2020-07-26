@@ -195,7 +195,15 @@ function draw() {
         let scaleFactor = 1.1;
         let factor = Math.pow(scaleFactor, delta);
 
+        const previousZoom = currentZoom;
         currentZoom *= factor;
+        if (currentZoom < 0.5) {
+            currentZoom = 0.5;
+            factor = currentZoom / previousZoom;
+        } else if (currentZoom > 60) {
+            currentZoom = 60;
+            factor = currentZoom / previousZoom;
+        } 
         startX = absX - (absX-startX)/factor;
         startY = absY - (absY-startY)/factor;
         console.log(currentZoom, startX, startY, absX, absY);
