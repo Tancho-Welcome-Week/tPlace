@@ -68,6 +68,7 @@ function draw() {
 
         // directly changes myImgData letiable
         console.log("grid callback reached");
+        console.log(grid)
         const gridValue = Object.values(grid.grid);
         // console.log(bitfieldGrid);
         // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
@@ -397,8 +398,12 @@ function draw() {
     // let socket = potato.connect();
     socket.on('grid', function(grid){
         console.log(grid)
-        bitfieldToImgData(grid);
-        redraw(myImgData, currentZoom);
+        try{
+            bitfieldToImgData(grid);
+            redraw(myImgData, currentZoom);
+        } catch (err) {
+            console.log(err)
+        }
     });
 }
 
