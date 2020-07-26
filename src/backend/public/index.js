@@ -1,25 +1,22 @@
-var socket = io();
+// var socket = io();
 var xCoordDisplay = document.getElementById("x");
 var yCoordDisplay = document.getElementById("y");
 var countdownSec = document.getElementById("countdown-s");
 var countdownMin = document.getElementById("countdown-m");
 var accPixels = document.getElementById("accPixels");
 
-var countdownRunning = false;
-var cooldownTime = 5; // in seconds
-
 // these will change with zooming and scrolling around
 var currentZoom = 1; // default zoom is 2 
 var startX = 0; // leftmost canvas x-coordinate displayed
 var startY = 0; // topmost canvas y-coordinate displayed
 
+var cooldownTime = 5; // in seconds
 var numberOfAccumulatedPixels = new accumulatedPixels(0);
-
 var startTime;
 
 var currentColour = "RED"; 
 
-const DISP_TO_CANVAS_SCALE = 512/128;
+const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
 
 function draw() {
     // for the actual image data
@@ -136,9 +133,10 @@ function draw() {
         const gap = new Date() - lastUpdated; // in ms
         numberOfAccumulatedPixels.addPixels(Math.floor(gap / ACCUMULATED_PIXEL_GAP));
         console.log("initialised number of pixels: ");
+        console.log(gap);
         updateAccPixels();
         
-        // TODO: init cooldown timing
+        // TODO: fix cooldown timing
         startTime = new Date();
         // if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins
     }
@@ -157,6 +155,7 @@ function draw() {
 
         // putting grey gridlines on imgData
         // every 5 pixels, if it's a white square, make it grey
+        
         for (let r = 0; r < 128; r++) {
             if ((r+1) % 5 == 0) {
                 // every 5th row
@@ -179,6 +178,7 @@ function draw() {
                 }
             }
         }
+        
         
         // update memCtx with new image data  
         memCtx.putImageData(imgData, 0, 0);
@@ -334,7 +334,6 @@ function draw() {
         numberOfAccumulatedPixels.subtractPixels(1);
         updateAccPixels();
 
-        // TODO: POST REQUEST with data of new pixel 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
         xhr.open("POST", url, true); 
@@ -372,20 +371,22 @@ function draw() {
     canvas.addEventListener('mousemove', displayCoods);
 
 
-    var previousColour = 0;
+    var previousColour = -1;
     function colourPanelListeners(number) {
         var col = document.getElementById(`${number}`);
         col.onclick = function(){ 
             col.style["stroke-width"]="3px";
+            console.log(number);
             // reset previous colour's border on selecting a new colour
-            if (previousColour != 0) {
-                document.getElementById(`${previousColour}`).style["stroke-width"]="0.9px"; 
+            if (previousColour != -1) {
+                document.getElementById(`${previousColour}`).style["stroke-width"]="1px"; 
             }
             previousColour = number;
             currentColour = ColorIndex[number]; // string of colour name e.g. "RED"
+            console.log(currentColour + " selected");
         };
     }
-    for (var n=1; n<=34; n++) {
+    for (var n=0; n<16; n++) {
         colourPanelListeners(n);
     }
 
@@ -395,11 +396,12 @@ function draw() {
 
     // var potato = io({transports: ['websocket'], upgrade: false})
     // var socket = potato.connect();
-    socket.on('grid', function(grid){
-        console.log(grid)
-        bitfieldToImgData(grid);
-        redraw(myImgData, currentZoom);
-    });
+
+    // socket.on('grid', function(grid){
+    //     console.log(grid)
+    //     bitfieldToImgData(grid);
+    //     redraw(myImgData, currentZoom);
+    // });
 }
 
 
@@ -417,7 +419,6 @@ function accumulatePixels() {
 }
 
 function startCountdown() {
-    countdownRunning = true;
     var elapsed = new Date() - startTime; // in ms
     var frac = 1 - ((elapsed/1000 % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
     var secs = Math.floor(frac * cooldownTime); 
@@ -430,7 +431,6 @@ function startCountdown() {
     var interval = setInterval(function() {
         if (secs == 0) {
             clearInterval(interval);
-            countdownRunning = false;
         } else {
             secs--;
             mins = Math.floor(secs / 60);
@@ -455,10 +455,10 @@ function putColour(coods, imgData) {
     
     var originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
-    // TODO: use selected colour
-    imgData.data[i] = 255;
-    imgData.data[i+1] = 0;
-    imgData.data[i+2] = 0;
+    var rgb = ColorRGB[currentColour];
+    imgData.data[i] = rgb[0];
+    imgData.data[i+1] = rgb[1];
+    imgData.data[i+2] = rgb[2];
     imgData.data[i+3] = 255;
 
     return originalPixel;
