@@ -11,8 +11,8 @@ let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
 // these will change with zooming and scrolling around
 let currentZoom = 1; // default zoom is 2
-let startX = 0; // leftmost canvas x-coordinate displayed
-let startY = 0; // topmost canvas y-coordinate displayed
+let startX = 0; // leftmost mem canvas x-coordinate displayed
+let startY = 0; // topmost mem canvas y-coordinate displayed
 
 let numberOfAccumulatedPixels = new accumulatedPixels(0);
 
@@ -156,47 +156,57 @@ function draw() {
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
         // putting grey gridlines on imgData
-        // every 5 pixels, if it's a white square, make it grey
+        // every 10 pixels, if it's a white square, make it grey
         
-        for (let r = 0; r < 128; r++) {
-
-            if ((r+1) % 5 === 0) {
-                // every 5th row
-                for (let c = 0; c < 128*4; c += 4) {
-                    if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-                        imgData.data[r*128*4 + c] = 211;
-                        imgData.data[r*128*4 + c+1] = 211;
-                        imgData.data[r*128*4 + c+2] = 211;
-                        imgData.data[r*128*4 + c+3] = 255;
-                    }
-                }
-            }
-            for (let c = 16; c < 128*4; c += 20) {
-                // every 5th column
-                if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-                    imgData.data[r*128*4 + c] = 211;
-                    imgData.data[r*128*4 + c+1] = 211;
-                    imgData.data[r*128*4 + c+2] = 211;
-                    imgData.data[r*128*4 + c+3] = 255;
-                }
-            }
-        }
+        // for (let r = 0; r < 128; r++) {
+        //     if ((r+1) % 10 === 0) {
+        //         // every 10th row
+        //         for (let c = 0; c < 128*4; c += 4) {
+        //             if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+        //                 imgData.data[r*128*4 + c] = 211;
+        //                 imgData.data[r*128*4 + c+1] = 211;
+        //                 imgData.data[r*128*4 + c+2] = 211;
+        //                 imgData.data[r*128*4 + c+3] = 255;
+        //             }
+        //         }
+        //     }
+        //     for (let c = 36; c < 128*4; c += 40) {
+        //         // every 10th column
+        //         if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+        //             imgData.data[r*128*4 + c] = 211;
+        //             imgData.data[r*128*4 + c+1] = 211;
+        //             imgData.data[r*128*4 + c+2] = 211;
+        //             imgData.data[r*128*4 + c+3] = 255;
+        //         }
+        //     }
+        // }
         
         
         // update memCtx with new image data  
         memCtx.putImageData(imgData, 0, 0);
         ctx.drawImage(memCvs, startX, startY, CANVAS_WIDTH/scale, CANVAS_HEIGHT/scale, 0, 0, canvas.clientWidth, canvas.clientHeight);
 
-        // TODO: put black border around image?
+        // put black border around image
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-startX*DISP_TO_CANVAS_SCALE*currentZoom, -startY*DISP_TO_CANVAS_SCALE*currentZoom, canvas.width*currentZoom, canvas.height*currentZoom);
     }
 
     // ZOOMING 
     function zoom(delta, absX, absY) {
         // absX and absY are the coordinates where the mouse is at when zooming
-        let scaleFactor = 1.1;
+        const scaleFactor = 1.1;
         let factor = Math.pow(scaleFactor, delta);
 
+        const previousZoom = currentZoom;
         currentZoom *= factor;
+        if (currentZoom < 0.5) {
+            currentZoom = 0.5;
+            factor = currentZoom / previousZoom;
+        } else if (currentZoom > 60) {
+            currentZoom = 60;
+            factor = currentZoom / previousZoom;
+        } 
         startX = absX - (absX-startX)/factor;
         startY = absY - (absY-startY)/factor;
         console.log(currentZoom, startX, startY, absX, absY);
