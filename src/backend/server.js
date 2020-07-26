@@ -192,8 +192,8 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      console.log(grid)
-      io.emit("grid", grid);
+      const json = {grid: grid}
+      io.emit("grid", json);
       res.sendStatus(200)
     } catch (err) {
       console.log(err);
