@@ -28,7 +28,7 @@ const startNotificationSchedule = require("./scheduler/schedule")
 app = express();
 app.use(function(req, res, next) {
   if (req.url === '/') {
-    res.redirect('https://www.reddit.com/r/HydroHomies/')
+    res.redirect('https://www.reddit.com/r/YouFellForItFool/comments/cjlngm/you_fell_for_it_fool/')
   }
   next();
 })
@@ -106,9 +106,15 @@ app.get("/api/grid", async(req, res) => {
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
+  console.log(req.body)
   if (isWhitelistPeriod) {
-    await db.addWhitelistGroupId(chatId)
-    res.sendStatus(200);
+    try {
+      await db.addWhitelistGroupId(chatId)
+      res.sendStatus(200);
+    } catch (err) {
+      console.log(err)
+      res.sendStatus(400)
+    }
   } else {
     res.sendStatus(401);
   }
