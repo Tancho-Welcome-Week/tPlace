@@ -1,7 +1,7 @@
 const keys = require("./keys.js");
 const auth = require("./auth.js");
 const db = require("./queries");
-const color = require("./colors");
+const color = require("./public/colors");
 const canvas_commons = require("./canvas_commons.js");
 
 // Express
@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 // Socket.io Setup
 const http = require("http").createServer(app);
 const io = require("socket.io")(http, {
-  perMessageDeflate: false,
+  perMessageDeflate: false
 });
 
 io.on("connection", () => {
@@ -137,8 +137,11 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
+  if (req.body.userId !== 250437415) {
+    res.sendStatus(401)
+    return
+  }
   try {
-    console.log(req.body)
     const topLeft = req.body.topLeft; // array of two numbers
     const bottomRight = req.body.bottomRight; // array of two numbers
     if (bottomRight[0] < topLeft[0] || bottomRight[1] < topLeft[1]) {
@@ -146,7 +149,7 @@ app.post("/admin/clear", async (req, res) => {
       return;
     }
 
-    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.Color.WHITE);
+    await redisManager.setAreaValue(topLeft[0], topLeft[1], bottomRight[0], bottomRight[1], color.ColorBinary.WHITE);
 
     try {
       const grid = await redisManager.getCanvas();
@@ -168,8 +171,11 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
+  if (req.body.x <= 0 || req.body.y <= 0) {
+    res.sendStatus(400)
+    return
+  }
   if (isPermitted) {
-    console.log(req.body)
     const redValue = req.body.r;
     const greenValue = req.body.g;
     const blueValue = req.body.b;
@@ -186,6 +192,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
+      console.log(grid)
       io.emit("grid", grid);
       res.sendStatus(200)
     } catch (err) {
@@ -235,6 +242,6 @@ app.get("/start/:chatId/:userId", async (req, res) => {
 //   res.sendStatus(200)
 // })
 
-app.listen(5000, () => console.log("Listening on port 5000..."));
+http.listen(5000, () => console.log("Listening on port 5000..."));
 
 module.exports = app; // exporting for testing purposes
