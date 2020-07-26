@@ -375,11 +375,11 @@ function draw() {
     function colourPanelListeners(number) {
         let col = document.getElementById(`${number}`);
         col.onclick = function(){ 
-            col.style["stroke-width"]="3px";
+            col.style["stroke-width"]="3.5px";
             console.log(number);
             // reset previous colour's border on selecting a new colour
             if (previousColour != -1) {
-                document.getElementById(`${previousColour}`).style["stroke-width"]="1.51px"; 
+                document.getElementById(`${previousColour}`).style["stroke-width"]="2"; 
             }
             previousColour = number;
             currentColour = ColorIndex[number]; // string of colour name e.g. "RED"
