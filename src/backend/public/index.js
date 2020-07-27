@@ -1,7 +1,7 @@
 
 // const { ColorIndex, ColorRGB, ColorBinary } = require("./colors");
 // const { CANVAS_WIDTH, CANVAS_HEIGHT } = require("./canvas_commons");
-// let socket = io();
+let socket = io();
 let xCoordDisplay = document.getElementById("x");
 let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
@@ -491,15 +491,15 @@ canvas.addEventListener("touchcancel", touchHandler, true);
 
     // let potato = io({transports: ['websocket'], upgrade: false})
     // let socket = potato.connect();
-    // socket.on('grid', function(grid){
-    //     console.log(grid)
-    //     try{
-    //         bitfieldToImgData(grid);
-    //         redraw(myImgData, currentZoom);
-    //     } catch (err) {
-    //         console.log(err)
-    //     }
-    // });
+    socket.on('grid', function(grid){
+        console.log(grid)
+        try{
+            bitfieldToImgData(grid);
+            redraw(myImgData, currentZoom);
+        } catch (err) {
+            console.log(err)
+        }
+    });
 }
 
 
