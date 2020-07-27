@@ -385,15 +385,21 @@ canvas.addEventListener("touchcancel", touchHandler, true);
             "color": ColorBinary[currentColour] });
         oldLastUpdatedTime = newLastUpdatedTime
         console.log(data);
-        xhr.send(data);
-        if (xhr.status === 403) {
-            let popup = document.getElementById("userconflict-popup");
-            popup.classList.toggle('show');
-            let okBtn = document.getElementById("ok3");
-            okBtn.onclick = function() {
-                popup.classList.toggle('show');
+        xhr.onreadystatechange = function () {
+            // In local files, status is 0 upon success in Mozilla Firefox
+            if(xhr.readyState === XMLHttpRequest.DONE) {
+                const status = xhr.status;
+                if (status === 403) {
+                    let popup = document.getElementById("userconflict-popup");
+                    popup.classList.toggle('show');
+                    let okBtn = document.getElementById("ok3");
+                    okBtn.onclick = function() {
+                        popup.classList.toggle('show');
+                    }
+                }
             }
-        }
+        };
+        xhr.send(data);
     }
     function cancelColour(imgData, originalPixel) {
         console.log("Go back go back go back");
