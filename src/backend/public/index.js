@@ -108,11 +108,11 @@ function draw() {
             // console.log(color2);
             let rgba1 = ColorRGB[color1];
             let rgba2 = ColorRGB[color2];
-            if (num !== 0) {
-                console.log(num);
-                console.log(rgba1);
-                console.log(rgba2);
-            }
+            // if (num !== 0) {
+            //     console.log(num);
+            //     console.log(rgba1);
+            //     console.log(rgba2);
+            // }
             rgbaArr[i*8] = rgba1[0];
             rgbaArr[i*8 + 1] = rgba1[1];
             rgbaArr[i*8 + 2] = rgba1[2];
@@ -152,12 +152,23 @@ function draw() {
         const gap = new Date() - lastUpdated; // in ms
         numberOfAccumulatedPixels.addPixels(Math.floor(gap / ACCUMULATED_PIXEL_GAP));
         console.log("initialised number of pixels: ");
-        console.log(gap);
+        console.log(gap + "ms");
         updateAccPixels();
         
-        // TODO: fix cooldown timing
+        // TODO: if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins   
         startTime = new Date();
-        // if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins
+        startTime.setTime(startTime.getTime() - gap % cooldownTime);   
+        startCountdown();
+        setTimeout(function() {
+            numberOfAccumulatedPixels.addPixels(1);
+            updateAccPixels();
+            accumulatePixels();
+            startCountdown();
+            console.log(gap % cooldownTime + "ms passed, starting accumulate pixel function");
+        }, (cooldownTime - gap % cooldownTime));
+        if (numberOfAccumulatedPixels.getPixels() == 0) {
+            startCountdown();
+        }
     }
 
     httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
@@ -175,28 +186,28 @@ function draw() {
         // putting grey gridlines on imgData
         // every 10 pixels, if it's a white square, make it grey
         
-        // for (let r = 0; r < 128; r++) {
-        //     if ((r+1) % 10 === 0) {
-        //         // every 10th row
-        //         for (let c = 0; c < 128*4; c += 4) {
-        //             if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-        //                 imgData.data[r*128*4 + c] = 211;
-        //                 imgData.data[r*128*4 + c+1] = 211;
-        //                 imgData.data[r*128*4 + c+2] = 211;
-        //                 imgData.data[r*128*4 + c+3] = 255;
-        //             }
-        //         }
-        //     }
-        //     for (let c = 36; c < 128*4; c += 40) {
-        //         // every 10th column
-        //         if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-        //             imgData.data[r*128*4 + c] = 211;
-        //             imgData.data[r*128*4 + c+1] = 211;
-        //             imgData.data[r*128*4 + c+2] = 211;
-        //             imgData.data[r*128*4 + c+3] = 255;
-        //         }
-        //     }
-        // }
+        for (let r = 0; r < 128; r++) {
+            if ((r+1) % 10 === 0) {
+                // every 10th row
+                for (let c = 0; c < 128*4; c += 4) {
+                    if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+                        imgData.data[r*128*4 + c] = 211;
+                        imgData.data[r*128*4 + c+1] = 211;
+                        imgData.data[r*128*4 + c+2] = 211;
+                        imgData.data[r*128*4 + c+3] = 255;
+                    }
+                }
+            }
+            for (let c = 36; c < 128*4; c += 40) {
+                // every 10th column
+                if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+                    imgData.data[r*128*4 + c] = 211;
+                    imgData.data[r*128*4 + c+1] = 211;
+                    imgData.data[r*128*4 + c+2] = 211;
+                    imgData.data[r*128*4 + c+3] = 255;
+                }
+            }
+        }
         
         
         // update memCtx with new image data  
@@ -241,13 +252,14 @@ function draw() {
     }
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     canvas.addEventListener('mousewheel', handleScroll, false);
+    canvas.addEventListener('wheel', handleScroll, false);
 
      // Pinch to Zoom
     var prevPinch = 1,
     pinchChk = false;
 
     function handlePinch(e) {
-        let scale = -((prevPinch-e.scale))*50;
+        let scale = -((prevPinch-e.scale))*20;
         prevPinch = e.scale;
         zoom(scale, 64, 64);
         pinchChk = true;
@@ -258,6 +270,7 @@ function draw() {
     hammertime.on('pinchstart', function(e) {
         pinchChk = true;
     });
+
     hammertime.on('pinchend', function(e) {
         window.setTimeout(function(){pinchChk = false}, 50);
         prevPinch = 1;
@@ -344,7 +357,7 @@ function draw() {
                         confirmBtn.onclick = function() {
                             confirmColour(x, y, chatId, userId);
                             console.log(x, y);
-                            if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 1) {
+                            if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
                                 // last accumulated pixel used
                                 startCountdown();
                             }
@@ -418,6 +431,7 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         cfm_popup.classList.toggle('show');
         numberOfAccumulatedPixels.subtractPixels(1);
         updateAccPixels();
+        startCountdown();
 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
@@ -475,7 +489,7 @@ canvas.addEventListener("touchcancel", touchHandler, true);
 
     updateAccPixels();
     // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user letiables that don't become accumulated pixels
-    accumulatePixels();
+    // accumulatePixels();
 
     // let potato = io({transports: ['websocket'], upgrade: false})
     // let socket = potato.connect();
@@ -499,33 +513,38 @@ function updateAccPixels() {
 
 function accumulatePixels() {
     let increaseAccPixels = setInterval(function() {
+        console.log(new Date()-startTime);
+        startTime = new Date();
         numberOfAccumulatedPixels.addPixels(1);
         updateAccPixels();
-        startTime = new Date();
-    }, cooldownTime); // *1000 to convert to ms
+        startCountdown();
+    }, cooldownTime); 
 }
 
 function startCountdown() {
-    let elapsed = new Date() - startTime; // in ms
-    let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
-    let secs = Math.floor(frac * cooldownTime); 
-    console.log("Countdown starting with ", frac, secs);
-    let mins = Math.floor(secs / 60);
-    let secsDisp = secs % 60;
-    // setInterval takes one second to start 
-    countdownMin.innerText = mins;
-    countdownSec.innerText = secsDisp; 
-    let interval = setInterval(function() {
-        if (secs === 0) {
-            clearInterval(interval);
-        } else {
-            secs--;
-            mins = Math.floor(secs / 60);
-            secsDisp = secs % 60;
-            countdownMin.innerText = mins;
-            countdownSec.innerText = secsDisp;
-        }
-    }, 1000);
+    if (numberOfAccumulatedPixels.getPixels() < 10) {
+        // NOTE: cooldownTime is in MILLISECONDS 
+        let elapsed = new Date() - startTime; // in ms
+        let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
+        let secs = Math.floor(frac * cooldownTime/1000); 
+        console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
+        let mins = Math.floor(secs / 60);
+        let secsDisp = secs % 60;
+        // setInterval takes one second to start 
+        countdownMin.innerText = mins;
+        countdownSec.innerText = secsDisp; 
+        let interval = setInterval(function() {
+            if (secs === 0) {
+                clearInterval(interval);
+            } else {
+                secs--;
+                mins = Math.floor(secs / 60);
+                secsDisp = secs % 60;
+                countdownMin.innerText = mins;
+                countdownSec.innerText = secsDisp;
+            }
+        }, 1000);
+    }   
 }
 
 
