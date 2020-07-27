@@ -47,7 +47,4 @@ class accumulatedPixels {
 }
 
 
-// const ACCUMULATED_PIXEL_GAP = (5*60*1000);
-const ACCUMULATED_PIXEL_GAP = (30*1000);
-
-// module.exports = { accumulatedPixels };
+const ACCUMULATED_PIXEL_GAP = (5*60*1000);
