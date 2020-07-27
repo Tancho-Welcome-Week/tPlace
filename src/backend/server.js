@@ -202,7 +202,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const frontendUserLastUpdatedTime = req.body.oldLastUpdatedTime;
   const last_updated = req.body.newLastUpdatedTime;
   if (userLastUpdatedTime != frontendUserLastUpdatedTime) {
-    res.sendStatus(403).send("Please place pixels using only 1 tab!")
+    res.sendStatus(403).send("Please place pixels using only 1 tab/1 client!")
     return
   }
 
