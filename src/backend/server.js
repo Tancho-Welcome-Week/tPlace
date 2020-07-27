@@ -56,7 +56,9 @@ if (!keys.databaseDeployed) {
 } else {
   db.getLatestCanvas().then((result) => {
     const bitfield = result.bitfield;
-    redisManager.setCanvas(bitfield);
+    redisManager.setCanvas(bitfield).then(() => {
+      console.log("Re-initialized Redis with a pre-saved canvas.");
+    });
   });
 }
 
