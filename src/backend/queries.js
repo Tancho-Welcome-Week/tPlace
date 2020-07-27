@@ -80,10 +80,10 @@ async function setUserNotificationsByTelegramId(telegram_id, notifications) {
     }
 }
 
-async function setUserAccumulatedPixelsByTelegramId(telegram_id, accumulated_pixels) {
+async function setUserAccumulatedPixelsByTelegramId(telegram_id, accumulated_pixels, last_updated) {
 
     try{
-        await pool.query('UPDATE Users SET accumulated_pixels = $2, last_updated = NOW() WHERE telegram_id = $1 RETURNING telegram_id, accumulated_pixels', [telegram_id, accumulated_pixels])
+        await pool.query('UPDATE Users SET accumulated_pixels = $2, last_updated = $3 WHERE telegram_id = $1 RETURNING telegram_id, accumulated_pixels', [telegram_id, accumulated_pixels, last_updated])
     } catch (err) {
         console.log(err)
     }

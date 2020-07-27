@@ -197,6 +197,15 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
+
+  const userLastUpdatedTime = await db.getUserByTelegramId(userId).last_updated;
+  const frontendUserLastUpdatedTime = req.body.oldLastUpdatedTime;
+  const last_updated = req.body.newLastUpdatedTime;
+  if (userLastUpdatedTime != frontendUserLastUpdatedTime) {
+    res.sendStatus(402).send("Please place pixels using only 1 tab!")
+    return
+  }
+
   if (req.body.x <= 0 || req.body.y <= 0 ||
       req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
     res.sendStatus(400)
@@ -227,7 +236,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
       res.sendStatus(500)
     }
 
-    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels)
+    await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels, last_updated)
   } else {
     res.sendStatus(401);
   }
