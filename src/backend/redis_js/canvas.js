@@ -99,13 +99,7 @@ class RedisManager {
                 this.setValue(x, y, color);
             }
         }
-        if (topLeftXCoordinate === bottomRightXCoordinate) {
-            console.log("X is same at: " + topLeftXCoordinate);
-        }
-        if (topLeftYCoordinate === bottomRightYCoordinate) {
-            console.log("Y is same at: " + topLeftYCoordinate);
-        }
-        console.log("Set area");
+        // console.log("Set area");
     }
 
     /**
@@ -131,6 +125,17 @@ class RedisManager {
             });
         }).catch((error) => { console.log(error) });
     }
+
+    /**
+     * Sets the entire Canvas object. This method does not sanitize the input or check that the dimensions are the same
+     * as the original initialized values.
+     * @param canvas The bitfield containing the pre-saved canvas data.
+     */
+    setCanvas(canvas) {
+        this.redisClient.set(this.key, canvas);
+        console.log("Re-initialized Redis with a pre-saved canvas.");
+    }
+
 
     /**
      *              ***************************************************************************
