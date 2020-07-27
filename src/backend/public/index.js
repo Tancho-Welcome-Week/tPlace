@@ -83,22 +83,14 @@ function draw() {
         let rgbaArr = new Uint8ClampedArray(128*128*4);
         for (let i = 0; i < gridValue.length; i++) {
             // iterates over each byte to separate into the two bits
-            let num = gridValue[i]; // gives an integer between 0 and 255
-            let nibble1 = (num & 0xF0) >> 4; // 0xF0 == '11110000' 
-            let nibble2 = num & 0x0F // 0x0F == '00001111'
-            let color1 = ColorIndex[nibble1];
-            let color2 = ColorIndex[nibble2];
-            // console.log(nibble1); // 0111 == 7?
-            // console.log(nibble2); // 1011 == 11?
-            // console.log(color1);
-            // console.log(color2);
-            let rgba1 = ColorRGB[color1];
-            let rgba2 = ColorRGB[color2];
-            // if (num !== 0) {
-            //     console.log(num);
-            //     console.log(rgba1);
-            //     console.log(rgba2);
-            // }
+            const num = gridValue[i]; // gives an integer between 0 and 255
+            const nibble1 = (num & 0xF0) >> 4; // 0xF0 == '11110000'
+            const nibble2 = num & 0x0F // 0x0F == '00001111'
+            const color1 = ColorIndex[nibble1];
+            const color2 = ColorIndex[nibble2];
+            const rgba1 = ColorRGB[color1];
+            const rgba2 = ColorRGB[color2];
+
             rgbaArr[i*8] = rgba1[0];
             rgbaArr[i*8 + 1] = rgba1[1];
             rgbaArr[i*8 + 2] = rgba1[2];
@@ -107,8 +99,6 @@ function draw() {
             rgbaArr[i*8 + 5] = rgba2[1];
             rgbaArr[i*8 + 6] = rgba2[2];
             rgbaArr[i*8 + 7] = 255;
-            // rgbaArr[i*2 + 2] = 255 << 24 | rgba1[2] << 16 | rgba1[1] << 8 | rgba1[0];
-            // rgbaArr[i*2 + 1] = 255 << 24 | rgba2[2] << 16 | rgba2[1] << 8 | rgba2[0];
         }
 
         console.log(rgbaArr);
@@ -117,20 +107,12 @@ function draw() {
     }
 
     const userUrl = window.location.href.split("/"); 
-    // const userId = userUrl[userUrl.length - 1];
-    const userId = '250437415';
+    const userId = userUrl[userUrl.length - 1];
+    // const userId = '250437415';
     let chatId;
 
     function initUserVariables(userVariables) {
-        // {
-        //     telegram_id: '250437415',
-        //    group_id: blabla,
-        //     last_updated: 2020-07-21T15:27:41.215Z,
-        //     accumulated_pixels: 0,
-        //     notifications: true
-        //   }
         console.log(userVariables);
-        // console.log("init user variables reached");
         chatId = userVariables["group_id"];
         oldLastUpdatedTime = userVariables["last_updated"];
 
@@ -142,7 +124,6 @@ function draw() {
         console.log(gap + "ms");
         updateAccPixels();
         
-        // TODO: if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins   
         startTime = new Date();
         startTime.setTime(startTime.getTime() - gap % cooldownTime);   
         startCountdown();
@@ -169,33 +150,6 @@ function draw() {
         // clear canvas
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-
-        // putting grey gridlines on imgData
-        // every 10 pixels, if it's a white square, make it grey
-        
-        // for (let r = 0; r < 128; r++) {
-        //     if ((r+1) % 10 === 0) {
-        //         // every 10th row
-        //         for (let c = 0; c < 128*4; c += 4) {
-        //             if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-        //                 imgData.data[r*128*4 + c] = 211;
-        //                 imgData.data[r*128*4 + c+1] = 211;
-        //                 imgData.data[r*128*4 + c+2] = 211;
-        //                 imgData.data[r*128*4 + c+3] = 255;
-        //             }
-        //         }
-        //     }
-        //     for (let c = 36; c < 128*4; c += 40) {
-        //         // every 10th column
-        //         if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-        //             imgData.data[r*128*4 + c] = 211;
-        //             imgData.data[r*128*4 + c+1] = 211;
-        //             imgData.data[r*128*4 + c+2] = 211;
-        //             imgData.data[r*128*4 + c+3] = 255;
-        //         }
-        //     }
-        // }
-        
         
         // update memCtx with new image data  
         memCtx.putImageData(imgData, 0, 0);
