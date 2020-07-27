@@ -250,13 +250,14 @@ function draw() {
     }
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     canvas.addEventListener('mousewheel', handleScroll, false);
+    canvas.addEventListener('wheel', handleScroll, false);
 
      // Pinch to Zoom
     var prevPinch = 1,
     pinchChk = false;
 
     function handlePinch(e) {
-        let scale = -((prevPinch-e.scale))*50;
+        let scale = -((prevPinch-e.scale))*20;
         prevPinch = e.scale;
         zoom(scale, 64, 64);
         pinchChk = true;
@@ -267,6 +268,7 @@ function draw() {
     hammertime.on('pinchstart', function(e) {
         pinchChk = true;
     });
+
     hammertime.on('pinchend', function(e) {
         window.setTimeout(function(){pinchChk = false}, 50);
         prevPinch = 1;
