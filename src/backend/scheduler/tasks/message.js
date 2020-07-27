@@ -1,7 +1,8 @@
 const Telegraf = require('telegraf');
+const keys = require('../../keys.js')
 
 require('dotenv').config();
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot = new Telegraf(keys.botToken);
 
 const MORNING_NOTIFICATION_PIXEL_FULLY_RECHARGED = "Wake up sleepy head! Your pixels are recharged!";
 const LUNCH_NOTIFICATION_PIXEL_FULLY_RECHARGED = "While you are recharging, your pixels have recharged";
