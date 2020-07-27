@@ -11,10 +11,6 @@ const pool = new Pool({
     port: keys.pgPort,
   })
 
-
-// TODO: Better error handling
-
-
 // Initialise database
 const initDatabase = () => {
     const init = fs.readFileSync("./database/init.sql").toString();

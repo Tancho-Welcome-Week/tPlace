@@ -9,11 +9,6 @@
 </head>
 
 <body onload="draw();">
-  <div class="background-video">
-    <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
-        <source src="img/banner.mp4" type="video/mp4">
-    </video>
-  </div>
   <div class="grid-container">
     <div class="grid-header bg-solid">
       <h1>tPlace</h1>
@@ -106,7 +101,7 @@
     </div>
     <div id="canvas-bg" class="grid-canvas bg-solid">
         <div id="canvas-div">
-            <canvas id="canvas" width="490" height="490">
+            <canvas id="canvas">
                 Oh no! Your browser doesn't support this :( Try using a more updated one!
             </canvas>
             <div class='popup' id='confirm-popup'>
@@ -132,7 +127,7 @@
     </div>
     <div id="display-items" class="grid-info bg-solid">
         <p>coordinates: (<span id="x">0</span>, <span id="y">0</span>)</p>
-        <p>time till next click: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
+        <p>time till next pixel: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
         <p>number of pixels clickable: <span id="accPixels"></span></p>
     </div>
 
@@ -152,6 +147,7 @@
   </div>
 
     <script src = "/socket.io/socket.io.js"></script>
+    <script src = "/hammer.min.js"></script>
     <script src = "/colors.js"></script>
     <script src = "/accumulatedPixels.js"></script>
     <script src = "/index.js"></script>
