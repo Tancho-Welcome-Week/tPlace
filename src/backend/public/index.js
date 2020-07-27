@@ -386,7 +386,10 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         oldLastUpdatedTime = newLastUpdatedTime
         console.log(data);
         xhr.send(data);
+        console.log(xhr.status)
         if (xhr.status === 403) {
+            windows.alert("You have more than 1 window open for this user!\n" +
+                "Check that you don\'t have it open on both mobile and desktop!");
             let popup = document.getElementById("userconflict-popup");
             popup.classList.toggle('show');
             let okBtn = document.getElementById("ok3");
