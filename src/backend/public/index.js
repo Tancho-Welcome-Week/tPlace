@@ -158,10 +158,12 @@ function draw() {
         // TODO: if timestamp was <5 mins of now, need to calculate cooldown timing; if not 5 mins   
         startTime = new Date();
         startTime.setTime(startTime.getTime() - gap % cooldownTime);   
+        startCountdown();
         setTimeout(function() {
             numberOfAccumulatedPixels.addPixels(1);
             updateAccPixels();
             accumulatePixels();
+            startCountdown();
             console.log(gap % cooldownTime + "ms passed, starting accumulate pixel function");
         }, (cooldownTime - gap % cooldownTime));
         if (numberOfAccumulatedPixels.getPixels() == 0) {
@@ -429,6 +431,7 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         cfm_popup.classList.toggle('show');
         numberOfAccumulatedPixels.subtractPixels(1);
         updateAccPixels();
+        startCountdown();
 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
@@ -514,31 +517,34 @@ function accumulatePixels() {
         startTime = new Date();
         numberOfAccumulatedPixels.addPixels(1);
         updateAccPixels();
+        startCountdown();
     }, cooldownTime); 
 }
 
 function startCountdown() {
-    // NOTE: cooldownTime is in MILLISECONDS 
-    let elapsed = new Date() - startTime; // in ms
-    let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
-    let secs = Math.floor(frac * cooldownTime/1000); 
-    console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
-    let mins = Math.floor(secs / 60);
-    let secsDisp = secs % 60;
-    // setInterval takes one second to start 
-    countdownMin.innerText = mins;
-    countdownSec.innerText = secsDisp; 
-    let interval = setInterval(function() {
-        if (secs === 0) {
-            clearInterval(interval);
-        } else {
-            secs--;
-            mins = Math.floor(secs / 60);
-            secsDisp = secs % 60;
-            countdownMin.innerText = mins;
-            countdownSec.innerText = secsDisp;
-        }
-    }, 1000);
+    if (numberOfAccumulatedPixels.getPixels() < 10) {
+        // NOTE: cooldownTime is in MILLISECONDS 
+        let elapsed = new Date() - startTime; // in ms
+        let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
+        let secs = Math.floor(frac * cooldownTime/1000); 
+        console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
+        let mins = Math.floor(secs / 60);
+        let secsDisp = secs % 60;
+        // setInterval takes one second to start 
+        countdownMin.innerText = mins;
+        countdownSec.innerText = secsDisp; 
+        let interval = setInterval(function() {
+            if (secs === 0) {
+                clearInterval(interval);
+            } else {
+                secs--;
+                mins = Math.floor(secs / 60);
+                secsDisp = secs % 60;
+                countdownMin.innerText = mins;
+                countdownSec.innerText = secsDisp;
+            }
+        }, 1000);
+    }   
 }
 
 
