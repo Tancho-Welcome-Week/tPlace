@@ -25,6 +25,7 @@ let displayToCanvasScale;
 function draw() {
     let canvas = document.getElementById('canvas');
     displayToCanvasScale = canvas.clientWidth/128;
+    // displayToCanvasScale = 490/128;
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
@@ -189,7 +190,7 @@ function draw() {
         // put black border around image
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;
-        ctx.strokeRect(-startX*DISP_TO_CANVAS_SCALE*currentZoom, -startY*DISP_TO_CANVAS_SCALE*currentZoom, canvas.width*currentZoom, canvas.height*currentZoom);
+        ctx.strokeRect(-startX*displayToCanvasScale*currentZoom, -startY*displayToCanvasScale*currentZoom, canvas.width*currentZoom, canvas.height*currentZoom);
     }
 
     // ZOOMING 
