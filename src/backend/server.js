@@ -46,14 +46,25 @@ io.on("connection", () => {
   console.log("A user is connected");
 });
 
-//Initialise Database
+// Initialize Redis
+const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
+
+// Initialize Database
 if (!keys.databaseDeployed) {
   db.initDatabase();
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+} else {
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+  db.getLatestCanvas().then((result) => {
+    const bitfield = result["bitfield"];
+    redisManager.setCanvas(bitfield).then(() => {
+      console.log("Re-initialized Redis with a pre-saved canvas.");
+    });
+  });
 }
 
-// Redis setup
-const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
-redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+// db.initDatabase();
+// redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
@@ -64,7 +75,7 @@ setInterval(() => {
       console.log(error);
     } else {
       db.addCanvas("250437415", result).then(r => {
-        console.log('Bitfield backed up successfully. UWU')
+        console.log('Bitfield backed up to database successfully.')
       })
     }
   })
@@ -94,11 +105,6 @@ POST /api/admin/clear : admin clear
 
 */
 
-// app.get('/', async (req, res) => {
-//   console.log('/ called')
-//   res.redirect('https://www.reddit.com/r/HydroHomies/')
-// })
-
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
   const json = {"grid": grid}
@@ -108,7 +114,7 @@ app.get("/api/grid", async(req, res) => {
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
-  console.log(req.body)
+  // console.log(req.body)
   if (isWhitelistPeriod) {
     try {
       await db.addWhitelistGroupId(chatId)
@@ -191,7 +197,8 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
-  if (req.body.x <= 0 || req.body.y <= 0) {
+  if (req.body.x <= 0 || req.body.y <= 0 ||
+      req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
     res.sendStatus(400)
     return
   }
@@ -201,12 +208,12 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     const blueValue = req.body.b;
     const colorValue = redValue + "," + greenValue + "," + blueValue;
     const binaryColorValue = color.ColorRGBToBinary[colorValue];
-
+    // const binaryColorValue = req.body.color;
     const accumulatedPixels = req.body.accPixels;
 
     const x_coordinate = req.body.x;
     const y_coordinate = req.body.y;
-    await redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
+    redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
     console.log("Set pixel with x-coordinate " + x_coordinate + " and y-coordinate " + y_coordinate +
         " with binary value " + binaryColorValue);
 

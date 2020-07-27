@@ -1,6 +1,3 @@
-
-// const { ColorIndex, ColorRGB, ColorBinary } = require("./colors");
-// const { CANVAS_WIDTH, CANVAS_HEIGHT } = require("./canvas_commons");
 let socket = io();
 let xCoordDisplay = document.getElementById("x");
 let yCoordDisplay = document.getElementById("y");
@@ -8,7 +5,7 @@ let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
 let canvas = document.getElementById('canvas');
-var hammertime = new Hammer(canvas);
+let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
 const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
@@ -26,6 +23,8 @@ let startTime;
 
 let currentColour = "RED"; 
 
+let displayToCanvasScale;
+
 // Resizing Canvas
 function scaleCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
@@ -39,16 +38,16 @@ function scaleCanvas() {
 scaleCanvas();
 window.addEventListener('resize', scaleCanvas());
 
-const DISP_TO_CANVAS_SCALE = canvas.clientWidth/128;
-
 function draw() {
+    let canvas = document.getElementById('canvas');
+    displayToCanvasScale = canvas.clientWidth/128;
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
     let memCvs = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     let memCtx = memCvs.getContext('2d');
 
-    let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global letiable
+    let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global variable
 
     // API requests
     function httpGetAsync(theUrl, callback) {
@@ -63,28 +62,13 @@ function draw() {
         xmlHttp.send(null);
     }
 
-    // function httpGetBinary(theUrl, callback) {
-    //     let xmlHttp = new XMLHttpRequest();
-    //     xmlHttp.open("GET", theUrl, true);
-    //     xmlHttp.responseType = "arraybuffer";
-    //
-    //     xmlHttp.onload = function() {
-    //         let arrayBuffer = xmlHttp.response; // note: NOT responseText
-    //         // if unsuccessful, arrayBuffer will be null
-    //         if (arrayBuffer) {
-    //             callback(arrayBuffer);
-    //         }
-    //     }
-    //     xmlHttp.send(null);
-    // }
-
     function bitfieldToImgData(grid) {
         // grid is raw binary data: 4 bits for one pixel, like "0000", so 2 pixels in 1 byte
         // first thing to map to: higher and lower nibbles in each byte
         // map the to 32-bit colours, i.e. r g b a each being one byte 
         // finally 8-bit unsigned int array used by imgData
 
-        // directly changes myImgData letiable
+        // directly changes myImgData variable
         console.log("grid callback reached");
         console.log(grid)
         const gridValue = Object.values(grid.grid);
@@ -144,7 +128,7 @@ function draw() {
         //     notifications: true
         //   }
         console.log(userVariables);
-        // console.log("init user letiables reached");
+        // console.log("init user variables reached");
         chatId = userVariables["group_id"];
 
         numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
@@ -166,7 +150,7 @@ function draw() {
             startCountdown();
             console.log(gap % cooldownTime + "ms passed, starting accumulate pixel function");
         }, (cooldownTime - gap % cooldownTime));
-        if (numberOfAccumulatedPixels.getPixels() == 0) {
+        if (numberOfAccumulatedPixels.getPixels() === 0) {
             startCountdown();
         }
     }
@@ -186,28 +170,28 @@ function draw() {
         // putting grey gridlines on imgData
         // every 10 pixels, if it's a white square, make it grey
         
-        for (let r = 0; r < 128; r++) {
-            if ((r+1) % 10 === 0) {
-                // every 10th row
-                for (let c = 0; c < 128*4; c += 4) {
-                    if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-                        imgData.data[r*128*4 + c] = 211;
-                        imgData.data[r*128*4 + c+1] = 211;
-                        imgData.data[r*128*4 + c+2] = 211;
-                        imgData.data[r*128*4 + c+3] = 255;
-                    }
-                }
-            }
-            for (let c = 36; c < 128*4; c += 40) {
-                // every 10th column
-                if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
-                    imgData.data[r*128*4 + c] = 211;
-                    imgData.data[r*128*4 + c+1] = 211;
-                    imgData.data[r*128*4 + c+2] = 211;
-                    imgData.data[r*128*4 + c+3] = 255;
-                }
-            }
-        }
+        // for (let r = 0; r < 128; r++) {
+        //     if ((r+1) % 10 === 0) {
+        //         // every 10th row
+        //         for (let c = 0; c < 128*4; c += 4) {
+        //             if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+        //                 imgData.data[r*128*4 + c] = 211;
+        //                 imgData.data[r*128*4 + c+1] = 211;
+        //                 imgData.data[r*128*4 + c+2] = 211;
+        //                 imgData.data[r*128*4 + c+3] = 255;
+        //             }
+        //         }
+        //     }
+        //     for (let c = 36; c < 128*4; c += 40) {
+        //         // every 10th column
+        //         if (imgData.data[r*128*4 + c] === 255 && imgData.data[r*128*4 + c+1] === 255 && imgData.data[r*128*4 + c+2] === 255) {
+        //             imgData.data[r*128*4 + c] = 211;
+        //             imgData.data[r*128*4 + c+1] = 211;
+        //             imgData.data[r*128*4 + c+2] = 211;
+        //             imgData.data[r*128*4 + c+3] = 255;
+        //         }
+        //     }
+        // }
         
         
         // update memCtx with new image data  
@@ -217,7 +201,7 @@ function draw() {
         // put black border around image
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;
-        ctx.strokeRect(-startX*DISP_TO_CANVAS_SCALE*currentZoom, -startY*DISP_TO_CANVAS_SCALE*currentZoom, canvas.width*currentZoom, canvas.height*currentZoom);
+        ctx.strokeRect(-startX*displayToCanvasScale*currentZoom, -startY*displayToCanvasScale*currentZoom, canvas.width*currentZoom, canvas.height*currentZoom);
     }
 
     // ZOOMING 
@@ -255,7 +239,7 @@ function draw() {
     canvas.addEventListener('wheel', handleScroll, false);
 
      // Pinch to Zoom
-    var prevPinch = 1,
+    let prevPinch = 1,
     pinchChk = false;
 
     function handlePinch(e) {
@@ -281,7 +265,7 @@ function draw() {
     let lastX, lastY;
     let hasSelectedPixel;
     function downDrag(evt) {
-        if (pinchChk == true) return;
+        if (pinchChk === true) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -289,15 +273,15 @@ function draw() {
         dragged = true;
     }
     function moveDrag(evt) {
-        if (dragged && pinchChk == false) {
+        if (dragged && pinchChk === false) {
             // console.log('drag');
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
             const deltaX = currX - lastX;
             const deltaY = currY - lastY;
             // updating canvas
-            startX -= deltaX/DISP_TO_CANVAS_SCALE / currentZoom;
-            startY -= deltaY/DISP_TO_CANVAS_SCALE / currentZoom;
+            startX -= deltaX/displayToCanvasScale / currentZoom;
+            startY -= deltaY/displayToCanvasScale / currentZoom;
             redraw(myImgData, currentZoom);
             // updating lastX and lastY
             lastX = currX;
@@ -313,9 +297,9 @@ function draw() {
         if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
             // END DRAG; updating canvas
             // console.log('dragMouseUp');
-            if (pinchChk == false) {
-                startX -= (currX - lastX)/DISP_TO_CANVAS_SCALE / currentZoom;
-                startY -= (currY - lastY)/DISP_TO_CANVAS_SCALE / currentZoom;
+            if (pinchChk === false) {
+                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
                 redraw(myImgData, currentZoom);
             }            
             dragStart = null;
@@ -395,7 +379,7 @@ function draw() {
 
 // Convert touch to mouse
 function touchHandler(event) {
-    var touches = event.changedTouches,
+    let touches = event.changedTouches,
         first = touches[0],
         type = "";
     switch(event.type)
@@ -410,7 +394,7 @@ function touchHandler(event) {
     //                screenX, screenY, clientX, clientY, ctrlKey, 
     //                altKey, shiftKey, metaKey, button, relatedTarget);
 
-    var simulatedEvent = document.createEvent("MouseEvent");
+    let simulatedEvent = document.createEvent("MouseEvent");
     simulatedEvent.initMouseEvent(type, true, true, window, 1, 
                                   first.screenX, first.screenY, 
                                   first.clientX, first.clientY, false, 
@@ -475,7 +459,7 @@ canvas.addEventListener("touchcancel", touchHandler, true);
             col.style["stroke-width"]="3.5px";
             console.log(number);
             // reset previous colour's border on selecting a new colour
-            if (previousColour != -1) {
+            if (previousColour !== -1) {
                 document.getElementById(`${previousColour}`).style["stroke-width"]="2"; 
             }
             previousColour = number;
@@ -483,12 +467,12 @@ canvas.addEventListener("touchcancel", touchHandler, true);
             console.log(currentColour + " selected");
         };
     }
-    for (var n=0; n<16; n++) {
+    for (let n=0; n<16; n++) {
         colourPanelListeners(n);
     }
 
     updateAccPixels();
-    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user letiables that don't become accumulated pixels
+    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
     // accumulatePixels();
 
     // let potato = io({transports: ['websocket'], upgrade: false})
@@ -522,7 +506,7 @@ function accumulatePixels() {
 }
 
 function startCountdown() {
-    if (numberOfAccumulatedPixels.getPixels() < 10) {
+    if (numberOfAccumulatedPixels.getPixels() < numberOfAccumulatedPixels.MAX_PIXEL_COUNT) {
         // NOTE: cooldownTime is in MILLISECONDS 
         let elapsed = new Date() - startTime; // in ms
         let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
@@ -557,11 +541,11 @@ function putColour(coords, imgData) {
     
     [x, y] = coords;
 
-    let i = getStartingIndexForCoord(x, y);
+    const i = getStartingIndexForCoord(x, y);
     
-    let originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
+    const originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
-    var rgb = ColorRGB[currentColour];
+    const rgb = ColorRGB[currentColour];
     imgData.data[i] = rgb[0];
     imgData.data[i+1] = rgb[1];
     imgData.data[i+2] = rgb[2];
@@ -571,8 +555,8 @@ function putColour(coords, imgData) {
 }
 
 function getCurrentCoords(event) {
-    let x = Math.floor(startX + event.offsetX/DISP_TO_CANVAS_SCALE / currentZoom);
-    let y = Math.floor(startY + event.offsetY/DISP_TO_CANVAS_SCALE / currentZoom);
+    let x = Math.floor(startX + event.offsetX/displayToCanvasScale / currentZoom);
+    let y = Math.floor(startY + event.offsetY/displayToCanvasScale / currentZoom);
     return [x, y];
 }
 
