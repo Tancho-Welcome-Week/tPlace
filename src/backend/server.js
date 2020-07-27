@@ -108,7 +108,7 @@ app.get("/api/grid", async(req, res) => {
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
-  console.log(req.body)
+  // console.log(req.body)
   if (isWhitelistPeriod) {
     try {
       await db.addWhitelistGroupId(chatId)
@@ -191,17 +191,18 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
-  if (req.body.x <= 0 || req.body.y <= 0) {
+  if (req.body.x <= 0 || req.body.y <= 0 ||
+      req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
     res.sendStatus(400)
     return
   }
   if (isPermitted) {
-    const redValue = req.body.r;
-    const greenValue = req.body.g;
-    const blueValue = req.body.b;
-    const colorValue = redValue + "," + greenValue + "," + blueValue;
-    const binaryColorValue = color.ColorRGBToBinary[colorValue];
-
+    // const redValue = req.body.r;
+    // const greenValue = req.body.g;
+    // const blueValue = req.body.b;
+    // const colorValue = redValue + "," + greenValue + "," + blueValue;
+    // const binaryColorValue = color.ColorRGBToBinary[colorValue];
+    const binaryColorValue = req.body.color;
     const accumulatedPixels = req.body.accPixels;
 
     const x_coordinate = req.body.x;
