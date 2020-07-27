@@ -46,10 +46,10 @@ class RedisManager {
         assert(interval > 0, "Interval between helper lines is negative or zero.")
 
         for (let i = interval; i < this.width + 1; i += interval) {
-            this.setAreaValue(i, 1, i, this.height, color.ColorBinary.RED);
+            this.setAreaValue(i, 1, i, this.height, color.ColorBinary.GREY);
         }
         for (let i = interval; i < this.height + 1; i += interval) {
-            this.setAreaValue(1, i, this.width, i, color.ColorBinary.RED);
+            this.setAreaValue(1, i, this.width, i, color.ColorBinary.GREY);
         }
         console.log("Redis Canvas initialized to zeroes with height " + this.height + " and width " + this.width);
     }
