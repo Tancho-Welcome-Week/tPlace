@@ -49,19 +49,19 @@ io.on("connection", () => {
 // Initialize Redis
 const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
 
-// // Initialize Database
-// if (!keys.databaseDeployed) {
-//   db.initDatabase();
-//   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
-// } else {
-//   db.getLatestCanvas().then((result) => {
-//     const bitfield = result.bitfield;
-//     redisManager.setCanvas(bitfield);
-//   });
-// }
+// Initialize Database
+if (!keys.databaseDeployed) {
+  db.initDatabase();
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+} else {
+  db.getLatestCanvas().then((result) => {
+    const bitfield = result.bitfield;
+    redisManager.setCanvas(bitfield);
+  });
+}
 
-db.initDatabase();
-redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+// db.initDatabase();
+// redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
