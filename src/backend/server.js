@@ -54,8 +54,9 @@ if (!keys.databaseDeployed) {
   db.initDatabase();
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 } else {
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
   db.getLatestCanvas().then((result) => {
-    const bitfield = result.bitfield;
+    const bitfield = result["bitfield"];
     redisManager.setCanvas(bitfield).then(() => {
       console.log("Re-initialized Redis with a pre-saved canvas.");
     });
@@ -212,7 +213,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     const x_coordinate = req.body.x;
     const y_coordinate = req.body.y;
-    await redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
+    redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
     console.log("Set pixel with x-coordinate " + x_coordinate + " and y-coordinate " + y_coordinate +
         " with binary value " + binaryColorValue);
 

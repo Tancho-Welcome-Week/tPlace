@@ -78,7 +78,7 @@ class RedisManager {
      */
     setValue(pixelXCoordinate, pixelYCoordinate, value) {
         const offset = commons.calculateOffset(pixelXCoordinate, pixelYCoordinate, this.width);
-        this.redisClient.send_command("bitfield",[this.key, 'SET', this.format, offset,
+        this.redisClient.send_command("bitfield",[new Buffer.from(this.key), 'SET', this.format, offset,
             parseInt(value, 2)]);
     }
 
