@@ -379,23 +379,11 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         xhr.open("POST", url, true); 
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
-        // xhr.onreadystatechange = function() { 
-        //     if (xhr.readyState === 4 && xhr.status === 200) { 
-        //         // Print received data from server 
-        //         console.log(this.responseText);
-        //     }
-        // }; 
-        // Sending JSON object
         let newLastUpdatedTime = new Date();
-        // let r = ColorRGB[currentColour][0];
-        // let g = ColorRGB[currentColour][1];
-        // let b = ColorRGB[currentColour][2];
-        
-        // let data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now,
-        //     "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
         let data = JSON.stringify({ "x": x+1, "y": y+1, "oldLastUpdatedTime": oldLastUpdatedTime,
             "newLastUpdatedTime": newLastUpdatedTime, "accPixels": numberOfAccumulatedPixels.getPixels(),
             "color": ColorBinary[currentColour] });
+        oldLastUpdatedTime = newLastUpdatedTime
         console.log(data);
         xhr.send(data); 
     }
