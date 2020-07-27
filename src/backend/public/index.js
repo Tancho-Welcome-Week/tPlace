@@ -20,6 +20,8 @@ let startY = 0; // topmost mem canvas y-coordinate displayed
 let numberOfAccumulatedPixels = new accumulatedPixels(0);
 
 let startTime;
+let oldLastUpdatedTime;
+let newLastUpdatedTime;
 
 let currentColour = "RED"; 
 
@@ -130,6 +132,7 @@ function draw() {
         console.log(userVariables);
         // console.log("init user variables reached");
         chatId = userVariables["group_id"];
+        oldLastUpdatedTime = userVariables["last_updated"];
 
         numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
         const lastUpdated = new Date(userVariables["last_updated"]);
@@ -429,14 +432,14 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         //     }
         // }; 
         // Sending JSON object
-        let now = new Date();
+        let newLastUpdatedTime = new Date();
         // let r = ColorRGB[currentColour][0];
         // let g = ColorRGB[currentColour][1];
         // let b = ColorRGB[currentColour][2];
         
         // let data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now,
         //     "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
-        let data = JSON.stringify({ "x": x+1, "y": y+1, "timestamp": now,
+        let data = JSON.stringify({ "x": x+1, "y": y+1, "oldLastUpdatedTime": oldLastUpdatedTime, "newLastUpdatedTime": newLastUpdatedTime,
             "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
         console.log(data);
         xhr.send(data); 
