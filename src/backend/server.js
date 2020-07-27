@@ -203,12 +203,12 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     return
   }
   if (isPermitted) {
-    const redValue = req.body.r;
-    const greenValue = req.body.g;
-    const blueValue = req.body.b;
-    const colorValue = redValue + "," + greenValue + "," + blueValue;
-    const binaryColorValue = color.ColorRGBToBinary[colorValue];
-    // const binaryColorValue = req.body.color;
+    // const redValue = req.body.r;
+    // const greenValue = req.body.g;
+    // const blueValue = req.body.b;
+    // const colorValue = redValue + "," + greenValue + "," + blueValue;
+    // const binaryColorValue = color.ColorRGBToBinary[colorValue];
+    const binaryColorValue = req.body.color;
     const accumulatedPixels = req.body.accPixels;
 
     const x_coordinate = req.body.x;
