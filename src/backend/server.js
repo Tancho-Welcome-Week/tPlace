@@ -198,11 +198,12 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const userId = req.params.userId;
   const isPermitted = auth.authenticateChatId(chatId);
 
-  const userLastUpdatedTime = await db.getUserByTelegramId(userId).last_updated;
-  const frontendUserLastUpdatedTime = req.body.oldLastUpdatedTime;
+  const user = await db.getUserByTelegramId(userId)
+  const userLastUpdatedTime = new Date(user.last_updated).getTime();
+  const frontendUserLastUpdatedTime = new Date(req.body.oldLastUpdatedTime).getTime();
   const last_updated = req.body.newLastUpdatedTime;
   if (userLastUpdatedTime !== frontendUserLastUpdatedTime) {
-    res.sendStatus(403).send("Please place pixels using only 1 tab/1 client!")
+    res.status(403).send("Please place pixels using only 1 tab/1 client!")
     return
   }
 
@@ -212,11 +213,6 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     return
   }
   if (isPermitted) {
-    // const redValue = req.body.r;
-    // const greenValue = req.body.g;
-    // const blueValue = req.body.b;
-    // const colorValue = redValue + "," + greenValue + "," + blueValue;
-    // const binaryColorValue = color.ColorRGBToBinary[colorValue];
     const binaryColorValue = req.body.color;
     const accumulatedPixels = req.body.accPixels;
 
