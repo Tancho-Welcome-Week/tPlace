@@ -211,7 +211,7 @@ body {
 }
 
 /* Background Video */
-.background-video {
+/* .background-video {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -230,4 +230,4 @@ body {
 height: 100%;
 width: 100%;
 object-fit: cover;
-}
+} */
