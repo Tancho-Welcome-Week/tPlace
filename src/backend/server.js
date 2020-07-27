@@ -46,14 +46,19 @@ io.on("connection", () => {
   console.log("A user is connected");
 });
 
-//Initialise Database
+// Initialize Redis
+const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
+
+// Initialize Database
 if (!keys.databaseDeployed) {
   db.initDatabase();
+  redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+} else {
+  db.getLatestCanvas().then((result) => {
+    const bitfield = result.bitfield;
+    redisManager.setCanvas(bitfield);
+  });
 }
-
-// Redis setup
-const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
-redisManager.initializeCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'))
@@ -64,7 +69,7 @@ setInterval(() => {
       console.log(error);
     } else {
       db.addCanvas("250437415", result).then(r => {
-        console.log('Bitfield backed up successfully. UWU')
+        console.log('Bitfield backed up to database successfully.')
       })
     }
   })
@@ -93,11 +98,6 @@ POST /api/grid : updates a pixel on the grid
 POST /api/admin/clear : admin clear
 
 */
-
-// app.get('/', async (req, res) => {
-//   console.log('/ called')
-//   res.redirect('https://www.reddit.com/r/HydroHomies/')
-// })
 
 app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas()
