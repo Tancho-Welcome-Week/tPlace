@@ -60,7 +60,7 @@ async function getUsersWithNotifications() {
 async function createUser(telegram_id, group_id) {
 
     try{
-        await pool.query('INSERT INTO Users (telegram_id, group_id) VALUES ($1, $2)', [telegram_id, group_id])
+        await pool.query('INSERT INTO Users (telegram_id, group_id, accumulated_pixels) VALUES ($1, $2, 3)', [telegram_id, group_id])
         const user = await getUserByTelegramId(telegram_id)
         return user;
     } catch (err) {
