@@ -6,7 +6,7 @@ const axios = require('axios')
 require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
 const gameShortName = process.env.GAME_SHORT_NAME
-const appEntry = process.env.APP_ENTRY_POINT || 'http://127.0.0.1:5000'
+const appEntry = process.env.APP_ENTRY_POINT || 'http://192.168.99.100:5000'
 
 const menuTemplate = new MenuTemplate(
     ctx => `Hello ${ctx.update.message.chat.title || ctx.update.message.from.first_name}! Welcome to tplace!`)

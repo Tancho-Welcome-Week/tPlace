@@ -47,7 +47,9 @@ io.on("connection", () => {
 });
 
 //Initialise Database
-db.initDatabase();
+if (!keys.databaseDeployed) {
+  db.initDatabase();
+}
 
 // Redis setup
 const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
