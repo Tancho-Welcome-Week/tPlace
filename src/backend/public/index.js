@@ -71,13 +71,13 @@ function draw() {
         // finally 8-bit unsigned int array used by imgData
 
         // directly changes myImgData variable
-        console.log("grid callback reached");
-        console.log(grid)
+        // console.log("grid callback reached");
+        // console.log(grid)
         const gridValue = Object.values(grid.grid);
         // console.log(bitfieldGrid);
         // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
         // console.log(Object.values(grid));
-        console.log(gridValue);
+        // console.log(gridValue);
         // let view = Uint8Array.from(gridValue);
         // console.log(view);
         let rgbaArr = new Uint8ClampedArray(128*128*4);
@@ -101,7 +101,7 @@ function draw() {
             rgbaArr[i*8 + 7] = 255;
         }
 
-        console.log(rgbaArr);
+        // console.log(rgbaArr);
         myImgData.data.set(rgbaArr);
         redraw(myImgData, currentZoom);
     }
@@ -393,8 +393,9 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         
         // let data = JSON.stringify({ "x": x+1, "y": y+1, "r": r, "g": g, "b": b, "a": 255, "timestamp": now,
         //     "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
-        let data = JSON.stringify({ "x": x+1, "y": y+1, "oldLastUpdatedTime": oldLastUpdatedTime, "newLastUpdatedTime": newLastUpdatedTime,
-            "accPixels": numberOfAccumulatedPixels.getPixels(), "color": ColorBinary[currentColour] });
+        let data = JSON.stringify({ "x": x+1, "y": y+1, "oldLastUpdatedTime": oldLastUpdatedTime,
+            "newLastUpdatedTime": newLastUpdatedTime, "accPixels": numberOfAccumulatedPixels.getPixels(),
+            "color": ColorBinary[currentColour] });
         console.log(data);
         xhr.send(data); 
     }
