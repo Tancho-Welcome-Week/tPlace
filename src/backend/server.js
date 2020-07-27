@@ -54,6 +54,7 @@ if (!keys.databaseDeployed) {
   db.initDatabase();
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 } else {
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
   db.getLatestCanvas().then((result) => {
     const bitfield = result["bitfield"];
     redisManager.setCanvas(bitfield).then(() => {
