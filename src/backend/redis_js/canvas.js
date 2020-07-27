@@ -36,7 +36,7 @@ class RedisManager {
      * @param canvas_height The height of the Canvas to be created, in pixels.
      * @param pixel_format The format (e.g. 8-bit unsigned integer) of each pixel.
      */
-    initializeCanvas(canvas_width, canvas_height, pixel_format) {
+    initializeBlankCanvas(canvas_width, canvas_height, pixel_format) {
         this.width = canvas_width;
         this.height = canvas_height;
         this.format = pixel_format;
@@ -132,7 +132,7 @@ class RedisManager {
      * @param canvas The bitfield containing the pre-saved canvas data.
      */
     setCanvas(canvas) {
-        this.redisClient.set(this.key, canvas);
+        this.redisClient.set(new Buffer.from(this.key), canvas);
         console.log("Re-initialized Redis with a pre-saved canvas.");
     }
 
