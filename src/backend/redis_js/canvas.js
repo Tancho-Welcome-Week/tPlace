@@ -132,8 +132,9 @@ class RedisManager {
      * @param canvas The bitfield containing the pre-saved canvas data.
      */
     setCanvas(canvas) {
-        this.redisClient.set(new Buffer.from(this.key), canvas);
-        console.log("Re-initialized Redis with a pre-saved canvas.");
+        return new Promise((ok, error) => {
+            this.redisClient.set(new Buffer.from(this.key), canvas);
+        });
     }
 
 
