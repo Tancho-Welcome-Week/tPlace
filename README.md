@@ -14,7 +14,7 @@ Each user draws on the canvas by placing pixels. Users will encounter a cooldown
 to ensure that users must collaborate in order to make larger drawings. Users can also accumulate pixels up to a
 certain limit before placing them as they wish.
 
-# Tech Stack
+## Tech Stack
 
 The stack that was used for this implementation is:
 - **PostgreSQL** for the database
@@ -26,7 +26,8 @@ The stack that was used for this implementation is:
 - **Docker** for deployment
 - **Elastic Beanstalk** on AWS for server hosting
 
-Credits:
+## Credits
+
 - [Sahil](https://github.com/Sahilgat): PostgreSQL database and Telegram integration
 - [Sam](https://github.com/Sam-limyr): Redis cache and Frontend programming
 - [Khairul](https://github.com/khairulazman1997): Telegram integration and ExpressJS
@@ -34,20 +35,20 @@ Credits:
 - [Yi Jia](https://github.com/fluffysaur): Mobile integration and Socket.io
 - [Rohan](https://github.com/rohan-av): ExpressJS, Deployment and Server management
 
-# To use as intended:
+## To use as intended:
 
 1. A hosting server must be used and this program must be running on the server.
 2. Install the Telegram bot ('**@TembusuPlaceBot**') on any Telegram chat ([instructions](https://docs.google.com/presentation/d/1PvEgIjDTDicbbiSd4Mj8fXBc6uV1n9qT9pmAv2R-OfI/edit#slide=id.g8c821f1979_0_204)).
 3. Ensure that the chat is whitelisted via the Telegram bot.
 4. Access the canvas as desired.
 
-# To use as a standalone:
+## To use as a standalone:
 
 1. Follow the instructions in the section below to download Docker.
 2. Run this program via Docker.
 3. Go to your localhost on any web browser to access the API calls.
 
-# Using Docker:
+## Using Docker:
 
 Docker is a useful tool in development. When using Docker, you do not need to download Redis or PostgreSQL separately on your machine. With `docker-compose`, you can run multiple services at once, streamlining the otherwise cumbersome testing process.
 
@@ -61,7 +62,8 @@ Docker is a useful tool in development. When using Docker, you do not need to do
 8. After testing the environment, terminate the build gracefully with ^C
 9. Run `docker-compose down`. This will remove all the containers from your machine
 
-# Using Redis
+## Using Redis:
+
 This is only necessary to run as a standalone; not necessary in this program due to Dockerization:
 
 1. Download Redis using either https://redis.io/topics/quickstart (Linux, maybe Mac also) or
