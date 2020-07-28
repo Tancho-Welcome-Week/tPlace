@@ -220,17 +220,21 @@ function draw() {
     // DRAGGING AND CLICKING
     let dragStart, dragged;
     let lastX, lastY;
-    let hasSelectedPixel;
+    let hasSelectedPixel = false;
+    let hoverPixel = 0;
+    let touchPoints = 0;
     function downDrag(evt) {
-        if (pinchChk === true) return;
+        if (pinchChk === true || evt.button != 0) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
         dragStart = {x: lastX, y: lastY};
         dragged = true;
+        touchPoints++;
+        console.log(touchPoints);
     }
     function moveDrag(evt) {
-        if (dragged && pinchChk === false) {
+        if (dragged && pinchChk === false && touchPoints < 2) {
             // console.log('drag');
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -244,7 +248,47 @@ function draw() {
             lastX = currX;
             lastY = currY;
         }
+
+        // Hover Pixels (not on touch interfaces)
+        if (evt.metaKey == false) {
+            if (hoverPixel && hasSelectedPixel == false) {
+                cancelColour(myImgData, hoverPixel);
+            }
+            var [x, y] = getCurrentCoords(evt);
+            if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
+                if (hasSelectedPixel == false) { 
+                    hoverPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                    redraw(myImgData, currentZoom);  
+                }
+            }
+        }
     }
+
+    function leaveCanvas(evt) {
+        // When mouse leaves canvas
+        const minDelta = 5; // i.e. more than 5 pixels movement consider drag
+        const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+        const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+        const totalDeltaX = currX - dragStart.x;
+        const totalDeltaY = currY - dragStart.y;
+
+        if (hoverPixel && hasSelectedPixel == false) {
+            cancelColour(myImgData, hoverPixel);
+        }
+        if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
+            // END DRAG; updating canvas
+            // console.log('dragMouseUp');
+            if (pinchChk === false && touchPoints < 2) {
+                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
+                redraw(myImgData, currentZoom);
+            }            
+            dragStart = null;
+        }
+        dragged = false;
+        touchPoints = 0;
+    }
+
     function upDrag(evt) {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
@@ -254,17 +298,15 @@ function draw() {
         if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
             // END DRAG; updating canvas
             // console.log('dragMouseUp');
-            if (pinchChk === false) {
+            if (pinchChk === false && touchPoints < 2) {
                 startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                 startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
                 redraw(myImgData, currentZoom);
             }            
             dragStart = null;
-            dragged = false;
-        } else {
+        } else if (evt.button == 0 && touchPoints < 2) {
             // CLICK
             console.log('click');
-            dragged = false;
 
             if (hasSelectedPixel) {
                 // won't put a colour
@@ -283,6 +325,7 @@ function draw() {
                         popup.classList.toggle('show');
                     }
                 } else {
+                    if (hoverPixel) cancelColour(myImgData, hoverPixel);
                     let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                     redraw(myImgData, currentZoom);        
                     hasSelectedPixel = true;
@@ -326,13 +369,14 @@ function draw() {
                 }
             }
         }
+        touchPoints = 0;
+        console.log(touchPoints);
+        dragged = false;
     }
     canvas.addEventListener('mousedown', downDrag, false);
     canvas.addEventListener('mousemove', moveDrag, false);
     canvas.addEventListener('mouseup', upDrag, false);
-    // canvas.addEventListener('touchstart', downDrag, false);
-    // canvas.addEventListener('touchmove', moveDrag, false);
-    // canvas.addEventListener('touchend', upDrag, false);
+    canvas.addEventListener('mouseleave', leaveCanvas, false);
 
 // Convert touch to mouse
 function touchHandler(event) {
@@ -355,7 +399,7 @@ function touchHandler(event) {
     simulatedEvent.initMouseEvent(type, true, true, window, 1, 
                                   first.screenX, first.screenY, 
                                   first.clientX, first.clientY, false, 
-                                  false, false, false, 0/*left*/, null);
+                                  false, false, true, 0/*left*/, null);
 
     first.target.dispatchEvent(simulatedEvent);
     event.preventDefault();
@@ -402,7 +446,6 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         xhr.send(data);
     }
     function cancelColour(imgData, originalPixel) {
-        console.log("Go back go back go back");
         let i = originalPixel.i;
         imgData.data[i] = originalPixel.r;
         imgData.data[i+1] = originalPixel.g;
