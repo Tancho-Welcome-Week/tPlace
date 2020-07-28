@@ -277,8 +277,8 @@ function draw() {
         }
         if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
             // END DRAG; updating canvas
-            // console.log('dragMouseUp');
-            if (pinchChk === false && touchPoints < 2) {
+            console.log('Potato!!!');
+            if (pinchChk === false && touchPoints == 1) {
                 startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                 startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
                 redraw(myImgData, currentZoom);
