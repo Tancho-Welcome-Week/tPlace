@@ -248,8 +248,7 @@ app.get("/api/user/:userId", async (req, res) => {
     const user = await db.getUserByTelegramId(userId);
     res.status(200).json(user);
   } catch (err) {
-    console.log(err);
-    res.sendStatus(401);
+    res.status(401).send(err);
   }
 })
 
