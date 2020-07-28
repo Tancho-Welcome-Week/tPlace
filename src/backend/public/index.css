@@ -54,14 +54,13 @@ body {
 
 #canvas {
     display: block;
-    background-color: lightgray;
     /* margin: auto; */
+    background-color: rgba(117, 117, 117, 0.2);
     border: 1px solid black; 
     border-radius: 6px;
     height: 90vw;
     width: 90vw;
-
-    background-color: white;
+    cursor: crosshair;
     /* transform: scale(2, 2); */
     /* transform: translate(300px, 200px); */
 }
