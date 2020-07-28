@@ -190,7 +190,8 @@ function draw() {
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
-        let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
+        let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
+        // let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
         if (delta) {
             zoom(delta, absX, absY);
             displayCoords(event);
@@ -238,7 +239,7 @@ function draw() {
         dragStart = {x: lastX, y: lastY};
         dragged = true;
         touchPoints++;
-        console.log(touchPoints);
+        // console.log(touchPoints);
     }
     function moveDrag(evt) {
         if (dragged && pinchChk === false && touchPoints < 2) {
@@ -381,7 +382,7 @@ function draw() {
             }
         }
         touchPoints = 0;
-        console.log(touchPoints);
+        // console.log(touchPoints);
         dragged = false;
     }
     canvas.addEventListener('mousedown', downDrag, false);
