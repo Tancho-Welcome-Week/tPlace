@@ -321,73 +321,72 @@ function draw() {
                     redraw(myImgData, currentZoom);
                 }            
                 dragStart = null;
-            }
-        } else if (evt.button == 0 && touchPoints < 2) {
-            // CLICK
-            console.log('click');
-
-            if (hasSelectedPixel) {
-                // won't put a colour
-                console.log("there is already a selected pixel");
-            } else {
-                const [x, y] = getCurrentCoords(evt);
-                if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
-                    // pixel out of range; won't put a colour 
-                    let popup = document.getElementById("outofrange-popup");
-                    popup.style.left = `${evt.pageX-8}px`;
-                    popup.style.top = `${evt.pageY+1}px`;
-                    popup.classList.toggle('show');
-    
-                    let okBtn = document.getElementById("ok2");
-                    okBtn.onclick = function(){
-                        popup.classList.toggle('show');
-                    }
+            } else if (evt.button == 0 && touchPoints < 2) {
+                // CLICK    
+                if (hasSelectedPixel) {
+                    // won't put a colour
+                    console.log("there is already a selected pixel");
                 } else {
-                    if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                    let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
-                    redraw(myImgData, currentZoom);        
-                    hasSelectedPixel = true;
-                    
-                    if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
-                        let popup = document.getElementById("confirm-popup");
-                        popup.style.left = `${evt.pageX-8}px`;
-                        popup.style.top = `${evt.pageY+1}px`;
-                        // maybe figure out a way to better set the popup location?
-                        popup.classList.toggle('show');
-
-                        let confirmBtn = document.getElementById("confirm");
-                        confirmBtn.onclick = function() {
-                            confirmColour(x, y, chatId, userId);
-                            console.log(x, y);
-                            if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
-                                // last accumulated pixel used
-                                startCountdown();
-                            }
-                            hasSelectedPixel = false;
-                        }
-                        let cancelBtn = document.getElementById("cancel");
-                        cancelBtn.onclick = function(){
-                            cancelColour(myImgData, originalPixel);
-                            popup.classList.toggle('show');
-                            hasSelectedPixel = false;
-                        };
-                    } else { // on cooldown, 0 accumulated pixels
-                        let popup = document.getElementById("cooldown-popup");
+                    const [x, y] = getCurrentCoords(evt);
+                    if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
+                        // pixel out of range; won't put a colour 
+                        let popup = document.getElementById("outofrange-popup");
                         popup.style.left = `${evt.pageX-8}px`;
                         popup.style.top = `${evt.pageY+1}px`;
                         popup.classList.toggle('show');
         
-                        let okBtn = document.getElementById("ok");
+                        let okBtn = document.getElementById("ok2");
                         okBtn.onclick = function(){
-                            cancelColour(myImgData, originalPixel);
                             popup.classList.toggle('show');
-                            hasSelectedPixel = false;
+                        }
+                    } else {
+                        if (hoverPixel) cancelColour(myImgData, hoverPixel);
+                        let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                        redraw(myImgData, currentZoom);        
+                        hasSelectedPixel = true;
+                        
+                        if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
+                            let popup = document.getElementById("confirm-popup");
+                            popup.style.left = `${evt.pageX-8}px`;
+                            popup.style.top = `${evt.pageY+1}px`;
+                            // maybe figure out a way to better set the popup location?
+                            popup.classList.toggle('show');
+    
+                            let confirmBtn = document.getElementById("confirm");
+                            confirmBtn.onclick = function() {
+                                confirmColour(x, y, chatId, userId);
+                                console.log(x, y);
+                                if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
+                                    // last accumulated pixel used
+                                    startCountdown();
+                                }
+                                hasSelectedPixel = false;
+                            }
+                            let cancelBtn = document.getElementById("cancel");
+                            cancelBtn.onclick = function(){
+                                cancelColour(myImgData, originalPixel);
+                                popup.classList.toggle('show');
+                                hasSelectedPixel = false;
+                            };
+                        } else { // on cooldown, 0 accumulated pixels
+                            let popup = document.getElementById("cooldown-popup");
+                            popup.style.left = `${evt.pageX-8}px`;
+                            popup.style.top = `${evt.pageY+1}px`;
+                            popup.classList.toggle('show');
+            
+                            let okBtn = document.getElementById("ok");
+                            okBtn.onclick = function(){
+                                cancelColour(myImgData, originalPixel);
+                                popup.classList.toggle('show');
+                                hasSelectedPixel = false;
+                            }
                         }
                     }
                 }
+            } else {
+                if (hoverPixel) cancelColour(myImgData, hoverPixel);
+                console.log("Potato");
             }
-        } else {
-            if (hoverPixel) cancelColour(myImgData, hoverPixel);
         }
         touchPoints = 0;
         console.log(touchPoints);
