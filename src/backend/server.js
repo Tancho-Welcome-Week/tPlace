@@ -98,11 +98,19 @@ app.use(function (req, res, next) {
 /*
 Requests:
 
-GET /  : gets the page
-GET /api/grid : gets the grid
-POST /api/grid : updates a pixel on the grid
-POST /api/admin/clear : admin clear
+User actions:
+GET /api/grid => gets the canvas
+POST /api/grid/:chatId/:userId => sets a pixel on the canvas
 
+Initialize chats and users:
+POST /whitelist => adds chat to whitelist
+POST /start/:chatId/:userId => activates user account
+POST /toggle/on => turns on telegram notifications for user
+POST /toggle/off => turns off telegram notifications for user
+
+Admin functions:
+GET /api/user/:userId => gets user with userId
+POST /admin/clear => clears an area of the canvas (Admin only)
 */
 
 app.get("/api/grid", async(req, res) => {
@@ -162,7 +170,7 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
-  if (req.body.userId !== 250437415) {
+  if (req.body.userId !== process.env.ADMIN_CHATID) {
     res.sendStatus(401)
     return
   }
