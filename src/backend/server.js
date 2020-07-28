@@ -82,7 +82,7 @@ setInterval(() => {
 }, 300000);
 
 // Flag for whitelisting
-const isWhitelistPeriod = process.env.WHITELIST || true;
+const isWhitelistPeriod = keys.isWhitelistPeriod || true;
 
 // Allow CORS
 app.use(function (req, res, next) {
@@ -170,7 +170,7 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
-  if (req.body.userId !== process.env.ADMIN_CHATID) {
+  if (req.body.userId !== keys.isAdminChatID) {
     res.sendStatus(401)
     return
   }
