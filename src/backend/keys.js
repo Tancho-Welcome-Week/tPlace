@@ -9,5 +9,8 @@ module.exports = {
   pgPassword: process.env.PGPASSWORD,
   pgPort: process.env.PGPORT,
   isWhitelistPeriod: process.env.WHITELIST,
-  isBeta: process.env.BETA
+  isBeta: process.env.BETA,
+  botToken: process.env.BOT_TOKEN,
+  databaseDeployed: process.env.DEPLOYED_DATABASE,
+  isAdminChatID: process.env.ADMIN_CHATID
 };

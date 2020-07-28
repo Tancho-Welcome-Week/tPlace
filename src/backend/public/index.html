@@ -2,162 +2,171 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>tPlace</title>
+    <meta name="description" content="tPlace Canvas for TWW2020">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="img/favicon/site.webmanifest">
+
     <!-- <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
     <title>tPlace</title>
     <link href="/index.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body onload="draw();">
-  <div class="background-video">
-    <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
-        <source src="img/banner.mp4" type="video/mp4">
-    </video>
-  </div>
-  <div class="grid-container">
-    <div class="grid-header bg-solid">
-      <h1>tPlace</h1>
-    </div>
-    <div class="grid-swatches bg-solid" id="colour-swatches">     
-        <svg class="palette" height="500px" viewBox="0 0 55 649" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
-            <g transform="matrix(1,0,0,1,-2881.78,-1280.78)">
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,18.1052)">
-                        <rect id="0" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:white;stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,57.7385)">
-                        <rect id="1" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(165,165,165);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,97.3718)">
-                        <rect id="2" x="112.041" y="242.497" width="27.019" height="27.019" style="stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,137.005)">
-                        <rect id="3" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(100,40,0);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,176.651)">
-                        <rect id="4" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,190,142);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,216.284)">
-                        <rect id="5" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,222,0);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,255.918)">
-                        <rect id="6" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,122,29);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,295.551)">
-                        <rect id="7" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255, 0, 0);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,335.184)">
-                        <rect id="8" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(175,0,0);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,374.607)">
-                        <rect id="9" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,100,230);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,414.241)">
-                        <rect id="10" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(150,30,215);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,453.874)">
-                        <rect id="11" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(0,0,128);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,493.507)">
-                        <rect id="12" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(17,22,255);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,533.141)">
-                        <rect id="13" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(79,221,255);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,572.774)">
-                        <rect id="14" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(0,235,20);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-                <g transform="matrix(1,0,0,1,1992.32,1162.56)">
-                    <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,612.407)">
-                        <rect id="15" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(7,77,0);stroke:white;stroke-width:2;"/>
-                    </g>
-                </g>
-            </g>
-        </svg>
-    </div>
-    <div id="canvas-bg" class="grid-canvas bg-solid">
-        <div id="canvas-div">
-            <canvas id="canvas">
-                Oh no! Your browser doesn't support this :( Try using a more updated one!
-            </canvas>
-            <div class='popup' id='confirm-popup'>
-                <button class='button' id='confirm'>Confirm</button>
-                <button class='button' id='cancel'>Cancel</button>
+    <div class="inline-block">
+        <div class="grid-container">
+            <div class="grid-header bg-solid">
+            <h1>tPlace</h1>
             </div>
-            <div class='popup' id='cooldown-popup'>
-                You can't put pixels while on cooldown,
-                <br>but feel free to try colours on!
-                <button class='button' id='ok'>Okay!</button>
+            <div class="grid-swatches bg-solid" id="colour-swatches">     
+                <svg class="palette" height="500px" viewBox="0 0 55 649" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+                    <g transform="matrix(1,0,0,1,-2881.78,-1280.78)">
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,18.1052)">
+                                <rect id="0" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:white;stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,57.7385)">
+                                <rect id="1" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(165,165,165);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,97.3718)">
+                                <rect id="2" x="112.041" y="242.497" width="27.019" height="27.019" style="stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,137.005)">
+                                <rect id="3" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(100,40,0);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,176.651)">
+                                <rect id="4" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,190,142);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,216.284)">
+                                <rect id="5" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,222,0);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,543.794,255.918)">
+                                <rect id="6" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,122,29);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,295.551)">
+                                <rect id="7" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255, 0, 0);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(-0.977908,-0.977908,-0.977908,0.977908,1290.05,335.184)">
+                                <rect id="8" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(175,0,0);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,374.607)">
+                                <rect id="9" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(255,100,230);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,414.241)">
+                                <rect id="10" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(150,30,215);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,453.874)">
+                                <rect id="11" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(0,0,128);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,493.507)">
+                                <rect id="12" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(17,22,255);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,533.141)">
+                                <rect id="13" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(79,221,255);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,572.774)">
+                                <rect id="14" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(0,235,20);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                        <g transform="matrix(1,0,0,1,1992.32,1162.56)">
+                            <g transform="matrix(0.977908,-0.977908,0.977908,0.977908,544.185,612.407)">
+                                <rect id="15" x="112.041" y="242.497" width="27.019" height="27.019" style="fill:rgb(7,77,0);stroke:white;stroke-width:2;"/>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
             </div>
-            <div class='popup' id='outofrange-popup'>
-                You can't put pixels outside of the canvas!
-                <button class='button' id='ok2'>Okay!</button>
+            <div id="canvas-bg" class="grid-canvas bg-solid">
+                <div id="canvas-div">
+                    <canvas id="canvas">
+                        Oh no! Your browser doesn't support this :( Try using a more updated one!
+                    </canvas>
+                    <div class='popup' id='confirm-popup'>
+                        <button class='button' id='confirm'>Confirm</button>
+                        <button class='button' id='cancel'>Cancel</button>
+                    </div>
+                    <div class='popup' id='cooldown-popup'>
+                        You can't put pixels while on cooldown,
+                        <br>but feel free to try colours on!
+                        <button class='button' id='ok'>Okay!</button>
+                    </div>
+                    <div class='popup' id='outofrange-popup'>
+                        You can't put pixels outside of the canvas!
+                        <button class='button' id='ok2'>Okay!</button>
+                    </div>
+                    <div class='popup' id='userconflict-popup'>
+                        You have more than 1 window open for this user!
+                        <br>Check that you don't have it open on both mobile and desktop!
+                        <button class='button' id='ok3'>Okay!</button>
+                    </div>
+                    <!-- <img class='popup' id='confirm-popup' src='confirmation popup.svg' width='140' usemap='#cfm-buttons'>
+                    <map name='cfm-buttons'>
+                        <area shape="rect" coords="" onclick="confirmColour()">
+                        <area shape="rect" coords="" onclick="cancelColour()">
+                    </map> -->
+                </div>
+                <!-- <span class="popup" id="confirm-popup" style="width: 90px; height: 30px; background-image: url('confirmation popup.svg'); display:block"></span> -->
             </div>
-            <!-- <img class='popup' id='confirm-popup' src='confirmation popup.svg' width='140' usemap='#cfm-buttons'>
-            <map name='cfm-buttons'>
-                <area shape="rect" coords="" onclick="confirmColour()">
-                <area shape="rect" coords="" onclick="cancelColour()">
-            </map> -->
+            <div id="display-items" class="grid-info bg-solid">
+                <p>coordinates: (<span id="x">0</span>, <span id="y">0</span>)</p>
+                <p>time till next pixel: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
+                <p>number of pixels clickable: <span id="accPixels"></span></p>
+            </div>
+
+            <!-- <div id="coords-div">
+                <p id="x">x: 0</p>
+                <p id="y">y: 0</p>
+            </div>
+            <div id="countdown-div">
+                <p>time till next click: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
+            </div>
+            <div id="accPixels-div">
+                <p>number of pixels clickable: <span id="accPixels"></span></p>
+            </div>
+            <div>
+                <img id="cat" />
+            </div> -->
         </div>
-        <!-- <span class="popup" id="confirm-popup" style="width: 90px; height: 30px; background-image: url('confirmation popup.svg'); display:block"></span> -->
+        <script src = "/socket.io/socket.io.js"></script>
+        <script src = "/hammer.min.js"></script>
+        <script src = "/colors.js"></script>
+        <script src = "/accumulatedPixels.js"></script>
+        <script src = "/index.js"></script>
+        <script src = "/canvas_commons.js"></script>
     </div>
-    <div id="display-items" class="grid-info bg-solid">
-        <p>coordinates: (<span id="x">0</span>, <span id="y">0</span>)</p>
-        <p>time till next pixel: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
-        <p>number of pixels clickable: <span id="accPixels"></span></p>
-    </div>
-
-    <!-- <div id="coords-div">
-        <p id="x">x: 0</p>
-        <p id="y">y: 0</p>
-    </div>
-    <div id="countdown-div">
-        <p>time till next click: <span id="countdown-m">0</span> min <span id="countdown-s">0</span> sec</p>
-    </div>
-    <div id="accPixels-div">
-        <p>number of pixels clickable: <span id="accPixels"></span></p>
-    </div>
-    <div>
-        <img id="cat" />
-    </div> -->
-  </div>
-
-    <script src = "/socket.io/socket.io.js"></script>
-    <script src = "/hammer.min.js"></script>
-    <script src = "/colors.js"></script>
-    <script src = "/accumulatedPixels.js"></script>
-    <script src = "/index.js"></script>
-    <script src = "/canvas_commons.js"></script>
-
 </body>
 
 </html>

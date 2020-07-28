@@ -1,14 +1,14 @@
 const Telegraf = require('telegraf');
+const keys = require('../../keys.js')
 
 require('dotenv').config();
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot = new Telegraf(keys.botToken);
 
 const MORNING_NOTIFICATION_PIXEL_FULLY_RECHARGED = "Wake up sleepy head! Your pixels are recharged!";
 const LUNCH_NOTIFICATION_PIXEL_FULLY_RECHARGED = "While you are recharging, your pixels have recharged";
 const DINNER_NOTIFICATION_PIXEL_FULLY_RECHARGED = "Grab your dinner, buckle in and start canvasing, your " +
     "pixels are recharged!";
-const NIGHT_NOTIFICATION_PIXEL_FULLY_RECHARGED = "Just because it's quiet hours, it doesn't mean you can't " +
-    "get to pixeling! Your pixels are charged!";
+const NIGHT_NOTIFICATION_PIXEL_FULLY_RECHARGED = "It's quiet hours! Make full use of your remaining pixels and get some rest!";
 
 const sendNotification = (user, message) => {
     const chatId = user.telegram_id

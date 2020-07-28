@@ -1,6 +1,8 @@
 const redis = require("redis");
 const commons = require("./commons.js");
 const color = require("../public/colors.js");
+const canvasCommons = require("../public/canvas_commons.js");
+const assert = require("assert");
 
 
 class RedisManager {
@@ -34,11 +36,21 @@ class RedisManager {
      * @param canvas_height The height of the Canvas to be created, in pixels.
      * @param pixel_format The format (e.g. 8-bit unsigned integer) of each pixel.
      */
-    initializeCanvas(canvas_width, canvas_height, pixel_format) {
+    initializeBlankCanvas(canvas_width, canvas_height, pixel_format) {
         this.width = canvas_width;
         this.height = canvas_height;
         this.format = pixel_format;
         this.setAreaValue(1, 1, this.width, this.height, color.ColorBinary.WHITE);
+
+        const interval = canvasCommons.INTERVAL_BETWEEN_HELPER_LINES;
+        assert(interval > 0, "Interval between helper lines is negative or zero.")
+
+        for (let i = interval; i < this.width + 1; i += interval) {
+            this.setAreaValue(i, 1, i, this.height, color.ColorBinary.GREY);
+        }
+        for (let i = interval; i < this.height + 1; i += interval) {
+            this.setAreaValue(1, i, this.width, i, color.ColorBinary.GREY);
+        }
         console.log("Redis Canvas initialized to zeroes with height " + this.height + " and width " + this.width);
     }
 
@@ -66,7 +78,7 @@ class RedisManager {
      */
     setValue(pixelXCoordinate, pixelYCoordinate, value) {
         const offset = commons.calculateOffset(pixelXCoordinate, pixelYCoordinate, this.width);
-        this.redisClient.send_command("bitfield",[this.key, 'SET', this.format, offset,
+        this.redisClient.send_command("bitfield",[new Buffer.from(this.key), 'SET', this.format, offset,
             parseInt(value, 2)]);
     }
 
@@ -87,6 +99,7 @@ class RedisManager {
                 this.setValue(x, y, color);
             }
         }
+        // console.log("Set area");
     }
 
     /**
@@ -112,6 +125,18 @@ class RedisManager {
             });
         }).catch((error) => { console.log(error) });
     }
+
+    /**
+     * Sets the entire Canvas object. This method does not sanitize the input or check that the dimensions are the same
+     * as the original initialized values.
+     * @param canvas The bitfield containing the pre-saved canvas data.
+     */
+    setCanvas(canvas) {
+        return new Promise((ok, error) => {
+            this.redisClient.set(new Buffer.from(this.key), canvas);
+        });
+    }
+
 
     /**
      *              ***************************************************************************
