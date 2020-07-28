@@ -33,7 +33,7 @@ The stack that was used for this implementation is:
 - [Khairul](https://github.com/khairulazman1997): Telegram integration and ExpressJS
 - [Hui Ling](https://github.com/porkeypine): Main Frontend developer
 - [Yi Jia](https://github.com/fluffysaur): Mobile integration and Socket.io
-- [Rohan](https://github.com/rohan-av): ExpressJS, Deployment and Server management
+- [Rohan](https://github.com/rohan-av): Dockerization, Deployment and DevOps
 
 ## To use as intended:
 
