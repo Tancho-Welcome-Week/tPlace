@@ -82,7 +82,7 @@ setInterval(() => {
 }, 300000);
 
 // Flag for whitelisting
-const isWhitelistPeriod = process.env.WHITELIST || true;
+const isWhitelistPeriod = process.env.WHITELIST || false;
 
 // Allow CORS
 app.use(function (req, res, next) {
