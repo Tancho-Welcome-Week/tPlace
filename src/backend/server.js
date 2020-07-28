@@ -9,12 +9,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-//HTTPS
+// HTTPS
 const fs = require("fs");
-const https = require("https")
-
-// PostgreSQL
-// const { Pool } = require("pg").Pool;
+const https = require("https");
 
 // Redis
 const redis = require("redis");
@@ -22,13 +19,13 @@ const canvas = require("./redis_js/canvas.js");
 const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
-const startNotificationSchedule = require("./scheduler/schedule")
+const startNotificationSchedule = require("./scheduler/schedule");
 
 // Express Setup
 app = express();
 app.use(function(req, res, next) {
   if (req.url === '/') {
-    res.redirect('https://www.reddit.com/r/YouFellForItFool/comments/cjlngm/you_fell_for_it_fool/')
+    res.redirect('https://www.reddit.com/r/YouFellForItFool/comments/cjlngm/you_fell_for_it_fool/');
   }
   next();
 })
@@ -67,7 +64,7 @@ if (!keys.databaseDeployed) {
 // redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 
 // Start Schedule
-startNotificationSchedule().then(r => console.log('Notification schedule started'))
+startNotificationSchedule().then(r => console.log('Notification schedule started'));
 
 setInterval(() => {
   redisManager.getCanvas().then((result, error) => {
@@ -75,7 +72,7 @@ setInterval(() => {
       console.log(error);
     } else {
       db.addCanvas("250437415", result).then(r => {
-        console.log('Bitfield backed up to database successfully.')
+        console.log('Bitfield backed up to database successfully.');
       })
     }
   })
@@ -86,10 +83,10 @@ const isWhitelistPeriod = keys.isWhitelistPeriod || true;
 
 // Allow CORS
 app.use(function (req, res, next) {
-      res.header('Access-Control-Allow-Origin', '*') // to be changed to telegram bot domain
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-      res.header('Access-Control-Allow-Credentials', 'true')
-      next()
+      res.header('Access-Control-Allow-Origin', '*'); // to be changed to telegram bot domain
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      next();
     }
 )
 
@@ -114,22 +111,21 @@ POST /admin/clear => clears an area of the canvas (Admin only)
 */
 
 app.get("/api/grid", async(req, res) => {
-  const grid = await redisManager.getCanvas()
-  const json = {"grid": grid}
-  res.status(200).json(json)
+  const grid = await redisManager.getCanvas();
+  const json = {"grid": grid};
+  res.status(200).json(json);
   console.log("Grid requested.");
 });
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
-  // console.log(req.body)
   if (isWhitelistPeriod) {
     try {
-      await db.addWhitelistGroupId(chatId)
+      await db.addWhitelistGroupId(chatId);
       res.sendStatus(200);
     } catch (err) {
-      console.log(err)
-      res.sendStatus(400)
+      console.log(err);
+      res.sendStatus(400);
     }
   } else {
     res.sendStatus(401);
@@ -139,15 +135,15 @@ app.post("/whitelist", async (req, res) => {
 app.post("/toggle/off", async (req, res) => {
   const userId = req.body.userId;
   try {
-    const exists = await db.setUserNotificationsByTelegramId(userId, false)
+    const exists = await db.setUserNotificationsByTelegramId(userId, false);
     if (!exists) {
-      res.sendStatus(204)
-      return
+      res.sendStatus(204);
+      return;
     }
-    res.sendStatus(200)
+    res.sendStatus(200);
   } catch (err) {
-    console.log(err)
-    res.sendStatus(401)
+    console.log(err);
+    res.sendStatus(401);
   }
 
 })
@@ -158,21 +154,21 @@ app.post("/toggle/on", async (req, res) => {
   try {
     const exists = await db.setUserNotificationsByTelegramId(userId, true)
     if (!exists) {
-      res.sendStatus(204)
-      return
+      res.sendStatus(204);
+      return;
     }
-    res.sendStatus(200)
+    res.sendStatus(200);
   } catch (err) {
-    console.log(err)
-    res.sendStatus(401)
+    console.log(err);
+    res.sendStatus(401);
   }
 
 })
 
 app.post("/admin/clear", async (req, res) => {
   if (req.body.userId !== keys.isAdminChatID) {
-    res.sendStatus(401)
-    return
+    res.sendStatus(401);
+    return;
   }
   try {
     const topLeft = req.body.topLeft; // array of two numbers
@@ -186,16 +182,16 @@ app.post("/admin/clear", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      const json = {grid: grid}
+      const json = {grid: grid};
       io.emit("grid", json);
-      res.sendStatus(200)
+      res.sendStatus(200);
     } catch (err) {
       console.log(err);
-      res.sendStatus(500)
+      res.sendStatus(500);
     }
 
   } catch (e) {
-    console.log(e)
+    console.log(e);
     res.sendStatus(400);
   }
 });
@@ -211,14 +207,14 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const frontendUserLastUpdatedTime = new Date(req.body.oldLastUpdatedTime).getTime();
   const last_updated = req.body.newLastUpdatedTime;
   if (userLastUpdatedTime !== frontendUserLastUpdatedTime) {
-    res.status(403).send("Please place pixels using only 1 tab/1 client!")
-    return
+    res.status(403).send("Please place pixels using only 1 tab/1 client!");
+    return;
   }
 
   if (req.body.x <= 0 || req.body.y <= 0 ||
       req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
-    res.sendStatus(400)
-    return
+    res.sendStatus(400);
+    return;
   }
   if (isPermitted) {
     const binaryColorValue = req.body.color;
@@ -232,12 +228,12 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
     try {
       const grid = await redisManager.getCanvas();
-      const json = {grid: grid}
+      const json = {grid: grid};
       io.emit("grid", json);
-      res.sendStatus(200)
+      res.sendStatus(200);
     } catch (err) {
       console.log(err);
-      res.sendStatus(500)
+      res.sendStatus(500);
     }
 
     await db.setUserAccumulatedPixelsByTelegramId(userId, accumulatedPixels, last_updated)
@@ -249,10 +245,11 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 app.get("/api/user/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
-    const user = await db.getUserByTelegramId(userId)
-    res.status(200).json(user)
+    const user = await db.getUserByTelegramId(userId);
+    res.status(200).json(user);
   } catch (err) {
-    console.log(err)
+    console.log(err);
+    res.sendStatus(401);
   }
 })
 
@@ -265,10 +262,10 @@ app.get("/start/:chatId/:userId", async (req, res) => {
     return
   }
   let user = await db.getUserByTelegramId(userId);
-  let whitelist = await db.getWhitelistByGroupId(chatId)
+  let whitelist = await db.getWhitelistByGroupId(chatId);
   if (!user) {
     if (keys.isBeta && !whitelist) {
-      await db.addWhitelistGroupId(chatId)
+      await db.addWhitelistGroupId(chatId);
     }
     await db.createUser(userId, chatId);
   }
