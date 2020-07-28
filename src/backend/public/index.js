@@ -8,7 +8,7 @@ let canvas = document.getElementById('canvas');
 let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
-var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -46,7 +46,7 @@ scaleCanvas();
 // Refresh page if canvas is changed between Mobile and Desktop size
 function resizeCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
-        if (currentDisplay != "Desktop") location.reload();
+        if (currentDisplay !== "Desktop") location.reload();
     } else {
         location.reload();
     }
@@ -84,16 +84,7 @@ function draw() {
         // map the to 32-bit colours, i.e. r g b a each being one byte 
         // finally 8-bit unsigned int array used by imgData
 
-        // directly changes myImgData variable
-        // console.log("grid callback reached");
-        // console.log(grid)
         const gridValue = Object.values(grid.grid);
-        // console.log(bitfieldGrid);
-        // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
-        // console.log(Object.values(grid));
-        // console.log(gridValue);
-        // let view = Uint8Array.from(gridValue);
-        // console.log(view);
         let rgbaArr = new Uint8ClampedArray(128*128*4);
         for (let i = 0; i < gridValue.length; i++) {
             // iterates over each byte to separate into the two bits
@@ -115,14 +106,12 @@ function draw() {
             rgbaArr[i*8 + 7] = 255;
         }
 
-        // console.log(rgbaArr);
         myImgData.data.set(rgbaArr);
         redraw(myImgData, currentZoom);
     }
 
     const userUrl = window.location.href.split("/"); 
     const userId = userUrl[userUrl.length - 1];
-    // const userId = '250437415';
     let chatId;
 
     function initUserVariables(userVariables) {
