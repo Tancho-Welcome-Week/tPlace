@@ -8,7 +8,7 @@ let canvas = document.getElementById('canvas');
 let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
-const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -26,19 +26,33 @@ let newLastUpdatedTime;
 let currentColour = "RED"; 
 
 let displayToCanvasScale;
+let currentDisplay;
 
 // Resizing Canvas
 function scaleCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
         canvas.setAttribute('width', '490');
         canvas.setAttribute('height', '490');
+        currentDisplay = "Desktop";
     } else {
         canvas.setAttribute('width', 0.9*vw);
         canvas.setAttribute('height', 0.9*vw);
+        currentDisplay = "Mobile";
     }
+    console.log(currentDisplay);
 }
 scaleCanvas();
-window.addEventListener('resize', scaleCanvas());
+
+// Refresh page if canvas is changed between Mobile and Desktop size
+function resizeCanvas() {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+        if (currentDisplay != "Desktop") location.reload();
+    } else {
+        location.reload();
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
 
 function draw() {
     let canvas = document.getElementById('canvas');
