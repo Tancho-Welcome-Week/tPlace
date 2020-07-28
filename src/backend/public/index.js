@@ -237,6 +237,7 @@ function draw() {
     let hasSelectedPixel = false;
     let hoverPixel = 0;
     let touchPoints = 0;
+
     function downDrag(evt) {
         if (pinchChk === true || evt.button != 0) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
@@ -283,41 +284,44 @@ function draw() {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        const totalDeltaX = currX - dragStart.x;
-        const totalDeltaY = currY - dragStart.y;
 
         if (hoverPixel && hasSelectedPixel == false) {
             cancelColour(myImgData, hoverPixel);
         }
-        if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
-            // END DRAG; updating canvas
-            console.log('Potato!!!');
-            if (pinchChk === false && touchPoints == 1) {
-                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
-                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                redraw(myImgData, currentZoom);
-            }            
-            dragStart = null;
+        if (dragged == true) {
+            const totalDeltaX = currX - dragStart.x;
+            const totalDeltaY = currY - dragStart.y;
+            if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
+                // END DRAG; updating canvas
+                if (pinchChk === false && touchPoints == 1) {
+                    startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                    startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
+                    redraw(myImgData, currentZoom);
+                }            
+                dragStart = null;
+            }
+            dragged = false;
         }
-        dragged = false;
-        touchPoints = 0;
+        if (touchPoints != 0) touchPoints = 0;
     }
 
     function upDrag(evt) {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        const totalDeltaX = currX - dragStart.x;
-        const totalDeltaY = currY - dragStart.y;
-        if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
-            // END DRAG; updating canvas
-            // console.log('dragMouseUp');
-            if (pinchChk === false && touchPoints < 2) {
-                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
-                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                redraw(myImgData, currentZoom);
-            }            
-            dragStart = null;
+        if (dragged == true) {
+            const totalDeltaX = currX - dragStart.x;
+            const totalDeltaY = currY - dragStart.y;
+            if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
+                // END DRAG; updating canvas
+                // console.log('dragMouseUp');
+                if (pinchChk === false && touchPoints < 2) {
+                    startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                    startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
+                    redraw(myImgData, currentZoom);
+                }            
+                dragStart = null;
+            }
         } else if (evt.button == 0 && touchPoints < 2) {
             // CLICK
             console.log('click');
@@ -382,6 +386,8 @@ function draw() {
                     }
                 }
             }
+        } else {
+            if (hoverPixel) cancelColour(myImgData, hoverPixel);
         }
         touchPoints = 0;
         console.log(touchPoints);
