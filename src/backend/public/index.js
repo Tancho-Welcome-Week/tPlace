@@ -48,7 +48,7 @@ function draw() {
     let memCvs = document.createElement('canvas');
     memCvs.width = CANVAS_WIDTH;
     memCvs.height = CANVAS_HEIGHT;
-    // let memCvs = new canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+    // let memCvs = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     let memCtx = memCvs.getContext('2d');
 
     let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global letiable
