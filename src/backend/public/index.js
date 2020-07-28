@@ -8,7 +8,7 @@ let canvas = document.getElementById('canvas');
 let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
-const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -26,19 +26,33 @@ let newLastUpdatedTime;
 let currentColour = "RED"; 
 
 let displayToCanvasScale;
+let currentDisplay;
 
 // Resizing Canvas
 function scaleCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
         canvas.setAttribute('width', '490');
         canvas.setAttribute('height', '490');
+        currentDisplay = "Desktop";
     } else {
         canvas.setAttribute('width', 0.9*vw);
         canvas.setAttribute('height', 0.9*vw);
+        currentDisplay = "Mobile";
     }
+    console.log(currentDisplay);
 }
 scaleCanvas();
-window.addEventListener('resize', scaleCanvas());
+
+// Refresh page if canvas is changed between Mobile and Desktop size
+function resizeCanvas() {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+        if (currentDisplay != "Desktop") location.reload();
+    } else {
+        location.reload();
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
 
 function draw() {
     let canvas = document.getElementById('canvas');
@@ -223,6 +237,7 @@ function draw() {
     let hasSelectedPixel = false;
     let hoverPixel = 0;
     let touchPoints = 0;
+
     function downDrag(evt) {
         if (pinchChk === true || evt.button != 0) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
@@ -269,41 +284,44 @@ function draw() {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        const totalDeltaX = currX - dragStart.x;
-        const totalDeltaY = currY - dragStart.y;
 
         if (hoverPixel && hasSelectedPixel == false) {
             cancelColour(myImgData, hoverPixel);
         }
-        if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
-            // END DRAG; updating canvas
-            // console.log('dragMouseUp');
-            if (pinchChk === false && touchPoints < 2) {
-                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
-                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                redraw(myImgData, currentZoom);
-            }            
-            dragStart = null;
+        if (dragged == true) {
+            const totalDeltaX = currX - dragStart.x;
+            const totalDeltaY = currY - dragStart.y;
+            if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
+                // END DRAG; updating canvas
+                if (pinchChk === false && touchPoints == 1) {
+                    startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                    startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
+                    redraw(myImgData, currentZoom);
+                }            
+                dragStart = null;
+            }
+            dragged = false;
         }
-        dragged = false;
-        touchPoints = 0;
+        if (touchPoints != 0) touchPoints = 0;
     }
 
     function upDrag(evt) {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        const totalDeltaX = currX - dragStart.x;
-        const totalDeltaY = currY - dragStart.y;
-        if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
-            // END DRAG; updating canvas
-            // console.log('dragMouseUp');
-            if (pinchChk === false && touchPoints < 2) {
-                startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
-                startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                redraw(myImgData, currentZoom);
-            }            
-            dragStart = null;
+        if (dragged == true) {
+            const totalDeltaX = currX - dragStart.x;
+            const totalDeltaY = currY - dragStart.y;
+            if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
+                // END DRAG; updating canvas
+                // console.log('dragMouseUp');
+                if (pinchChk === false && touchPoints < 2) {
+                    startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
+                    startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
+                    redraw(myImgData, currentZoom);
+                }            
+                dragStart = null;
+            }
         } else if (evt.button == 0 && touchPoints < 2) {
             // CLICK
             console.log('click');
@@ -368,6 +386,8 @@ function draw() {
                     }
                 }
             }
+        } else {
+            if (hoverPixel) cancelColour(myImgData, hoverPixel);
         }
         touchPoints = 0;
         console.log(touchPoints);
