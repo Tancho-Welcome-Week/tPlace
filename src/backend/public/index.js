@@ -8,7 +8,7 @@ let canvas = document.getElementById('canvas');
 let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
-var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
 let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
 
@@ -46,7 +46,7 @@ scaleCanvas();
 // Refresh page if canvas is changed between Mobile and Desktop size
 function resizeCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
-        if (currentDisplay != "Desktop") location.reload();
+        if (currentDisplay !== "Desktop") location.reload();
     } else {
         location.reload();
     }
@@ -84,16 +84,7 @@ function draw() {
         // map the to 32-bit colours, i.e. r g b a each being one byte 
         // finally 8-bit unsigned int array used by imgData
 
-        // directly changes myImgData variable
-        // console.log("grid callback reached");
-        // console.log(grid)
         const gridValue = Object.values(grid.grid);
-        // console.log(bitfieldGrid);
-        // console.log(String.fromCharCode.apply(null, new Uint8Array(grid)));
-        // console.log(Object.values(grid));
-        // console.log(gridValue);
-        // let view = Uint8Array.from(gridValue);
-        // console.log(view);
         let rgbaArr = new Uint8ClampedArray(128*128*4);
         for (let i = 0; i < gridValue.length; i++) {
             // iterates over each byte to separate into the two bits
@@ -115,14 +106,12 @@ function draw() {
             rgbaArr[i*8 + 7] = 255;
         }
 
-        // console.log(rgbaArr);
         myImgData.data.set(rgbaArr);
         redraw(myImgData, currentZoom);
     }
 
     const userUrl = window.location.href.split("/"); 
     const userId = userUrl[userUrl.length - 1];
-    // const userId = '250437415';
     let chatId;
 
     function initUserVariables(userVariables) {
@@ -321,73 +310,72 @@ function draw() {
                     redraw(myImgData, currentZoom);
                 }            
                 dragStart = null;
-            }
-        } else if (evt.button == 0 && touchPoints < 2) {
-            // CLICK
-            console.log('click');
-
-            if (hasSelectedPixel) {
-                // won't put a colour
-                console.log("there is already a selected pixel");
-            } else {
-                const [x, y] = getCurrentCoords(evt);
-                if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
-                    // pixel out of range; won't put a colour 
-                    let popup = document.getElementById("outofrange-popup");
-                    popup.style.left = `${evt.pageX-8}px`;
-                    popup.style.top = `${evt.pageY+1}px`;
-                    popup.classList.toggle('show');
-    
-                    let okBtn = document.getElementById("ok2");
-                    okBtn.onclick = function(){
-                        popup.classList.toggle('show');
-                    }
+            } else if (evt.button == 0 && touchPoints < 2) {
+                // CLICK    
+                if (hasSelectedPixel) {
+                    // won't put a colour
+                    console.log("there is already a selected pixel");
                 } else {
-                    if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                    let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
-                    redraw(myImgData, currentZoom);        
-                    hasSelectedPixel = true;
-                    
-                    if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
-                        let popup = document.getElementById("confirm-popup");
-                        popup.style.left = `${evt.pageX-8}px`;
-                        popup.style.top = `${evt.pageY+1}px`;
-                        // maybe figure out a way to better set the popup location?
-                        popup.classList.toggle('show');
-
-                        let confirmBtn = document.getElementById("confirm");
-                        confirmBtn.onclick = function() {
-                            confirmColour(x, y, chatId, userId);
-                            console.log(x, y);
-                            if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
-                                // last accumulated pixel used
-                                startCountdown();
-                            }
-                            hasSelectedPixel = false;
-                        }
-                        let cancelBtn = document.getElementById("cancel");
-                        cancelBtn.onclick = function(){
-                            cancelColour(myImgData, originalPixel);
-                            popup.classList.toggle('show');
-                            hasSelectedPixel = false;
-                        };
-                    } else { // on cooldown, 0 accumulated pixels
-                        let popup = document.getElementById("cooldown-popup");
+                    const [x, y] = getCurrentCoords(evt);
+                    if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
+                        // pixel out of range; won't put a colour 
+                        let popup = document.getElementById("outofrange-popup");
                         popup.style.left = `${evt.pageX-8}px`;
                         popup.style.top = `${evt.pageY+1}px`;
                         popup.classList.toggle('show');
         
-                        let okBtn = document.getElementById("ok");
+                        let okBtn = document.getElementById("ok2");
                         okBtn.onclick = function(){
-                            cancelColour(myImgData, originalPixel);
                             popup.classList.toggle('show');
-                            hasSelectedPixel = false;
+                        }
+                    } else {
+                        if (hoverPixel) cancelColour(myImgData, hoverPixel);
+                        let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                        redraw(myImgData, currentZoom);        
+                        hasSelectedPixel = true;
+                        
+                        if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
+                            let popup = document.getElementById("confirm-popup");
+                            popup.style.left = `${evt.pageX-8}px`;
+                            popup.style.top = `${evt.pageY+1}px`;
+                            // maybe figure out a way to better set the popup location?
+                            popup.classList.toggle('show');
+    
+                            let confirmBtn = document.getElementById("confirm");
+                            confirmBtn.onclick = function() {
+                                confirmColour(x, y, chatId, userId);
+                                console.log(x, y);
+                                if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
+                                    // last accumulated pixel used
+                                    startCountdown();
+                                }
+                                hasSelectedPixel = false;
+                            }
+                            let cancelBtn = document.getElementById("cancel");
+                            cancelBtn.onclick = function(){
+                                cancelColour(myImgData, originalPixel);
+                                popup.classList.toggle('show');
+                                hasSelectedPixel = false;
+                            };
+                        } else { // on cooldown, 0 accumulated pixels
+                            let popup = document.getElementById("cooldown-popup");
+                            popup.style.left = `${evt.pageX-8}px`;
+                            popup.style.top = `${evt.pageY+1}px`;
+                            popup.classList.toggle('show');
+            
+                            let okBtn = document.getElementById("ok");
+                            okBtn.onclick = function(){
+                                cancelColour(myImgData, originalPixel);
+                                popup.classList.toggle('show');
+                                hasSelectedPixel = false;
+                            }
                         }
                     }
                 }
+            } else {
+                if (hoverPixel) cancelColour(myImgData, hoverPixel);
+                console.log("Potato");
             }
-        } else {
-            if (hoverPixel) cancelColour(myImgData, hoverPixel);
         }
         touchPoints = 0;
         console.log(touchPoints);

@@ -11,5 +11,6 @@ module.exports = {
   isWhitelistPeriod: process.env.WHITELIST,
   isBeta: process.env.BETA,
   botToken: process.env.BOT_TOKEN,
-  databaseDeployed: process.env.DEPLOYED_DATABASE
+  databaseDeployed: process.env.DEPLOYED_DATABASE,
+  isAdminChatID: process.env.ADMIN_CHATID
 };

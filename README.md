@@ -29,7 +29,7 @@ The stack that was used for this implementation is:
 ## Credits
 
 - [Sahil](https://github.com/Sahilgat): PostgreSQL database and Telegram integration
-- [Sam](https://github.com/Sam-limyr): Redis cache and Frontend programming
+- [Sam](https://github.com/Sam-limyr): Redis cache and Frontend development
 - [Khairul](https://github.com/khairulazman1997): Telegram integration and ExpressJS
 - [Hui Ling](https://github.com/porkeypine): Main Frontend developer
 - [Yi Jia](https://github.com/fluffysaur): Mobile integration and Socket.io
