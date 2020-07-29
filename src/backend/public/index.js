@@ -187,6 +187,7 @@ function draw() {
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
+        console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
         let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
         if (delta) {
             zoom(delta, absX, absY);
@@ -205,7 +206,9 @@ function draw() {
     function handlePinch(e) {
         let scale = -((prevPinch-e.scale))*20;
         prevPinch = e.scale;
-        zoom(scale, 64, 64);
+        event = {offsetX: canvas.clientWidth/2, offsetY: canvas.clientWidth/2};
+        [absX, absY] = getCurrentCoords(event);
+        zoom(scale, absX, absY);
         pinchChk = true;
     }
 
