@@ -9,10 +9,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-// HTTPS
-const fs = require("fs");
-const https = require("https");
-
 // Redis
 const redis = require("redis");
 const canvas = require("./redis_js/canvas.js");
@@ -79,7 +75,8 @@ setInterval(() => {
 }, 300000);
 
 // Flag for whitelisting
-const isWhitelistPeriod = keys.isWhitelistPeriod || true;
+
+const isWhitelistPeriod = keys.isWhitelistPeriod || false;
 
 // Allow CORS
 app.use(function (req, res, next) {
