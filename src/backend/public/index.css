@@ -139,6 +139,9 @@ body {
     grid-area: header;
     text-align: center;
 }
+.grid-header > h1 {
+    margin: 33px;
+}
 .grid-swatches {
     grid-area: swatches;
     text-align: center;
@@ -191,11 +194,12 @@ body {
 /* Rotate palette for mobile */
 .palette {
     height: 500px;
+    transform: translateY(9px);
 }
 
 @media (max-width: 768px) {
     .palette {
-        transform: rotate(90deg) scale(5.3);
+        transform: rotate(90deg) scale(5.5) translateY(0.3vw);
         height: var(--swatch-mobile-height);
     }
 }
@@ -213,4 +217,25 @@ body {
 
 .inline-block {
     display: inline-block;
+}
+
+/* Coords Overlay */
+#coords {
+    border-radius: 6px;
+    position: absolute;
+    text-align: center;
+    right: 7vw;
+    top: 115px;
+    width: 80px;
+    line-height: 0.1;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 768px) {
+    #coords {
+        position: relative;
+        right: -395px;
+        top: -497px;
+        line-height: 1.5;
+    }
 }

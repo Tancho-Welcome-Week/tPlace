@@ -28,6 +28,8 @@ let currentColour = "RED";
 let displayToCanvasScale;
 let currentDisplay;
 
+var clicked = false;
+
 // Resizing Canvas
 function scaleCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
@@ -185,8 +187,8 @@ function draw() {
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
-        let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
-        // let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
+        console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
+        let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
         if (delta) {
             zoom(delta, absX, absY);
             displayCoords(event);
@@ -204,7 +206,9 @@ function draw() {
     function handlePinch(e) {
         let scale = -((prevPinch-e.scale))*20;
         prevPinch = e.scale;
-        zoom(scale, 64, 64);
+        event = {offsetX: canvas.clientWidth/2, offsetY: canvas.clientWidth/2};
+        [absX, absY] = getCurrentCoords(event);
+        zoom(scale, absX, absY);
         pinchChk = true;
     }
 
@@ -314,6 +318,7 @@ function draw() {
                     // if there's already a selected pixel, other clicks will be ignored
                     console.log("there is already a selected pixel");
                 } else {
+                    clicked = true;
                     const [x, y] = getCurrentCoords(evt);
                     if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
                         // pixel out of range
@@ -325,6 +330,7 @@ function draw() {
                         let okBtn = document.getElementById("ok2");
                         okBtn.onclick = function(){
                             popup.classList.toggle('show');
+                            clicked = false;
                         }
                     } else {
                         if (hoverPixel) cancelColour(myImgData, hoverPixel);
@@ -347,6 +353,7 @@ function draw() {
                                     // last accumulated pixel just used
                                     startCountdown();
                                 }
+                                clicked = false;
                                 hasSelectedPixel = false;
                             }
                             let cancelBtn = document.getElementById("cancel");
@@ -354,6 +361,7 @@ function draw() {
                                 cancelColour(myImgData, originalPixel);
                                 popup.classList.toggle('show');
                                 hasSelectedPixel = false;
+                                clicked = false;
                             };
                         } else { // on cooldown, 0 accumulated pixels
                             let popup = document.getElementById("cooldown-popup");
@@ -366,6 +374,7 @@ function draw() {
                                 cancelColour(myImgData, originalPixel);
                                 popup.classList.toggle('show');
                                 hasSelectedPixel = false;
+                                clicked = false;
                             }
                         }
                     }
@@ -569,7 +578,9 @@ function getCurrentCoords(event) {
 
 
 function displayCoords(event) {
-    [x, y] = getCurrentCoords(event);
-    xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "out of range" : x + 1);
-    yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "out of range" : y + 1);
+    if (clicked == false) {
+        [x, y] = getCurrentCoords(event);
+        xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "NA" : x + 1);
+        yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "NA" : y + 1);
+    }
 }
