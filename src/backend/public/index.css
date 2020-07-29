@@ -24,13 +24,6 @@
          url('fonts/inversionz-webfont.woff') format('woff');
 }
 
-h1 {
-    font-family: 'inversionz unboxed regular', sans-serif;
-    font-size: 60px;
-    letter-spacing: -5px;
-    line-height: 0.2em;
-}
-
 body {
     min-height: 100vh;
     background-color: #1b2d37;
@@ -40,6 +33,14 @@ body {
     background-size: cover;
     color: white;
     text-align: center;
+    font-family: 'Exo 2', sans-serif;
+}
+
+h1 {
+    font-family: 'inversionz unboxed regular', sans-serif;
+    font-size: 60px;
+    letter-spacing: -5px;
+    line-height: 0.2em;
 }
 
 #canvas-bg {
