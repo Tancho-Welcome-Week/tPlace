@@ -1,4 +1,4 @@
-let socket = io();
+let socket = io({ transport : ['websocket'] });
 let xCoordDisplay = document.getElementById("x");
 let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
