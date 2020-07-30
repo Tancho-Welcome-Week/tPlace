@@ -28,6 +28,8 @@ let currentColour = "RED";
 let displayToCanvasScale;
 let currentDisplay;
 
+var clicked = false;
+
 // Resizing Canvas
 function scaleCanvas() {
     if (window.matchMedia("(min-width: 768px)").matches) {
@@ -60,7 +62,10 @@ function draw() {
     let ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    let memCvs = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+    let memCvs = document.createElement('canvas');
+    memCvs.width = CANVAS_WIDTH;
+    memCvs.height = CANVAS_HEIGHT;
+    // let memCvs = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     let memCtx = memCvs.getContext('2d');
 
     let myImgData = memCtx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT); // might change to global variable
@@ -80,9 +85,8 @@ function draw() {
 
     function bitfieldToImgData(grid) {
         // grid is raw binary data: 4 bits for one pixel, like "0000", so 2 pixels in 1 byte
-        // first thing to map to: higher and lower nibbles in each byte
-        // map the to 32-bit colours, i.e. r g b a each being one byte 
-        // finally 8-bit unsigned int array used by imgData
+        // first map to: higher and lower nibbles in each byte
+        // then map to: 8-bit unsigned int array used by imgData, r g b a each being one byte 
 
         const gridValue = Object.values(grid.grid);
         let rgbaArr = new Uint8ClampedArray(128*128*4);
@@ -145,9 +149,6 @@ function draw() {
     httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
     httpGetAsync("https://tplace.xyz/api/grid", bitfieldToImgData);
     
-    // let rawArr = [255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, ]
-    // bitfieldToImgData(rawArr);
-
     function redraw(imgData, scale) {
         // TODO: I THINK CAN REMOVE THE PARAMETERS CUZ I JUST USE myImgData and currentZoom all the time?
         // clear canvas
@@ -181,13 +182,13 @@ function draw() {
         } 
         startX = absX - (absX-startX)/factor;
         startY = absY - (absY-startY)/factor;
-        // console.log(currentZoom, startX, startY, absX, absY);
         
         redraw(myImgData, currentZoom);
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
-        let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
+        console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
+        let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
         if (delta) {
             zoom(delta, absX, absY);
             displayCoords(event);
@@ -205,7 +206,9 @@ function draw() {
     function handlePinch(e) {
         let scale = -((prevPinch-e.scale))*20;
         prevPinch = e.scale;
-        zoom(scale, 64, 64);
+        event = {offsetX: canvas.clientWidth/2, offsetY: canvas.clientWidth/2};
+        [absX, absY] = getCurrentCoords(event);
+        zoom(scale, absX, absY);
         pinchChk = true;
     }
 
@@ -224,7 +227,7 @@ function draw() {
     let dragStart, dragged;
     let lastX, lastY;
     let hasSelectedPixel = false;
-    let hoverPixel = 0;
+    let originalPixel = 0;
     let touchPoints = 0;
 
     function downDrag(evt) {
@@ -235,11 +238,10 @@ function draw() {
         dragStart = {x: lastX, y: lastY};
         dragged = true;
         touchPoints++;
-        console.log(touchPoints);
+        // console.log(touchPoints);
     }
     function moveDrag(evt) {
         if (dragged && pinchChk === false && touchPoints < 2) {
-            // console.log('drag');
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
             const deltaX = currX - lastX;
@@ -255,13 +257,13 @@ function draw() {
 
         // Hover Pixels (not on touch interfaces)
         if (evt.metaKey == false) {
-            if (hoverPixel && hasSelectedPixel == false) {
-                cancelColour(myImgData, hoverPixel);
+            if (originalPixel && hasSelectedPixel == false) {
+                cancelColour(myImgData, originalPixel);
             }
             var [x, y] = getCurrentCoords(evt);
             if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
                 if (hasSelectedPixel == false) { 
-                    hoverPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                    originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                     redraw(myImgData, currentZoom);  
                 }
             }
@@ -269,13 +271,13 @@ function draw() {
     }
 
     function leaveCanvas(evt) {
-        // When mouse leaves canvas
+        // when mouse leaves canvas
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        if (hoverPixel && hasSelectedPixel == false) {
-            cancelColour(myImgData, hoverPixel);
+        if (originalPixel && hasSelectedPixel == false) {
+            cancelColour(myImgData, originalPixel);
         }
         if (dragged == true) {
             const totalDeltaX = currX - dragStart.x;
@@ -313,12 +315,13 @@ function draw() {
             } else if (evt.button == 0 && touchPoints < 2) {
                 // CLICK    
                 if (hasSelectedPixel) {
-                    // won't put a colour
+                    // if there's already a selected pixel, other clicks will be ignored
                     console.log("there is already a selected pixel");
                 } else {
+                    clicked = true;
                     const [x, y] = getCurrentCoords(evt);
                     if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) {
-                        // pixel out of range; won't put a colour 
+                        // pixel out of range
                         let popup = document.getElementById("outofrange-popup");
                         popup.style.left = `${evt.pageX-8}px`;
                         popup.style.top = `${evt.pageY+1}px`;
@@ -327,10 +330,11 @@ function draw() {
                         let okBtn = document.getElementById("ok2");
                         okBtn.onclick = function(){
                             popup.classList.toggle('show');
+                            clicked = false;
                         }
                     } else {
-                        if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                        let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                        if (originalPixel) cancelColour(myImgData, originalPixel);
+                        originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                         redraw(myImgData, currentZoom);        
                         hasSelectedPixel = true;
                         
@@ -346,16 +350,19 @@ function draw() {
                                 confirmColour(x, y, chatId, userId);
                                 console.log(x, y);
                                 if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
-                                    // last accumulated pixel used
+                                    // last accumulated pixel just used
                                     startCountdown();
                                 }
+                                clicked = false;
                                 hasSelectedPixel = false;
+                                originalPixel = null;
                             }
                             let cancelBtn = document.getElementById("cancel");
                             cancelBtn.onclick = function(){
                                 cancelColour(myImgData, originalPixel);
                                 popup.classList.toggle('show');
                                 hasSelectedPixel = false;
+                                clicked = false;
                             };
                         } else { // on cooldown, 0 accumulated pixels
                             let popup = document.getElementById("cooldown-popup");
@@ -368,17 +375,17 @@ function draw() {
                                 cancelColour(myImgData, originalPixel);
                                 popup.classList.toggle('show');
                                 hasSelectedPixel = false;
+                                clicked = false;
                             }
                         }
                     }
                 }
             } else {
-                if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                console.log("Potato");
+                if (originalPixel) cancelColour(myImgData, originalPixel);
             }
         }
         touchPoints = 0;
-        console.log(touchPoints);
+        // console.log(touchPoints);
         dragged = false;
     }
     canvas.addEventListener('mousedown', downDrag, false);
@@ -386,37 +393,37 @@ function draw() {
     canvas.addEventListener('mouseup', upDrag, false);
     canvas.addEventListener('mouseleave', leaveCanvas, false);
 
-// Convert touch to mouse
-function touchHandler(event) {
-    let touches = event.changedTouches,
-        first = touches[0],
-        type = "";
-    switch(event.type)
-    {
-        case "touchstart": type = "mousedown"; break;
-        case "touchmove":  type = "mousemove"; break;        
-        case "touchend":   type = "mouseup";   break;
-        default:           return;
+    // Convert touch to mouse
+    function touchHandler(event) {
+        let touches = event.changedTouches,
+            first = touches[0],
+            type = "";
+        switch(event.type)
+        {
+            case "touchstart": type = "mousedown"; break;
+            case "touchmove":  type = "mousemove"; break;        
+            case "touchend":   type = "mouseup";   break;
+            default:           return;
+        }
+
+        // initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+        //                screenX, screenY, clientX, clientY, ctrlKey, 
+        //                altKey, shiftKey, metaKey, button, relatedTarget);
+
+        let simulatedEvent = document.createEvent("MouseEvent");
+        simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+                                    first.screenX, first.screenY, 
+                                    first.clientX, first.clientY, false, 
+                                    false, false, true, 0/*left*/, null);
+
+        first.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
     }
 
-    // initMouseEvent(type, canBubble, cancelable, view, clickCount, 
-    //                screenX, screenY, clientX, clientY, ctrlKey, 
-    //                altKey, shiftKey, metaKey, button, relatedTarget);
-
-    let simulatedEvent = document.createEvent("MouseEvent");
-    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
-                                  first.screenX, first.screenY, 
-                                  first.clientX, first.clientY, false, 
-                                  false, false, true, 0/*left*/, null);
-
-    first.target.dispatchEvent(simulatedEvent);
-    event.preventDefault();
-}
-
-canvas.addEventListener("touchstart", touchHandler, true);
-canvas.addEventListener("touchmove", touchHandler, true);
-canvas.addEventListener("touchend", touchHandler, true);
-canvas.addEventListener("touchcancel", touchHandler, true);    
+    canvas.addEventListener("touchstart", touchHandler, true);
+    canvas.addEventListener("touchmove", touchHandler, true);
+    canvas.addEventListener("touchend", touchHandler, true);
+    canvas.addEventListener("touchcancel", touchHandler, true);    
 
     function confirmColour(x, y, chatId, userId) { 
         console.log("Confirmed colour");
@@ -470,7 +477,6 @@ canvas.addEventListener("touchcancel", touchHandler, true);
         let col = document.getElementById(`${number}`);
         col.onclick = function(){ 
             col.style["stroke-width"]="3.5px";
-            console.log(number);
             // reset previous colour's border on selecting a new colour
             if (previousColour !== -1) {
                 document.getElementById(`${previousColour}`).style["stroke-width"]="2"; 
@@ -485,8 +491,6 @@ canvas.addEventListener("touchcancel", touchHandler, true);
     }
 
     updateAccPixels();
-    // startTime = new Date(); // WAIT need to change this to take into account the "leftover" from the user variables that don't become accumulated pixels
-    // accumulatePixels();
 
     // let potato = io({transports: ['websocket'], upgrade: false})
     // let socket = potato.connect();
@@ -522,7 +526,7 @@ function startCountdown() {
     if (numberOfAccumulatedPixels.getPixels() < numberOfAccumulatedPixels.MAX_PIXEL_COUNT) {
         // NOTE: cooldownTime is in MILLISECONDS 
         let elapsed = new Date() - startTime; // in ms
-        let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next accumulated pixels + 1
+        let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next pixel
         let secs = Math.floor(frac * cooldownTime/1000); 
         console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
         let mins = Math.floor(secs / 60);
@@ -551,12 +555,11 @@ function getStartingIndexForCoord(x, y) {
 
 function putColour(coords, imgData) {
     // destructively changes imgData but returns a "backup" originalPixel for the pixel it changes
-    
     [x, y] = coords;
 
     const i = getStartingIndexForCoord(x, y);
     
-    const originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
+    originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
     const rgb = ColorRGB[currentColour];
     imgData.data[i] = rgb[0];
@@ -575,7 +578,9 @@ function getCurrentCoords(event) {
 
 
 function displayCoords(event) {
-    [x, y] = getCurrentCoords(event);
-    xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "out of range" : x + 1);
-    yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "out of range" : y + 1);
+    if (clicked == false) {
+        [x, y] = getCurrentCoords(event);
+        xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "NA" : x + 1);
+        yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "NA" : y + 1);
+    }
 }
