@@ -1,4 +1,4 @@
-let socket = io();
+let socket = io({ transport : ['websocket'] });
 let xCoordDisplay = document.getElementById("x");
 let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
@@ -188,7 +188,7 @@ function draw() {
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
         console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
-        let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
+        let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
         if (delta) {
             zoom(delta, absX, absY);
             displayCoords(event);
