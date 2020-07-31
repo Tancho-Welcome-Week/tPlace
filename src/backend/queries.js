@@ -42,7 +42,7 @@ async function getUserByTelegramId(telegram_id) {
         if (user) {
             return user.rows[0];
         } else {
-            return undefined;
+            return null;
         }
     } catch (err) {
         console.log(err)
