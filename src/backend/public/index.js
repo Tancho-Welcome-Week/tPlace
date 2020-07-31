@@ -231,7 +231,7 @@ function draw() {
     let touchPoints = 0;
 
     function downDrag(evt) {
-        if (pinchChk === true || evt.button != 0) return;
+        if (pinchChk || evt.button !== 0) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -241,7 +241,7 @@ function draw() {
         // console.log(touchPoints);
     }
     function moveDrag(evt) {
-        if (dragged && pinchChk === false && touchPoints < 2) {
+        if (dragged && !pinchChk && touchPoints < 2) {
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
             const deltaX = currX - lastX;
@@ -256,13 +256,13 @@ function draw() {
         }
 
         // Hover Pixels (not on touch interfaces)
-        if (evt.metaKey == false) {
-            if (originalPixel && hasSelectedPixel == false) {
+        if (!evt.metaKey) {
+            if (originalPixel && !hasSelectedPixel) {
                 cancelColour(myImgData, originalPixel);
             }
             var [x, y] = getCurrentCoords(evt);
             if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
-                if (hasSelectedPixel == false) { 
+                if (!hasSelectedPixel) {
                     originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                     redraw(myImgData, currentZoom);  
                 }
@@ -276,15 +276,15 @@ function draw() {
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        if (originalPixel && hasSelectedPixel == false) {
+        if (originalPixel && !hasSelectedPixel) {
             cancelColour(myImgData, originalPixel);
         }
-        if (dragged == true) {
+        if (dragged) {
             const totalDeltaX = currX - dragStart.x;
             const totalDeltaY = currY - dragStart.y;
             if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
                 // END DRAG; updating canvas
-                if (pinchChk === false && touchPoints == 1) {
+                if (!pinchChk && touchPoints === 1) {
                     startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                     startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
                     redraw(myImgData, currentZoom);
@@ -293,14 +293,14 @@ function draw() {
             }
             dragged = false;
         }
-        if (touchPoints != 0) touchPoints = 0;
+        if (touchPoints !== 0) touchPoints = 0;
     }
 
     function upDrag(evt) {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        if (dragged == true) {
+        if (dragged) {
             const totalDeltaX = currX - dragStart.x;
             const totalDeltaY = currY - dragStart.y;
             if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
@@ -312,7 +312,7 @@ function draw() {
                     redraw(myImgData, currentZoom);
                 }            
                 dragStart = null;
-            } else if (evt.button == 0 && touchPoints < 2) {
+            } else if (evt.button === 0 && touchPoints < 2) {
                 // CLICK    
                 if (hasSelectedPixel) {
                     // if there's already a selected pixel, other clicks will be ignored
@@ -492,8 +492,6 @@ function draw() {
 
     updateAccPixels();
 
-    // let potato = io({transports: ['websocket'], upgrade: false})
-    // let socket = potato.connect();
     socket.on('grid', function(grid){
         console.log(grid)
         try{
@@ -578,7 +576,7 @@ function getCurrentCoords(event) {
 
 
 function displayCoords(event) {
-    if (clicked == false) {
+    if (!clicked) {
         [x, y] = getCurrentCoords(event);
         xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "NA" : x + 1);
         yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "NA" : y + 1);
