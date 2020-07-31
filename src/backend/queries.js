@@ -39,7 +39,11 @@ async function getUserByTelegramId(telegram_id) {
 
     try{
         const user = await pool.query('SELECT * FROM Users WHERE telegram_id = $1', [telegram_id])
-        return user.rows[0]
+        if (user) {
+            return user.rows[0];
+        } else {
+            return undefined;
+        }
     } catch (err) {
         console.log(err)
     }

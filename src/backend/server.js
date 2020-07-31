@@ -163,7 +163,7 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
-  if (req.body.userId !== keys.isAdminChatID) {
+  if (req.body.userId !== keys.adminChatID) {
     res.sendStatus(401);
     return;
   }
@@ -198,6 +198,12 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const userId = req.params.userId;
 
   const user = await db.getUserByTelegramId(userId)
+
+  // Verifies that the user exists in the database
+  if (user === undefined) {
+    res.status(401).send("User does not exist in the database.")
+  }
+
   const userLastUpdatedTime = new Date(user.last_updated).getTime();
   const frontendUserLastUpdatedTime = new Date(req.body.oldLastUpdatedTime).getTime();
   const last_updated = req.body.newLastUpdatedTime;

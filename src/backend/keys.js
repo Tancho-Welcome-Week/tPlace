@@ -12,6 +12,6 @@ module.exports = {
   isBeta: process.env.BETA,
   botToken: process.env.BOT_TOKEN,
   databaseDeployed: process.env.DEPLOYED_DATABASE,
-  isAdminChatID: process.env.ADMIN_CHATID,
+  adminChatID: process.env.ADMIN_CHATID,
   hiddenLargeConstant: process.env.LARGE_PRIME_1 * process.env.LARGE_PRIME_2 * process.env.LARGE_PRIME_3
 };
