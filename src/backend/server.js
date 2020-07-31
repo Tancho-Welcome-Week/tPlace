@@ -214,12 +214,6 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     return;
   }
 
-  // Verifies that user is not using invalid userIds
-  if (userId % keys.hiddenLargeConstant !== 0) {
-    res.status(401).send("Please use a valid User Id.");
-    return;
-  }
-
   // Verifies that placed pixel is valid
   if (req.body.x <= 0 || req.body.y <= 0 ||
       req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
@@ -279,8 +273,14 @@ app.get("/start/:chatId/:userId", async (req, res) => {
     if (keys.isBeta && !whitelist) {
       await db.addWhitelistGroupId(chatId);
     }
-    const modifiedUserId = user * keys.hiddenLargeConstant;
-    await db.createUser(modifiedUserId, chatId);
+
+    // Verifies that user is not using invalid userIds
+    if (userId % keys.hiddenLargeConstant !== 0) {
+      res.status(401).send("Please use a valid User Id.");
+      return;
+    }
+
+    await db.createUser(userId, chatId);
   }
   res.sendFile("./public/index.html", { root: "." });
 });

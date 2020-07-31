@@ -2,6 +2,7 @@
 const Telegraf = require('telegraf')
 const {MenuTemplate, MenuMiddleware} = require('telegraf-inline-menu')
 const axios = require('axios')
+const keys = require('../keys')
 
 require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
@@ -74,7 +75,7 @@ bot.command('off', ctx => {
     const url = `${appEntry}/toggle/off`
     axios.post(url, {userId: userId})
         .then(res => {
-            if (res.status == 200) {
+            if (res.status === 200) {
                 ctx.reply('Notification turned off successfully!')
             } else {
                 ctx.reply('It seems you are not registered yet! Register on the bot using the Start Drawing button!')
@@ -82,7 +83,7 @@ bot.command('off', ctx => {
         })
         .catch(err => {
             console.log(err)
-            ctx.reply(`Unicorns! Looks like an error has occured. Contact @Khairoulll for more info`)
+            ctx.reply(`Unicorns! Looks like an error has occurred. Contact @Khairoulll for more info`)
         })
 })
 
@@ -91,7 +92,7 @@ bot.command('on', ctx => {
     const url = `${appEntry}/toggle/on`
     axios.post(url, {userId: userId})
         .then(res => {
-            if (res.status == 200) {
+            if (res.status === 200) {
                 ctx.reply('Notification turned on successfully!')
             } else {
                 ctx.reply('It seems you are not registered yet! Register on the bot using the Start Drawing button!')
@@ -99,7 +100,7 @@ bot.command('on', ctx => {
         })
         .catch(err => {
             console.log(err)
-            ctx.reply(`Unicorns! Looks like an error has occured. Contact @Khairoulll for more info`)
+            ctx.reply(`Unicorns! Looks like an error has occurred. Contact @Khairoulll for more info`)
         })
 })
 
@@ -133,7 +134,11 @@ bot.on('callback_query', ctx => {
     } else {
         const chatId = query.message.chat.id
         const userId = query.from.id
-        let gameurl = `${appEntry}/start/${chatId}/${userId}`;
+
+        // Perform the prime multiplication
+        const modifiedUserId = userId * keys.hiddenLargeConstant;
+
+        let gameurl = `${appEntry}/start/${chatId}/${modifiedUserId}`;
         ctx.answerGameQuery(gameurl);
     }
 });
