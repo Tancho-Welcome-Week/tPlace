@@ -3,6 +3,7 @@ const auth = require("./auth.js");
 const db = require("./queries");
 const color = require("./public/colors");
 const canvas_commons = require("./public/canvas_commons.js");
+const {sendMassMessage} = require("./telegram/sendMessage")
 
 // Express
 const express = require("express");
@@ -162,8 +163,21 @@ app.post("/toggle/on", async (req, res) => {
 
 })
 
+app.post("/massMessage", async (req, res) => {
+  console.log(req.body.userId)
+  console.log(keys.isAdminChatID)
+  if (req.body.userId != keys.isAdminChatID) {
+    res.sendStatus(401);
+    return;
+  }
+  const message = req.body.message
+  const users = await db.getAllUsers()
+  sendMassMessage(users, message)
+  // sendMassMessage(users, message)
+})
+
 app.post("/admin/clear", async (req, res) => {
-  if (req.body.userId !== keys.isAdminChatID) {
+  if (req.body.userId != keys.isAdminChatID) {
     res.sendStatus(401);
     return;
   }
