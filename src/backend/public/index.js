@@ -5,12 +5,13 @@ let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
 let canvas = document.getElementById('canvas');
+let maxAccPixelCount = document.getElementById('maxAccPixelCount').innerHTML = MAXIMUM_ACCUMULATED_PIXEL_COUNT;
 let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
 let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
-let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
+let cooldownTime = COOLDOWN_TIME; // in seconds
 
 // these will change with zooming and scrolling around
 let currentZoom = 1; // default zoom is 2
@@ -28,7 +29,7 @@ let currentColour = "RED";
 let displayToCanvasScale;
 let currentDisplay;
 
-var clicked = false;
+let clicked = false;
 
 // Resizing Canvas
 function scaleCanvas() {
@@ -37,8 +38,8 @@ function scaleCanvas() {
         canvas.setAttribute('height', '490');
         currentDisplay = "Desktop";
     } else {
-        canvas.setAttribute('width', 0.9*vw);
-        canvas.setAttribute('height', 0.9*vw);
+        canvas.setAttribute('width', (0.9 * vw).toString());
+        canvas.setAttribute('height', (0.9 * vw).toString());
         currentDisplay = "Mobile";
     }
     console.log(currentDisplay);
@@ -126,7 +127,7 @@ function draw() {
         numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
         const lastUpdated = new Date(userVariables["last_updated"]);
         const gap = new Date() - lastUpdated; // in ms
-        numberOfAccumulatedPixels.addPixels(Math.floor(gap / ACCUMULATED_PIXEL_GAP));
+        numberOfAccumulatedPixels.addPixels(Math.floor(gap / COOLDOWN_TIME));
         console.log("initialised number of pixels: ");
         console.log(gap + "ms");
         updateAccPixels();
