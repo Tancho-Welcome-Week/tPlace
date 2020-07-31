@@ -1,10 +1,9 @@
 class accumulatedPixels {
-    MAX_PIXEL_COUNT = 10;
-    currentPixelCount = 0;
 
     constructor(initialCount) {
         console.log("Initialising pixel count");
         // this.currentPixelCount = initialCount;
+        this.MAX_PIXEL_COUNT = 10;
         this.currentPixelCount = 0;
     }
 

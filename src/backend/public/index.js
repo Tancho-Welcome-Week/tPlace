@@ -1,4 +1,4 @@
-let socket = io();
+let socket = io({ transport : ['websocket'] });
 let xCoordDisplay = document.getElementById("x");
 let yCoordDisplay = document.getElementById("y");
 let countdownSec = document.getElementById("countdown-s");
@@ -188,7 +188,7 @@ function draw() {
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
         console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
-        let delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
+        let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
         if (delta) {
             zoom(delta, absX, absY);
             displayCoords(event);
@@ -227,7 +227,7 @@ function draw() {
     let dragStart, dragged;
     let lastX, lastY;
     let hasSelectedPixel = false;
-    let hoverPixel = 0;
+    let originalPixel = 0;
     let touchPoints = 0;
 
     function downDrag(evt) {
@@ -257,13 +257,13 @@ function draw() {
 
         // Hover Pixels (not on touch interfaces)
         if (evt.metaKey == false) {
-            if (hoverPixel && hasSelectedPixel == false) {
-                cancelColour(myImgData, hoverPixel);
+            if (originalPixel && hasSelectedPixel == false) {
+                cancelColour(myImgData, originalPixel);
             }
             var [x, y] = getCurrentCoords(evt);
             if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
                 if (hasSelectedPixel == false) { 
-                    hoverPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                    originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                     redraw(myImgData, currentZoom);  
                 }
             }
@@ -276,8 +276,8 @@ function draw() {
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        if (hoverPixel && hasSelectedPixel == false) {
-            cancelColour(myImgData, hoverPixel);
+        if (originalPixel && hasSelectedPixel == false) {
+            cancelColour(myImgData, originalPixel);
         }
         if (dragged == true) {
             const totalDeltaX = currX - dragStart.x;
@@ -333,8 +333,8 @@ function draw() {
                             clicked = false;
                         }
                     } else {
-                        if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                        let originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
+                        if (originalPixel) cancelColour(myImgData, originalPixel);
+                        originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                         redraw(myImgData, currentZoom);        
                         hasSelectedPixel = true;
                         
@@ -355,6 +355,7 @@ function draw() {
                                 }
                                 clicked = false;
                                 hasSelectedPixel = false;
+                                originalPixel = null;
                             }
                             let cancelBtn = document.getElementById("cancel");
                             cancelBtn.onclick = function(){
@@ -380,8 +381,7 @@ function draw() {
                     }
                 }
             } else {
-                if (hoverPixel) cancelColour(myImgData, hoverPixel);
-                console.log("Potato");
+                if (originalPixel) cancelColour(myImgData, originalPixel);
             }
         }
         touchPoints = 0;
@@ -559,7 +559,7 @@ function putColour(coords, imgData) {
 
     const i = getStartingIndexForCoord(x, y);
     
-    const originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
+    originalPixel = {i, r:imgData.data[i], g:imgData.data[i+1], b:imgData.data[i+2], a:imgData.data[i+3]};
 
     const rgb = ColorRGB[currentColour];
     imgData.data[i] = rgb[0];
