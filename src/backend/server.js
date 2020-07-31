@@ -193,26 +193,36 @@ app.post("/admin/clear", async (req, res) => {
   }
 });
 
-
 app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
-  const isPermitted = auth.authenticateChatId(chatId);
 
   const user = await db.getUserByTelegramId(userId)
   const userLastUpdatedTime = new Date(user.last_updated).getTime();
   const frontendUserLastUpdatedTime = new Date(req.body.oldLastUpdatedTime).getTime();
   const last_updated = req.body.newLastUpdatedTime;
+
+  // Verifies that user does not have more than 1 tab open simultaneously
   if (userLastUpdatedTime !== frontendUserLastUpdatedTime) {
     res.status(403).send("Please place pixels using only 1 tab/1 client!");
     return;
   }
 
+  // Verifies that user is not using invalid userIds
+  if (userId % keys.hiddenLargeConstant !== 0) {
+    res.status(401).send("Please use a valid User Id.");
+    return;
+  }
+
+  // Verifies that placed pixel is valid
   if (req.body.x <= 0 || req.body.y <= 0 ||
       req.body.x > canvas_commons.CANVAS_WIDTH || req.body.y > canvas_commons.CANVAS_HEIGHT) {
     res.sendStatus(400);
     return;
   }
+
+  const isPermitted = auth.authenticateChatId(chatId);
+
   if (isPermitted) {
     const binaryColorValue = req.body.color;
     const accumulatedPixels = req.body.accPixels;
@@ -263,7 +273,8 @@ app.get("/start/:chatId/:userId", async (req, res) => {
     if (keys.isBeta && !whitelist) {
       await db.addWhitelistGroupId(chatId);
     }
-    await db.createUser(userId, chatId);
+    const modifiedUserId = user * keys.hiddenLargeConstant;
+    await db.createUser(modifiedUserId, chatId);
   }
   res.sendFile("./public/index.html", { root: "." });
 });
