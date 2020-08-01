@@ -17,7 +17,8 @@ const initDatabase = () => {
     try {
         pool.query(init).then(r => console.log('Database initialised successfully'));
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -31,7 +32,8 @@ async function getAllUsers() {
         const users = await pool.query('SELECT * FROM Users ORDER BY telegram_id DESC')
         return users.rows
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -45,7 +47,8 @@ async function getUserByTelegramId(telegram_id) {
             return null;
         }
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -55,7 +58,8 @@ async function getUsersWithNotifications() {
         const users = await pool.query('SELECT * FROM Users WHERE notifications = TRUE')
         return users.rows
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -68,7 +72,8 @@ async function createUser(telegram_id, group_id) {
         const user = await getUserByTelegramId(telegram_id)
         return user;
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -80,7 +85,8 @@ async function setUserNotificationsByTelegramId(telegram_id, notifications) {
         const result = await pool.query('UPDATE Users SET notifications = $2 WHERE telegram_id = $1 RETURNING telegram_id, notifications', [telegram_id, notifications])
         return !!result.rows[0]
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -89,7 +95,8 @@ async function setUserAccumulatedPixelsByTelegramId(telegram_id, accumulated_pix
     try{
         await pool.query('UPDATE Users SET accumulated_pixels = $2, last_updated = $3 WHERE telegram_id = $1 RETURNING telegram_id, accumulated_pixels', [telegram_id, accumulated_pixels, last_updated])
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -100,7 +107,8 @@ async function deleteUserByTelegramId(telegram_id) {
     try{
         await pool.query('DELETE FROM Users WHERE telegram_id = $1 RETURNING telegram_id', [telegram_id])
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -114,7 +122,8 @@ async function getWhitelistGroupIds() {
         const group_ids = await pool.query('SELECT * FROM Whitelist')
         return group_ids.rows
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -124,7 +133,8 @@ async function getWhitelistByGroupId(id) {
         const group_id = await pool.query("SELECT * FROM Whitelist WHERE group_id = $1", [id])
         return group_id.rows[0]
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -135,7 +145,8 @@ async function addWhitelistGroupId(group_id) {
     try{
         await pool.query('INSERT INTO Whitelist (group_id) VALUES ($1) RETURNING group_id', [group_id])
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -146,7 +157,8 @@ async function deleteWhitelistGroupId(group_id) {
     try{
         await pool.query('DELETE FROM Whitelist WHERE group_id = $1 RETURNING group_id', [group_id])
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -160,7 +172,8 @@ async function getLatestCanvas() {
         const canvas = await pool.query('SELECT * FROM Canvas ORDER BY last_updated DESC LIMIT 1')
         return canvas.rows[0]
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -170,7 +183,8 @@ async function getCanvasByTelegramId(telegram_id) {
         const canvas = await pool.query('SELECT * FROM Canvas WHERE telegram_id = $1 ORDER BY last_updated DESC', [telegram_id])
         return canvas.rows[0]
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
@@ -181,7 +195,8 @@ async function addCanvas(telegram_id, bitfield) {
     try{
         await pool.query('INSERT INTO Canvas (telegram_id, bitfield) VALUES ($1, $2) RETURNING telegram_id', [telegram_id, bitfield])
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        throw err;
     }
 }
 
