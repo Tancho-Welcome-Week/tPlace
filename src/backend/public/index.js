@@ -76,9 +76,14 @@ function draw() {
         let xmlHttp = new XMLHttpRequest();
 
         xmlHttp.onload = function() { 
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 callback(xmlHttp.response);
+            }
         }
+
+        console.log("Url: " + theUrl);
+        console.log("Callback: " + callback.toString());
+
         xmlHttp.open("GET", theUrl, true);
         xmlHttp.responseType = "json";
         xmlHttp.send(null);

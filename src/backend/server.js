@@ -114,6 +114,8 @@ app.get("/api/grid", async(req, res) => {
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
+  console.log(req.body);
+  console.log(chatId);
   if (isWhitelistPeriod) {
     try {
       await db.addWhitelistGroupId(chatId);
@@ -161,7 +163,7 @@ app.post("/toggle/on", async (req, res) => {
 })
 
 app.post("/massMessage", async (req, res) => {
-  if (req.body.userId !== keys.adminUserId) {
+  if (req.body.userId != keys.adminUserId) {
     res.sendStatus(401);
     return;
   }
@@ -171,7 +173,7 @@ app.post("/massMessage", async (req, res) => {
 })
 
 app.post("/admin/clear", async (req, res) => {
-  if (req.body.userId !== keys.adminUserId) {
+  if (req.body.userId != keys.adminUserId) {
     res.sendStatus(401);
     return;
   }
@@ -259,6 +261,7 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
 app.get("/api/user/:userId", async (req, res) => {
   const userId = req.params.userId;
+  console.log("In the API: " + userId);
   try {
     const user = await db.getUserByTelegramId(userId);
     res.status(200).json(user);
