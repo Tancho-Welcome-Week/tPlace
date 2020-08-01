@@ -57,9 +57,6 @@ if (!keys.databaseDeployed) {
   });
 }
 
-// db.initDatabase();
-// redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
-
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'));
 
@@ -68,7 +65,7 @@ setInterval(() => {
     if (error) {
       console.log(error);
     } else {
-      db.addCanvas("250437415", result).then(r => {
+      db.addCanvas(keys.adminUserId, result).then(r => {
         console.log('Bitfield backed up to database successfully.');
       })
     }
@@ -76,7 +73,6 @@ setInterval(() => {
 }, 300000);
 
 // Flag for whitelisting
-
 const isWhitelistPeriod = keys.isWhitelistPeriod || false;
 
 // Allow CORS
@@ -102,9 +98,10 @@ POST /whitelist => adds chat to whitelist
 POST /start/:chatId/:userId => activates user account
 POST /toggle/on => turns on telegram notifications for user
 POST /toggle/off => turns off telegram notifications for user
+GET /api/user/:userId => gets user with userId
 
 Admin functions:
-GET /api/user/:userId => gets user with userId
+POST /massMessage => sends a message to all users of the bot (Admin only)
 POST /admin/clear => clears an area of the canvas (Admin only)
 */
 

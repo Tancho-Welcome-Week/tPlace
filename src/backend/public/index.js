@@ -7,7 +7,6 @@ let accPixels = document.getElementById("accPixels");
 let canvas = document.getElementById('canvas');
 let maxAccPixelCount = document.getElementById('maxAccPixelCount').innerHTML = MAXIMUM_ACCUMULATED_PIXEL_COUNT;
 let hammertime = new Hammer(canvas);
-let maxAccPixelCount = document.getElementById('maxAccPixelCount').innerHTML = MAXIMUM_ACCUMULATED_PIXEL_COUNT;
 hammertime.get('pinch').set({enable: true});
 
 let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
