@@ -56,38 +56,43 @@ const databaseDeployed = convertToBoolean(keys.databaseDeployed);
 // Initialize Redis
 const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
 
+function backupRedisToDatabase() {
+  redisManager.getCanvas().then((result, error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      db.addCanvas(keys.adminUserId, result).then((result) => {
+        console.log("Bitfield backed up to database successfully.");
+      })
+    }
+  })
+}
+
 // Initialize Database
 if (!databaseDeployed) {
   console.log("Initializing database...");
   db.initDatabase();
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
+  backupRedisToDatabase();
 } else {
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
-  try {
-    db.getLatestCanvas().then((result) => {
+  db.getLatestCanvas().catch((err) => {}).then((result) => {
+    try {
       const bitfield = result["bitfield"];
       redisManager.setCanvas(bitfield).then(() => {
         console.log("Re-initialized Redis with a pre-saved canvas.");
-      });
-    });
-  } catch (TypeError) {
-    console.log("Re-initialized Redis with a blank canvas due to no canvas found in database.");
-  }
+      })
+    } catch (e) {
+      console.log("\n\n\nCRITICAL DATABASE ERROR: The database must be re-initialized.\n\n\n");
+    }
+  });
 }
 
 // Start Schedule
 startNotificationSchedule().then(r => console.log('Notification schedule started'));
 
 setInterval(() => {
-  redisManager.getCanvas().then((result, error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      db.addCanvas(keys.adminUserId, result).then(r => {
-        console.log('Bitfield backed up to database successfully.');
-      })
-    }
-  })
+  backupRedisToDatabase();
 }, 300000);
 
 // Allow CORS
@@ -124,13 +129,12 @@ app.get("/api/grid", async(req, res) => {
   const grid = await redisManager.getCanvas();
   const json = {"grid": grid};
   res.status(200).json(json);
-  console.log("Grid requested.");
+  // console.log("Grid requested.");
 });
 
 app.post("/whitelist", async (req, res) => {
   const chatId = req.body.chatId;
-  console.log(req.body);
-  console.log(chatId);
+  console.log("Whitelisting chatId: " + chatId);
   if (isWhitelistPeriod) {
     try {
       await db.addWhitelistGroupId(chatId);
@@ -226,15 +230,14 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   let user;
   try {
     user = await db.getUserByTelegramId(userId)
-  } catch (Error) {
+  } catch (e) {
     res.status(401).send("User does not exist in the database.")
   }
 
+  // Verifies that user does not have more than 1 tab open simultaneously
   const userLastUpdatedTime = new Date(user.last_updated).getTime();
   const frontendUserLastUpdatedTime = new Date(req.body.oldLastUpdatedTime).getTime();
   const last_updated = req.body.newLastUpdatedTime;
-
-  // Verifies that user does not have more than 1 tab open simultaneously
   if (userLastUpdatedTime !== frontendUserLastUpdatedTime) {
     res.status(403).send("Please place pixels using only 1 tab/1 client!");
     return;
@@ -256,8 +259,8 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
     const x_coordinate = req.body.x;
     const y_coordinate = req.body.y;
     redisManager.setValue(x_coordinate, y_coordinate, binaryColorValue);
-    console.log("Set pixel with x-coordinate " + x_coordinate + " and y-coordinate " + y_coordinate +
-        " with binary value " + binaryColorValue);
+    // console.log("Set pixel with x-coordinate " + x_coordinate + " and y-coordinate " + y_coordinate +
+    //     " with binary value " + binaryColorValue);
 
     try {
       const grid = await redisManager.getCanvas();
@@ -277,7 +280,6 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
 
 app.get("/api/user/:userId", async (req, res) => {
   const userId = req.params.userId;
-  console.log("In the API: " + userId);
   try {
     const user = await db.getUserByTelegramId(userId);
     res.status(200).json(user);
@@ -301,8 +303,10 @@ app.get("/start/:chatId/:userId", async (req, res) => {
       await db.addWhitelistGroupId(chatId);
     }
 
-    // Verifies that user is not using invalid userIds
-    if (userId % keys.hiddenLargeConstant !== 0) {
+    // Verifies that user is not using invalid userIds.
+    // The userId must divide the specified large constant exactly.
+    // 0 and negative numbers are invalid as well.
+    if (userId % keys.hiddenLargeConstant !== 0 || userId <= 0) {
       res.status(401).send("Please use a valid User Id.");
       return;
     }
