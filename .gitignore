@@ -5,3 +5,4 @@ src/docker-compose.yml
 /src/backend/node_modules
 **/__pycache__
 .pyc
+src/backend/database/init.sql
