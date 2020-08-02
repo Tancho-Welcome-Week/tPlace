@@ -13,5 +13,5 @@ module.exports = {
   botToken: process.env.BOT_TOKEN,
   databaseDeployed: process.env.DEPLOYED_DATABASE,
   adminUserId: process.env.ADMIN_USERID,
-  hiddenLargeConstant: process.env.LARGE_PRIME
+  hiddenLargeConstant: 865069
 };
