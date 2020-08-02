@@ -3,12 +3,12 @@ drop table if exists Whitelist cascade;
 drop table if exists Canvas cascade;
 
 create table Whitelist (
-    group_id varchar(20) primary key
+    group_id varchar(30) primary key
 );
 
 create table Users (
-    telegram_id varchar(20) primary key,
-    group_id varchar(20) NOT NULL,
+    telegram_id varchar(300) primary key,
+    group_id varchar(30) NOT NULL,
     last_updated timestamp NOT NULL DEFAULT NOW(),
     accumulated_pixels integer DEFAULT 0,
     notifications bool DEFAULT TRUE,
@@ -16,10 +16,9 @@ create table Users (
 );
 
 create table Canvas (
-	telegram_id varchar(20) NOT NULL,
+	telegram_id varchar(300) NOT NULL,
     bitfield bytea,
     last_updated timestamp NOT NULL DEFAULT NOW(),
-    primary key (bitfield, last_updated),
     foreign key (telegram_id) references Users
 );
 
