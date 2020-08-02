@@ -112,7 +112,7 @@ function draw() {
         }
 
         myImgData.data.set(rgbaArr);
-        redraw(myImgData, currentZoom);
+        redraw();
     }
 
     const userUrl = window.location.href.split("/"); 
@@ -149,16 +149,43 @@ function draw() {
 
     httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
     httpGetAsync("https://tplace.xyz/api/grid", bitfieldToImgData);
+
+    function getOperatingSystem() {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      
+        // iOS detection from: http://stackoverflow.com/a/9039885/177710
+        var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification)) || ['iPad Simulator','iPhone Simulator','iPod Simulator','iPad','iPhone','iPod'].includes(navigator.platform) || (navigator.userAgent.includes("Mac") && "ontouchend" in document) || navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+
+        if (isSafari || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return "iOS";
+        }
     
-    function redraw(imgData, scale) {
+        return "notIOS";
+    }
+    
+    function redraw() {
+        if (getOperatingSystem() == "iOS") {
+            console.log("iOS");
+            // Check if entire drawing can appear on canvas; if not, adjust accordingly.
+            if (startX < 0) startX = 0;
+            if (startY < 0) startY = 0;
+            if (CANVAS_WIDTH/currentZoom+startX > 128) startX = 128-CANVAS_WIDTH/currentZoom
+            if (CANVAS_HEIGHT/currentZoom+startY > 128) startY = 128-CANVAS_HEIGHT/currentZoom
+            if (startX < 0 || startY < 0) {
+                currentZoom = 1;
+                startX = 0;
+                startY = 0;
+            }
+        }
+        
         // TODO: I THINK CAN REMOVE THE PARAMETERS CUZ I JUST USE myImgData and currentZoom all the time?
         // clear canvas
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
         
         // update memCtx with new image data  
-        memCtx.putImageData(imgData, 0, 0);
-        ctx.drawImage(memCvs, startX, startY, CANVAS_WIDTH/scale, CANVAS_HEIGHT/scale, 0, 0, canvas.clientWidth, canvas.clientHeight);
+        memCtx.putImageData(myImgData, 0, 0);
+        ctx.drawImage(memCvs, startX, startY, CANVAS_WIDTH/currentZoom, CANVAS_HEIGHT/currentZoom, 0, 0, canvas.clientWidth, canvas.clientHeight);
 
         // put black border around image
         ctx.strokeStyle = 'black';
@@ -184,7 +211,7 @@ function draw() {
         startX = absX - (absX-startX)/factor;
         startY = absY - (absY-startY)/factor;
         
-        redraw(myImgData, currentZoom);
+        redraw();
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
@@ -250,7 +277,8 @@ function draw() {
             // updating canvas
             startX -= deltaX/displayToCanvasScale / currentZoom;
             startY -= deltaY/displayToCanvasScale / currentZoom;
-            redraw(myImgData, currentZoom);
+
+            redraw();
             // updating lastX and lastY
             lastX = currX;
             lastY = currY;
@@ -265,7 +293,7 @@ function draw() {
             if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
                 if (hasSelectedPixel == false) { 
                     originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
-                    redraw(myImgData, currentZoom);  
+                    redraw();  
                 }
             }
         }
@@ -288,7 +316,7 @@ function draw() {
                 if (pinchChk === false && touchPoints == 1) {
                     startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                     startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                    redraw(myImgData, currentZoom);
+                    redraw();
                 }            
                 dragStart = null;
             }
@@ -310,7 +338,7 @@ function draw() {
                 if (pinchChk === false && touchPoints < 2) {
                     startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                     startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
-                    redraw(myImgData, currentZoom);
+                    redraw();
                 }            
                 dragStart = null;
             } else if (evt.button == 0 && touchPoints < 2) {
@@ -336,7 +364,7 @@ function draw() {
                     } else {
                         if (originalPixel) cancelColour(myImgData, originalPixel);
                         originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
-                        redraw(myImgData, currentZoom);        
+                        redraw();        
                         hasSelectedPixel = true;
                         
                         if (Math.floor(numberOfAccumulatedPixels.getPixels()) > 0) {
@@ -467,7 +495,7 @@ function draw() {
         imgData.data[i+1] = originalPixel.g;
         imgData.data[i+2] = originalPixel.b;
         imgData.data[i+3] = originalPixel.a;
-        redraw(imgData, currentZoom);
+        redraw();
     }
 
     canvas.addEventListener('mousemove', displayCoords);
@@ -499,7 +527,7 @@ function draw() {
         console.log(grid)
         try{
             bitfieldToImgData(grid);
-            redraw(myImgData, currentZoom);
+            redraw();
         } catch (err) {
             console.log(err)
         }
