@@ -155,6 +155,8 @@ function draw() {
 
     httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
     httpGetAsync("https://tplace.xyz/api/grid", bitfieldToImgData);
+    // httpGetAsync(`http://192.168.99.100:5000/api/user/${userId}`, initUserVariables);
+    // httpGetAsync("http://192.168.99.100:5000/api/grid", bitfieldToImgData);
 
     function redraw(imgData, scale) {
         // TODO: I THINK CAN REMOVE THE PARAMETERS CUZ I JUST USE myImgData and currentZoom all the time?
@@ -442,7 +444,8 @@ function draw() {
 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
-        xhr.open("POST", url, true); 
+        // let url = `http://192.168.99.100:5000/api/grid/${chatId}/${userId}`;
+        xhr.open("POST", url, true);
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
         let newLastUpdatedTime = new Date();
