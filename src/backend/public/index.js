@@ -125,7 +125,11 @@ function draw() {
     let chatId;
 
     function initUserVariables(userVariables) {
-        console.log(userVariables);
+        // console.log(userVariables);
+        if (!userVariables) {
+            alert("Something went wrong when trying to check the user details. No user was found. Contact the" +
+                " developers for assistance.");
+        }
         chatId = userVariables["group_id"];
         oldLastUpdatedTime = userVariables["last_updated"];
 

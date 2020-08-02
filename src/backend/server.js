@@ -222,10 +222,11 @@ app.post("/api/grid/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
 
-  const user = await db.getUserByTelegramId(userId)
-
   // Verifies that the user exists in the database
-  if (user === null) {
+  let user;
+  try {
+    user = await db.getUserByTelegramId(userId)
+  } catch (Error) {
     res.status(401).send("User does not exist in the database.")
   }
 
