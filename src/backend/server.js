@@ -86,6 +86,7 @@ if (!databaseDeployed) {
       console.log("\n\n\nCRITICAL DATABASE ERROR: The database must be re-initialized.\n\n\n");
     }
   });
+  redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 }
 
 // Start Schedule
@@ -93,7 +94,7 @@ startNotificationSchedule().then(r => console.log('Notification schedule started
 
 setInterval(() => {
   backupRedisToDatabase();
-}, 300000);
+}, 10000);
 
 // Allow CORS
 app.use(function (req, res, next) {
