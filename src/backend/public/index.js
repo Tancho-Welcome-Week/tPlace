@@ -5,13 +5,13 @@ let countdownSec = document.getElementById("countdown-s");
 let countdownMin = document.getElementById("countdown-m");
 let accPixels = document.getElementById("accPixels");
 let canvas = document.getElementById('canvas');
-let hammertime = new Hammer(canvas);
 let maxAccPixelCount = document.getElementById('maxAccPixelCount').innerHTML = MAXIMUM_ACCUMULATED_PIXEL_COUNT;
+let hammertime = new Hammer(canvas);
 hammertime.get('pinch').set({enable: true});
 
 let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
 
-let cooldownTime = ACCUMULATED_PIXEL_GAP; // in seconds
+let cooldownTime = COOLDOWN_TIME; // in seconds
 
 // these will change with zooming and scrolling around
 let currentZoom = 1; // default zoom is 2
@@ -29,7 +29,7 @@ let currentColour = "RED";
 let displayToCanvasScale;
 let currentDisplay;
 
-var clicked = false;
+let clicked = false;
 
 // Resizing Canvas
 function scaleCanvas() {
@@ -38,11 +38,11 @@ function scaleCanvas() {
         canvas.setAttribute('height', '490');
         currentDisplay = "Desktop";
     } else {
-        canvas.setAttribute('width', 0.9*vw);
-        canvas.setAttribute('height', 0.9*vw);
+        canvas.setAttribute('width', (0.9 * vw).toString());
+        canvas.setAttribute('height', (0.9 * vw).toString());
         currentDisplay = "Mobile";
     }
-    console.log(currentDisplay);
+    // console.log(currentDisplay);
 }
 scaleCanvas();
 
@@ -76,9 +76,11 @@ function draw() {
         let xmlHttp = new XMLHttpRequest();
 
         xmlHttp.onload = function() { 
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 callback(xmlHttp.response);
+            }
         }
+
         xmlHttp.open("GET", theUrl, true);
         xmlHttp.responseType = "json";
         xmlHttp.send(null);
@@ -120,16 +122,20 @@ function draw() {
     let chatId;
 
     function initUserVariables(userVariables) {
-        console.log(userVariables);
+        // console.log(userVariables);
+        if (!userVariables) {
+            alert("Something went wrong when trying to check the user details. No user was found. Contact the" +
+                " developers for assistance.");
+        }
         chatId = userVariables["group_id"];
         oldLastUpdatedTime = userVariables["last_updated"];
 
         numberOfAccumulatedPixels.setPixels(userVariables["accumulated_pixels"]);
         const lastUpdated = new Date(userVariables["last_updated"]);
         const gap = new Date() - lastUpdated; // in ms
-        numberOfAccumulatedPixels.addPixels(Math.floor(gap / ACCUMULATED_PIXEL_GAP));
-        console.log("initialised number of pixels: ");
-        console.log(gap + "ms");
+        numberOfAccumulatedPixels.addPixels(Math.floor(gap / COOLDOWN_TIME));
+        // console.log("initialised number of pixels: ");
+        // console.log(gap + "ms");
         updateAccPixels();
         
         startTime = new Date();
@@ -140,7 +146,7 @@ function draw() {
             updateAccPixels();
             accumulatePixels();
             startCountdown();
-            console.log(gap % cooldownTime + "ms passed, starting accumulate pixel function");
+            // console.log(gap % cooldownTime + "ms passed, starting accumulate pixel function");
         }, (cooldownTime - gap % cooldownTime));
         if (numberOfAccumulatedPixels.getPixels() === 0) {
             startCountdown();
@@ -149,6 +155,8 @@ function draw() {
 
     httpGetAsync(`https://tplace.xyz/api/user/${userId}`, initUserVariables);
     httpGetAsync("https://tplace.xyz/api/grid", bitfieldToImgData);
+    // httpGetAsync(`http://192.168.99.100:5000/api/user/${userId}`, initUserVariables);
+    // httpGetAsync("http://192.168.99.100:5000/api/grid", bitfieldToImgData);
 
     function getOperatingSystem() {
         var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -177,7 +185,6 @@ function draw() {
             }
         }
         
-        // TODO: I THINK CAN REMOVE THE PARAMETERS CUZ I JUST USE myImgData and currentZoom all the time?
         // clear canvas
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
@@ -214,7 +221,7 @@ function draw() {
     }
     function handleScroll(event) {
         [absX, absY] = getCurrentCoords(event);
-        console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
+        // console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
         let delta = event.wheelDelta ? event.wheelDelta/40 : event.deltaY ? -event.deltaY : 0;
         if (delta) {
             zoom(delta, absX, absY);
@@ -258,7 +265,7 @@ function draw() {
     let touchPoints = 0;
 
     function downDrag(evt) {
-        if (pinchChk === true || evt.button != 0) return;
+        if (pinchChk || evt.button !== 0) return;
         document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -268,7 +275,7 @@ function draw() {
         // console.log(touchPoints);
     }
     function moveDrag(evt) {
-        if (dragged && pinchChk === false && touchPoints < 2) {
+        if (dragged && !pinchChk && touchPoints < 2) {
             const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
             const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
             const deltaX = currX - lastX;
@@ -284,13 +291,13 @@ function draw() {
         }
 
         // Hover Pixels (not on touch interfaces)
-        if (evt.metaKey == false) {
-            if (originalPixel && hasSelectedPixel == false) {
+        if (!evt.metaKey) {
+            if (originalPixel && !hasSelectedPixel) {
                 cancelColour(myImgData, originalPixel);
             }
             var [x, y] = getCurrentCoords(evt);
             if (!(x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT)) {
-                if (hasSelectedPixel == false) { 
+                if (!hasSelectedPixel) {
                     originalPixel = putColour([x, y], myImgData); // destructively changes myImgData but returned "backup" of changed pixel
                     redraw();  
                 }
@@ -304,15 +311,15 @@ function draw() {
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 
-        if (originalPixel && hasSelectedPixel == false) {
+        if (originalPixel && !hasSelectedPixel) {
             cancelColour(myImgData, originalPixel);
         }
-        if (dragged == true) {
+        if (dragged) {
             const totalDeltaX = currX - dragStart.x;
             const totalDeltaY = currY - dragStart.y;
             if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
                 // END DRAG; updating canvas
-                if (pinchChk === false && touchPoints == 1) {
+                if (!pinchChk && touchPoints === 1) {
                     startX -= (currX - lastX)/displayToCanvasScale / currentZoom;
                     startY -= (currY - lastY)/displayToCanvasScale / currentZoom;
                     redraw();
@@ -321,14 +328,14 @@ function draw() {
             }
             dragged = false;
         }
-        if (touchPoints != 0) touchPoints = 0;
+        if (touchPoints !== 0) touchPoints = 0;
     }
 
     function upDrag(evt) {
         const minDelta = 5; // i.e. more than 5 pixels movement consider drag
         const currX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
         const currY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-        if (dragged == true) {
+        if (dragged) {
             const totalDeltaX = currX - dragStart.x;
             const totalDeltaY = currY - dragStart.y;
             if (Math.abs(totalDeltaX) > minDelta || Math.abs(totalDeltaY) > minDelta) {
@@ -340,11 +347,11 @@ function draw() {
                     redraw();
                 }            
                 dragStart = null;
-            } else if (evt.button == 0 && touchPoints < 2) {
+            } else if (evt.button === 0 && touchPoints < 2) {
                 // CLICK    
                 if (hasSelectedPixel) {
                     // if there's already a selected pixel, other clicks will be ignored
-                    console.log("there is already a selected pixel");
+                    // console.log("there is already a selected pixel");
                 } else {
                     clicked = true;
                     const [x, y] = getCurrentCoords(evt);
@@ -376,7 +383,7 @@ function draw() {
                             let confirmBtn = document.getElementById("confirm");
                             confirmBtn.onclick = function() {
                                 confirmColour(x, y, chatId, userId);
-                                console.log(x, y);
+                                // console.log(x, y);
                                 if (Math.floor(numberOfAccumulatedPixels.getPixels()) === 0) {
                                     // last accumulated pixel just used
                                     startCountdown();
@@ -454,7 +461,7 @@ function draw() {
     canvas.addEventListener("touchcancel", touchHandler, true);    
 
     function confirmColour(x, y, chatId, userId) { 
-        console.log("Confirmed colour");
+        // console.log("Confirmed colour");
         let cfm_popup = document.getElementById("confirm-popup");
         cfm_popup.classList.toggle('show');
         numberOfAccumulatedPixels.subtractPixels(1);
@@ -463,7 +470,8 @@ function draw() {
 
         let xhr = new XMLHttpRequest();
         let url = `https://tplace.xyz/api/grid/${chatId}/${userId}`;
-        xhr.open("POST", url, true); 
+        // let url = `http://192.168.99.100:5000/api/grid/${chatId}/${userId}`;
+        xhr.open("POST", url, true);
         xhr.setRequestHeader("Content-Type", "application/json"); 
 
         let newLastUpdatedTime = new Date();
@@ -471,7 +479,7 @@ function draw() {
             "newLastUpdatedTime": newLastUpdatedTime, "accPixels": numberOfAccumulatedPixels.getPixels(),
             "color": ColorBinary[currentColour] });
         oldLastUpdatedTime = newLastUpdatedTime
-        console.log(data);
+        // console.log(data);
         xhr.onreadystatechange = function () {
             // In local files, status is 0 upon success in Mozilla Firefox
             if(xhr.readyState === XMLHttpRequest.DONE) {
@@ -511,7 +519,7 @@ function draw() {
             }
             previousColour = number;
             currentColour = ColorIndex[number]; // string of colour name e.g. "RED"
-            console.log(currentColour + " selected");
+            // console.log(currentColour + " selected");
         };
     }
     for (let n=0; n<16; n++) {
@@ -520,10 +528,8 @@ function draw() {
 
     updateAccPixels();
 
-    // let potato = io({transports: ['websocket'], upgrade: false})
-    // let socket = potato.connect();
     socket.on('grid', function(grid){
-        console.log(grid)
+        // console.log(grid)
         try{
             bitfieldToImgData(grid);
             redraw();
@@ -535,14 +541,14 @@ function draw() {
 
 
 function updateAccPixels() {
-    console.log(numberOfAccumulatedPixels.getPixels());
+    // console.log(numberOfAccumulatedPixels.getPixels());
     accPixels.innerText = Math.floor(numberOfAccumulatedPixels.getPixels()).toString();
 }
 
 
 function accumulatePixels() {
     let increaseAccPixels = setInterval(function() {
-        console.log(new Date()-startTime);
+        // console.log(new Date()-startTime);
         startTime = new Date();
         numberOfAccumulatedPixels.addPixels(1);
         updateAccPixels();
@@ -556,7 +562,7 @@ function startCountdown() {
         let elapsed = new Date() - startTime; // in ms
         let frac = 1 - ((elapsed % cooldownTime) / cooldownTime); // fraction of cooldownTime left till next pixel
         let secs = Math.floor(frac * cooldownTime/1000); 
-        console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
+        // console.log("Elapsed timing: " + elapsed + "\n Countdown starting with ", frac, secs);
         let mins = Math.floor(secs / 60);
         let secsDisp = secs % 60;
         // setInterval takes one second to start 
@@ -606,7 +612,7 @@ function getCurrentCoords(event) {
 
 
 function displayCoords(event) {
-    if (clicked == false) {
+    if (!clicked) {
         [x, y] = getCurrentCoords(event);
         xCoordDisplay.innerText = (x >= CANVAS_WIDTH || x < 0 ? "NA" : x + 1);
         yCoordDisplay.innerText = (y >= CANVAS_HEIGHT || y < 0 ? "NA" : y + 1);
