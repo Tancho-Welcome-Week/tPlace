@@ -76,16 +76,17 @@ if (!databaseDeployed) {
   backupRedisToDatabase();
 } else {
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
-  db.getLatestCanvas().catch((err) => {}).then((result) => {
-    try {
-      const bitfield = result["bitfield"];
-      redisManager.setCanvas(bitfield).then(() => {
-        console.log("Re-initialized Redis with a pre-saved canvas.");
-      })
-    } catch (e) {
-      console.log("\n\n\nCRITICAL DATABASE ERROR: The database must be re-initialized.\n\n\n");
-    }
-  });
+  backupRedisToDatabase();
+  // db.getLatestCanvas().catch((err) => {}).then((result) => {
+  //   try {
+  //     const bitfield = result["bitfield"];
+  //     redisManager.setCanvas(bitfield).then(() => {
+  //       console.log("Re-initialized Redis with a pre-saved canvas.");
+  //     })
+  //   } catch (e) {
+  //     console.log("\n\n\nCRITICAL DATABASE ERROR: The database must be re-initialized.\n\n\n");
+  //   }
+  // });
 }
 
 // Start Schedule
