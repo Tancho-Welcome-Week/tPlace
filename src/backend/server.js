@@ -11,9 +11,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 // Redis
-const redis = require("redis");
 const canvas = require("./redis_js/canvas.js");
-const redis_commons = require("./redis_js/commons.js");
 
 // Notification Scheduler
 const startNotificationSchedule = require("./scheduler/schedule");
@@ -40,11 +38,27 @@ io.on("connection", () => {
   console.log("A user is connected");
 });
 
+// Verify environmental constants
+function convertToBoolean(parameter) {
+  if (parameter.toString() === "true") {
+    return true;
+  } else if (parameter.toString() === "false") {
+    return false;
+  } else {
+    throw Error("Parameter " + parameter + " does not contain a valid value (i.e. true or false)");
+  }
+}
+
+const isBeta = convertToBoolean(keys.isBeta);
+const isWhitelistPeriod = convertToBoolean(keys.isWhitelistPeriod);
+const databaseDeployed = convertToBoolean(keys.databaseDeployed);
+
 // Initialize Redis
 const redisManager = new canvas.RedisManager(canvas_commons.CANVAS_NAME);
 
 // Initialize Database
-if (!keys.databaseDeployed) {
+if (!databaseDeployed) {
+  console.log("Initializing database...");
   db.initDatabase();
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 } else {
@@ -71,9 +85,6 @@ setInterval(() => {
     }
   })
 }, 300000);
-
-// Flag for whitelisting
-const isWhitelistPeriod = keys.isWhitelistPeriod || false;
 
 // Allow CORS
 app.use(function (req, res, next) {
@@ -273,7 +284,7 @@ app.get("/api/user/:userId", async (req, res) => {
 app.get("/start/:chatId/:userId", async (req, res) => {
   const chatId = req.params.chatId;
   const userId = req.params.userId;
-  const isPermitted = keys.isBeta || await auth.authenticateChatId(chatId);
+  const isPermitted = isBeta || await auth.authenticateChatId(chatId);
   if (!isPermitted) {
     res.sendStatus(401);
     return
@@ -281,7 +292,7 @@ app.get("/start/:chatId/:userId", async (req, res) => {
   let user = await db.getUserByTelegramId(userId);
   let whitelist = await db.getWhitelistByGroupId(chatId);
   if (!user) {
-    if (keys.isBeta && !whitelist) {
+    if (isBeta && !whitelist) {
       await db.addWhitelistGroupId(chatId);
     }
 
