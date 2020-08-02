@@ -98,28 +98,6 @@ bot.command('on', ctx => {
             ctx.reply(`Unicorns! Looks like an error has occurred. Contact @Khairoulll for more info`)
         })
 })
-// bot.command('whitelist', (ctx) => {
-//     const chatId = ctx.update.message.chat.id
-//     const url = `${appEntry}/whitelist`
-//     axios.post(url, {chatId: chatId})
-//         .then(res => {
-//             if (res.status === 200) {
-//                 ctx.reply('This chat group has been successfully whitelisted!')
-//             } else {
-//                 ctx.reply('Uh oh looks like the whitelist period is up. Contact @Khairoulll for more info')
-//             }
-//         })
-//         .catch(err => {
-//             ctx.reply(`Unicorns! Looks like an error has occured. Contact @Khairoulll for more info`)
-//         })
-// })
-
-// bot.command('f', (ctx) => {
-//     ctx.reply('Your respect has been forwarded to the creators')
-//     const message = `${ctx.update.message.from.first_name} has paid us compliments`
-//     ctx.telegram.sendMessage(-484684580, message)
-// })
-
 
 bot.on('callback_query', ctx => {
     const query = ctx.callbackQuery;
