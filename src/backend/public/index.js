@@ -165,7 +165,6 @@ function draw() {
     
     function redraw() {
         if (getOperatingSystem() == "iOS") {
-            console.log("iOS");
             // Check if entire drawing can appear on canvas; if not, adjust accordingly.
             if (startX < 0) startX = 0;
             if (startY < 0) startY = 0;
