@@ -63,12 +63,16 @@ if (!databaseDeployed) {
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
 } else {
   redisManager.initializeBlankCanvas(canvas_commons.CANVAS_WIDTH, canvas_commons.CANVAS_HEIGHT, canvas_commons.PIXEL_FORMAT);
-  db.getLatestCanvas().then((result) => {
-    const bitfield = result["bitfield"];
-    redisManager.setCanvas(bitfield).then(() => {
-      console.log("Re-initialized Redis with a pre-saved canvas.");
+  try {
+    db.getLatestCanvas().then((result) => {
+      const bitfield = result["bitfield"];
+      redisManager.setCanvas(bitfield).then(() => {
+        console.log("Re-initialized Redis with a pre-saved canvas.");
+      });
     });
-  });
+  } catch (TypeError) {
+    console.log("Re-initialized Redis with a blank canvas due to no canvas found in database.");
+  }
 }
 
 // Start Schedule
