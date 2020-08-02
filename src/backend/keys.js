@@ -12,7 +12,7 @@ module.exports = {
   isBeta: process.env.BETA,
   botToken: process.env.BOT_TOKEN,
   databaseDeployed: process.env.DEPLOYED_DATABASE,
-  adminUserId: ADMIN_CHATID,
+  adminUserId: process.env.ADMIN_CHATID,
   hiddenLargeConstant: 865069
 };
 // This is a necessary comment
