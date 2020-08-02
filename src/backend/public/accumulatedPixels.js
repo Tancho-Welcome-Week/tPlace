@@ -1,10 +1,9 @@
 class accumulatedPixels {
 
     constructor(initialCount) {
-        console.log("Initialising pixel count");
-        // this.currentPixelCount = initialCount;
+        // console.log("Initialising pixel count");
         this.MAX_PIXEL_COUNT = MAXIMUM_ACCUMULATED_PIXEL_COUNT;
-        this.currentPixelCount = 0;
+        this.currentPixelCount = initialCount;
     }
 
     addPixels(pixelsToAdd) {
@@ -44,6 +43,3 @@ class accumulatedPixels {
     }
 
 }
-
-
-const ACCUMULATED_PIXEL_GAP = (5*60*1000);
