@@ -1,6 +1,16 @@
 # tPlace 
 [![Build Status](https://travis-ci.org/Tancho-Welcome-Week/tPlace.svg?branch=master)](https://travis-ci.org/Tancho-Welcome-Week/tPlace)
 
+## Canvas Photos
+
+### Iteration 1
+![](resources/tPlaceSeniors.png)
+
+### Iteration 2
+![](resources/tPlaceFinal.png)
+
+## Background
+
 tPlace is a recreation of Reddit's [r/place](https://en.wikipedia.org/wiki/Place_(Reddit)) for Tembusu Welcome Week 2020.
 This implementation takes heavy inspiration from 
 [this blogpost](https://redditblog.com/2017/04/13/how-we-built-rplace/) by Reddit.
