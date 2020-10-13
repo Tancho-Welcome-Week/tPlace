@@ -3,9 +3,13 @@
 
 ## Canvas Photos
 
+### Iteration 1
 ![](resources/tPlaceSeniors.png)
 
+### Iteration 2
 ![](resources/tPlaceFinal.png)
+
+## Background
 
 tPlace is a recreation of Reddit's [r/place](https://en.wikipedia.org/wiki/Place_(Reddit)) for Tembusu Welcome Week 2020.
 This implementation takes heavy inspiration from 
