@@ -16,7 +16,7 @@
     "test": "mocha test --exit"
   },
   "devDependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "mocha": "^8.1.0",
     "socket.io": "^2.3.0",
