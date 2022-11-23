@@ -7,7 +7,7 @@
     "nodemon": "^2.0.4",
     "pg": "8.0.3",
     "redis": "3.0.2",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "telegraf": "^3.38.0"
   },
   "scripts": {
@@ -19,7 +19,7 @@
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "mocha": "^8.1.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "supertest": "^4.0.2",
     "telegraf-inline-menu": "^5.0.0"
   }
